@@ -1,58 +1,100 @@
+import { ArrowUpRight, MapPin, Circle } from 'lucide-react';
 import ifroLogo from '../assets/logos/logo-ifro-branca-white-branco.png.webp';
 
 export default function Footer() {
     return (
-      <footer className="bg-black text-gray-400 py-16 font-sans border-t border-gray-900">
-        <div className="max-w-7xl mx-auto px-6">
-          
-          <div className="grid md:grid-cols-3 gap-12 mb-12">
-            
-            {/* Column 1: Brand */}
-            <div>
-              <h2 className="text-2xl text-white font-bold mb-4 tracking-tight">FEDERADA</h2>
-              <p className="max-w-sm text-sm leading-relaxed mb-6">
-                Atlética de Análise e Desenvolvimento de Sistemas.<br/>
-                IFRO - Campus Ji-Paraná.
-              </p>
-              
-              <img src={ifroLogo} alt="IFRO Logo" className="h-10 opacity-60 mb-6 hover:opacity-100 transition-opacity" />
+      <footer className="bg-black text-white pt-24 pb-8 overflow-hidden relative">
+        
+        {/* Massive Background Signature */}
+        <div className="absolute bottom-[-5%] left-0 w-full select-none pointer-events-none opacity-10">
+            <h1 className="text-[15vw] leading-none font-bold text-center tracking-tighter text-transparent stroke-text">
+                FEDERADA
+            </h1>
+        </div>
 
-              <div className="text-xs text-gray-500">
-                Fundada em 2024
+        <div className="max-w-7xl mx-auto px-6 relative z-10">
+          
+          <div className="grid md:grid-cols-12 gap-12 border-b border-white/20 pb-16 mb-12">
+            
+            {/* Brand Section (Cols 1-5) */}
+            <div className="md:col-span-5 space-y-8">
+              <div>
+                <h2 className="text-3xl font-bold tracking-wide mb-2">ATLÉTICA DE ADS</h2>
+                <p className="text-gray-400 font-sans text-lg leading-relaxed">
+                  Fomentando tecnologia, esporte e integração no IFRO Campus Ji-Paraná desde 2024.
+                </p>
+              </div>
+              
+              <div className="flex items-center gap-6">
+                <img src={ifroLogo} alt="IFRO Logo" className="h-12 opacity-80 hover:opacity-100 transition-opacity" />
+                <div className="h-8 w-[1px] bg-white/20"></div>
+                <div className="text-xs text-gray-500 font-mono uppercase">
+                  Parceiro<br/>Institucional
+                </div>
               </div>
             </div>
-    
-            {/* Column 2: Navigation */}
-            <div>
-               <h3 className="text-white font-bold mb-4 uppercase text-sm tracking-wider">Navegação</h3>
-               <ul className="space-y-3 text-sm">
-                 <li><a href="#" className="hover:text-white transition-colors">Início</a></li>
-                 <li><a href="#merch" className="hover:text-white transition-colors">Loja Oficial</a></li>
-                 <li><a href="#news" className="hover:text-white transition-colors">Notícias</a></li>
-                 <li><a href="#about" className="hover:text-white transition-colors">Quem Somos</a></li>
-               </ul>
-            </div>
 
-            {/* Column 3: Contact */}
-            <div>
-                <h3 className="text-white font-bold mb-4 uppercase text-sm tracking-wider">Contato & Social</h3>
-                <ul className="space-y-3 text-sm">
-                    <li><a href="#" className="hover:text-white transition-colors flex items-center gap-2">Instagram</a></li>
-                    <li><a href="#" className="hover:text-white transition-colors flex items-center gap-2">WhatsApp</a></li>
-                    <li><a href="#" className="hover:text-white transition-colors flex items-center gap-2">Email</a></li>
+            {/* Links Section (Cols 6-9) */}
+            <div className="md:col-span-3 md:col-start-7">
+                <h3 className="font-mono text-xs text-gray-500 mb-6 uppercase tracking-widest">// NAVEGAÇÃO</h3>
+                <ul className="space-y-4 font-bold text-xl">
+                    {['INÍCIO', 'LOJA OFICIAL', 'NOTÍCIAS', 'SOBRE NÓS'].map((item, i) => (
+                        <li key={i}>
+                            <a href="#" className="group flex items-center gap-2 hover:text-gray-300 transition-colors">
+                                <span className="w-0 group-hover:w-4 h-[2px] bg-white transition-all duration-300"></span>
+                                {item}
+                            </a>
+                        </li>
+                    ))}
                 </ul>
             </div>
-    
+
+            {/* Contact/Social (Cols 10-12) */}
+            <div className="md:col-span-3">
+                <h3 className="font-mono text-xs text-gray-500 mb-6 uppercase tracking-widest">// CONEXÃO</h3>
+                <ul className="space-y-4">
+                    <li>
+                        <a href="#" className="flex items-center justify-between border-b border-white/10 pb-2 group hover:border-white transition-colors">
+                            <span>INSTAGRAM</span>
+                            <ArrowUpRight size={18} className="group-hover:-translate-y-1 group-hover:translate-x-1 transition-transform" />
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" className="flex items-center justify-between border-b border-white/10 pb-2 group hover:border-white transition-colors">
+                            <span>WHATSAPP</span>
+                            <ArrowUpRight size={18} className="group-hover:-translate-y-1 group-hover:translate-x-1 transition-transform" />
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" className="flex items-center justify-between border-b border-white/10 pb-2 group hover:border-white transition-colors">
+                            <span>GITHUB</span>
+                            <ArrowUpRight size={18} className="group-hover:-translate-y-1 group-hover:translate-x-1 transition-transform" />
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
           </div>
           
-          <div className="pt-8 border-t border-gray-900 flex flex-col md:flex-row justify-between items-center text-xs text-gray-600 gap-4">
-            <div>
-              © 2026 FEDERADA. Todos os direitos reservados.
+          {/* Bottom Bar: Tech Details */}
+          <div className="flex flex-col md:flex-row justify-between items-end md:items-center gap-6 font-mono text-xs text-gray-500">
+            
+            <div className="flex flex-col gap-1">
+                <div className="flex items-center gap-2">
+                    <MapPin size={12} />
+                    <span>JI-PARANÁ, RO - BRASIL</span>
+                </div>
+                <span>LAT: -10.87, LONG: -61.95</span>
             </div>
-            <div className="flex items-center gap-2">
-                <div className="w-2 h-2 rounded-full bg-green-500"></div>
-                <span>Sistemas Operacionais</span>
+
+            <div className="flex flex-col md:items-end gap-1">
+                <div className="flex items-center gap-2 text-green-500">
+                    <Circle size={8} fill="currentColor" className="animate-pulse" />
+                    <span>SYSTEM STATUS: ONLINE</span>
+                </div>
+                <span>© 2026 FEDERADA. ALL RIGHTS RESERVED.</span>
             </div>
+
           </div>
 
         </div>
