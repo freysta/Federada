@@ -1,80 +1,75 @@
-import { Instagram, ArrowUpRight } from 'lucide-react';
+import { useEffect } from 'react';
 import FadeIn from './FadeIn';
-import img1 from '../assets/urso.jpg';
-import img2 from '../assets/merchs/camiseta-atletica-v1-front.jpg';
-import img3 from '../assets/membros/hyago.png';
-import img4 from '../assets/membros/gabriel.jpg';
-
-const moments = [
-  { id: 1, image: img1, caption: 'NOSSA IDENTIDADE' },
-  { id: 2, image: img2, caption: 'NOVA COLEÇÃO' },
-  { id: 3, image: img3, caption: 'GESTÃO 2026' },
-  { id: 4, image: img4, caption: 'ESPORTES' },
-];
 
 export default function Gallery() {
+  useEffect(() => {
+    // Carrega o script do Instagram se ele ainda não existir
+    if (!document.getElementById('instagram-embed-script')) {
+      const script = document.createElement('script');
+      script.id = 'instagram-embed-script';
+      script.src = "https://www.instagram.com/embed.js";
+      script.async = true;
+      document.body.appendChild(script);
+    } else {
+      // Se já existir, força o re-processamento do post
+      // @ts-ignore
+      if (window.instgrm) {
+        // @ts-ignore
+        window.instgrm.Embeds.process();
+      }
+    }
+  }, []);
+
   return (
-    <section className="py-24 bg-white border-t border-black" id="gallery">
+    <section className="py-24 bg-neutral-50 border-t border-black" id="gallery">
       <div className="max-w-7xl mx-auto px-6">
         
         <FadeIn>
-          <div className="flex flex-col md:flex-row justify-between items-end mb-12">
-            <div>
-              <h2 className="text-4xl md:text-5xl tracking-normal mb-2">
-                <span className="glitch" data-text="LEGADO FEDERADA">LEGADO FEDERADA</span>
-              </h2>
-              <p className="text-gray-500 font-sans text-lg">Acompanhe nossa rotina no Instagram.</p>
-            </div>
-            <a 
-              href="https://instagram.com/federadaifro" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="hidden md:flex items-center gap-2 text-sm font-bold border-b border-black pb-1 hover:text-gray-600 transition-colors"
-            >
-              <Instagram size={16} />
-              @FEDERADAIFRO
-            </a>
+          <div className="text-center mb-16">
+            <h2 className="text-4xl md:text-5xl mb-4 uppercase">
+                <span className="glitch" data-text="INSTAGRAM FEED">INSTAGRAM FEED</span>
+            </h2>
+            <p className="text-gray-500 font-sans text-lg">Acompanhe as últimas novidades direto da fonte.</p>
           </div>
         </FadeIn>
 
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {moments.map((moment, i) => (
-            <FadeIn key={moment.id} delay={i * 100}>
-              <a 
-                href="https://instagram.com/federadaifro"
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="group relative aspect-square overflow-hidden cursor-pointer bg-neutral-100 border border-gray-200 block"
-              >
-                {/* Image */}
-                <img 
-                    src={moment.image} 
-                    alt={moment.caption} 
-                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 grayscale group-hover:grayscale-0"
-                />
-                
-                {/* Overlay Info */}
-                <div className="absolute inset-0 flex flex-col justify-end p-6 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                  <span className="text-white font-bold text-lg tracking-wide mb-1">{moment.caption}</span>
-                  <div className="flex items-center gap-2 text-white/80 text-xs font-mono">
-                    <span>VER POST</span>
-                    <ArrowUpRight size={12} />
-                  </div>
-                </div>
-              </a>
+        {/* Grid de Posts Incorporados */}
+        <div className="grid md:grid-cols-2 gap-8 justify-items-center">
+            
+            {/* Post 1 - Campeonato de Jogos Eletrônicos (CAADS) */}
+            <FadeIn delay={100} className="w-full max-w-[540px]">
+                <blockquote 
+                    className="instagram-media" 
+                    data-instgrm-captioned
+                    data-instgrm-permalink="https://www.instagram.com/p/DNYkM3IpT1U/" 
+                    data-instgrm-version="14"
+                    style={{ background: '#FFF', border: '0', borderRadius: '3px', boxShadow: '0 0 1px 0 rgba(0,0,0,0.5),0 1px 10px 0 rgba(0,0,0,0.15)', margin: '1px', width: 'calc(100% - 2px)' }}
+                >
+                </blockquote>
             </FadeIn>
-          ))}
+
+            {/* Post 2 - Post Recente Federada */}
+            <FadeIn delay={300} className="w-full max-w-[540px]">
+                <blockquote 
+                    className="instagram-media" 
+                    data-instgrm-captioned
+                    data-instgrm-permalink="https://www.instagram.com/p/DT6UdNAjmQV/" 
+                    data-instgrm-version="14"
+                    style={{ background: '#FFF', border: '0', borderRadius: '3px', boxShadow: '0 0 1px 0 rgba(0,0,0,0.5),0 1px 10px 0 rgba(0,0,0,0.15)', margin: '1px', width: 'calc(100% - 2px)' }}
+                >
+                </blockquote>
+            </FadeIn>
+
         </div>
 
-        <div className="mt-12 text-center md:hidden">
+        <div className="mt-16 text-center">
             <a 
-              href="https://instagram.com/federadaifro" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 text-sm font-bold border border-black px-6 py-3 hover:bg-black hover:text-white transition-colors"
+                href="https://instagram.com/federadaifro" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-4 bg-black text-white px-8 py-4 font-bold hover:bg-neutral-800 transition-all"
             >
-              <Instagram size={16} />
-              SEGUIR NO INSTAGRAM
+                VER PERFIL COMPLETO NO INSTAGRAM
             </a>
         </div>
 
