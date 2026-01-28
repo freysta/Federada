@@ -1,31 +1,5 @@
 import { Calendar, ArrowUpRight } from 'lucide-react';
-
-const news = [
-  {
-    id: 1,
-    type: 'IMPORTANTE',
-    date: '25/01/2026',
-    title: 'RENOVAÇÃO DE MATRÍCULA',
-    excerpt: 'Prazo final para rematrícula via SUAP. Não perca o acesso ao servidor.',
-    link: '#'
-  },
-  {
-    id: 2,
-    type: 'NOVIDADE',
-    date: '10/02/2026',
-    title: 'PARCERIA: ALURA & ORACLE',
-    excerpt: 'Novos tokens de acesso para cursos de Cloud Computing disponíveis para membros.',
-    link: '#'
-  },
-  {
-    id: 3,
-    type: 'EVENTO',
-    date: '20/02/2026',
-    title: 'HACKATHON IFRO: INSCRIÇÕES',
-    excerpt: 'Monte seu time e participe. Stack sugerida: React/Node.',
-    link: '#'
-  }
-];
+import { newsData } from '../data/news';
 
 export default function NewsSection() {
   return (
@@ -34,12 +8,12 @@ export default function NewsSection() {
         
         <div className="flex items-center gap-4 mb-12">
             <div className="w-3 h-3 bg-red-500 animate-pulse rounded-full"></div>
-            <h2 className="text-4xl tracking-tighter">CENTRAL DE NOTÍCIAS</h2>
+            <h2 className="text-4xl tracking-normal">CENTRAL DE NOTÍCIAS</h2>
             <span className="font-mono text-xs text-gray-400">ATUALIZAÇÕES DO C.A.</span>
         </div>
 
         <div className="grid gap-6">
-            {news.map((item) => (
+            {newsData.map((item) => (
                 <div key={item.id} className="group relative bg-white border border-gray-200 p-6 hover:border-black transition-all duration-300 shadow-sm hover:shadow-md cursor-pointer">
                     <div className="absolute top-0 left-0 w-1 h-full bg-gray-200 group-hover:bg-black transition-colors"></div>
                     
@@ -73,4 +47,5 @@ export default function NewsSection() {
     </section>
   );
 }
+
 

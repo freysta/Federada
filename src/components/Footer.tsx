@@ -1,3 +1,5 @@
+import ifroLogo from '../assets/logos/logo-ifro-branca-white-branco.png.webp';
+
 export default function Footer() {
     return (
       <footer className="bg-black text-gray-400 py-16 font-sans border-t border-gray-900">
@@ -12,6 +14,9 @@ export default function Footer() {
                 Atlética de Análise e Desenvolvimento de Sistemas.<br/>
                 IFRO - Campus Ji-Paraná.
               </p>
+              
+              <img src={ifroLogo} alt="IFRO Logo" className="h-10 opacity-60 mb-6 hover:opacity-100 transition-opacity" />
+
               <div className="text-xs text-gray-500">
                 Fundada em 2024
               </div>

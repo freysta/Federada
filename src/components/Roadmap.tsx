@@ -31,7 +31,7 @@ export default function Roadmap() {
       <div className="absolute inset-0 opacity-10 pointer-events-none" style={{ backgroundImage: 'linear-gradient(#333 1px, transparent 1px), linear-gradient(90deg, #333 1px, transparent 1px)', backgroundSize: '40px 40px' }}></div>
 
       <div className="max-w-4xl mx-auto px-6 relative z-10">
-        <h2 className="text-4xl md:text-5xl mb-16 text-center tracking-tighter">
+        <h2 className="text-4xl md:text-5xl mb-16 text-center tracking-normal">
             CALENDÁRIO <br/>
             DE EVENTOS
         </h2>

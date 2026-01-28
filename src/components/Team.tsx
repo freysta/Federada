@@ -29,14 +29,13 @@ export default function Team() {
         {/* Manifesto */}
         <div className="grid md:grid-cols-2 gap-16 mb-24">
             <div>
-                <h2 className="text-4xl md:text-5xl tracking-tighter mb-8">STACK MEMBERS</h2>
+                <h2 className="text-4xl md:text-5xl tracking-normal mb-8">EQUIPE FEDERADA</h2>
                 <span className="font-mono text-xs block mb-2">// QUEM SOMOS</span>
             </div>
             <div>
-                <p className="font-serif text-2xl md:text-3xl leading-relaxed text-gray-800">
+                <p className="font-serif text-2xl md:text-3xl leading-relaxed text-gray-800 tracking-wide">
                     "A Federada não é apenas uma atlética; é um sistema operacional de pessoas. 
-                    Nossa missão é compilar talentos, otimizar experiências acadêmicas e 
-                    executar o futuro com precisão."
+                    Nossa missão é compilar talentos e executar o futuro com precisão."
                 </p>
                 <div className="mt-8 font-mono text-sm text-gray-500">
                     -- MANIFESTO_V1.txt

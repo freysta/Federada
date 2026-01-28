@@ -27,7 +27,7 @@ export default function Hero() {
             <span className="font-mono text-sm tracking-widest uppercase text-gray-600">Desde 2024</span>
           </div>
           
-          <h1 className="text-6xl md:text-[7rem] leading-[0.9] mb-6 font-bold tracking-tighter">
+          <h1 className="text-6xl md:text-[7rem] leading-[0.9] mb-6 font-bold tracking-normal">
             <span className="glitch" data-text="FEDERADA:">FEDERADA:</span><br/>
             ESTILO &<br/>
             PERFORMANCE

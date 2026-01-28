@@ -3,10 +3,10 @@
 
 @layer base {
   body {
-    @apply bg-ice text-black font-serif antialiased cursor-default;
+    @apply bg-ice text-black font-serif antialiased cursor-default tracking-normal;
   }
   h1, h2, h3, h4, h5, h6 {
-    @apply font-sans font-bold tracking-tight;
+    @apply font-sans font-bold tracking-wide uppercase;
   }
   
   /* Custom Scrollbar */

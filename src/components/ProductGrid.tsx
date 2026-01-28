@@ -49,7 +49,7 @@ export default function ProductGrid() {
       <div className="max-w-7xl mx-auto px-6">
         <div className="flex items-end justify-between mb-16 border-b border-black pb-4">
           <div>
-            <h2 className="text-5xl md:text-6xl tracking-tighter mb-2">LOJA OFICIAL</h2>
+            <h2 className="text-5xl md:text-6xl tracking-normal mb-2">LOJA OFICIAL</h2>
             <p className="text-gray-600 text-lg">Produtos exclusivos da Atlética</p>
           </div>
           <span className="font-mono text-sm mb-2 text-gray-500 hidden md:block">
@@ -99,7 +99,7 @@ export default function ProductGrid() {
               {/* Info */}
               <div className="space-y-3">
                 <div className="flex justify-between items-baseline border-b border-gray-100 pb-2">
-                  <h3 className="text-2xl font-bold tracking-tight">{product.name}</h3>
+                  <h3 className="text-2xl font-bold tracking-normal">{product.name}</h3>
                   <span className="font-sans font-bold text-xl text-black">{product.price}</span>
                 </div>
                 
