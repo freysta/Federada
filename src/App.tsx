@@ -1,6 +1,7 @@
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
 import NewsSection from './components/NewsSection';
+import Gallery from './components/Gallery';
 import ProductGrid from './components/ProductGrid';
 import Roadmap from './components/Roadmap';
 import Team from './components/Team';
@@ -14,6 +15,7 @@ function App() {
       <main>
         <Hero />
         <NewsSection />
+        <Gallery />
         <ProductGrid />
         <Roadmap />
         <Team />
