@@ -1,6 +1,6 @@
 import { ArrowUpRight, MapPin, Circle } from 'lucide-react';
 import ifroLogo from '../assets/logos/logo-ifro-branca-white-branco.png.webp';
-import federadaLogo from '../assets/logos/logo-minimalista-federada.jpg';
+import federadaLogo from '../assets/logos/logo-mimalista-federada.png';
 
 export default function Footer() {
     return (
@@ -20,7 +20,7 @@ export default function Footer() {
             {/* Brand Section (Cols 1-5) */}
             <div className="md:col-span-5 space-y-8">
               <div>
-                <img src={federadaLogo} alt="Federada Logo" className="h-16 mb-6 invert mix-blend-screen opacity-90" />
+                <img src={federadaLogo} alt="Federada Logo" className="h-16 mb-6 invert opacity-90" />
                 <h2 className="sr-only">ATLÉTICA DE ADS</h2>
                 <p className="text-gray-400 font-sans text-lg leading-relaxed">
                   Fomentando tecnologia, esporte e integração no IFRO Campus Ji-Paraná desde 2024.

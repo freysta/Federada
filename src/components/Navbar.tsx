@@ -1,7 +1,7 @@
 import { Menu, X, ShoppingBag } from 'lucide-react';
 import { useState } from 'react';
 import ifroLogo from '../assets/logos/logo-ifro-branca-white-branco.png.webp';
-import federadaLogo from '../assets/logos/logo-minimalista-federada.jpg';
+import federadaIcon from '../assets/logos/logo-sem-nome.png';
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -12,7 +12,7 @@ export default function Navbar() {
         
         {/* Brand */}
         <div className="flex items-center gap-2">
-            <img src={federadaLogo} alt="Federada Logo" className="h-12 mix-blend-multiply" />
+            <img src={federadaIcon} alt="Federada" className="h-12" />
         </div>
 
         {/* Desktop Menu */}
