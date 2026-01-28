@@ -1,102 +1,81 @@
-import { Grid, Heart, MessageCircle } from 'lucide-react';
+import { Instagram, ArrowUpRight } from 'lucide-react';
 import FadeIn from './FadeIn';
-import federadaProfile from '../assets/logos/logo-mimalista-federada.png';
-import post1 from '../assets/urso.jpg';
-import post2 from '../assets/merchs/camiseta-atletica-v1-front.jpg';
-import post3 from '../assets/membros/hyago.png';
-import post4 from '../assets/membros/gabriel.jpg';
+import img1 from '../assets/urso.jpg';
+import img2 from '../assets/merchs/camiseta-atletica-v1-front.jpg';
+import img3 from '../assets/membros/hyago.png';
+import img4 from '../assets/membros/gabriel.jpg';
 
-// Mock Posts Data
-const posts = [
-  { id: 1, img: post1, likes: '124', comments: '12' },
-  { id: 2, img: post2, likes: '89', comments: '5' },
-  { id: 3, img: post3, likes: '230', comments: '45' },
-  { id: 4, img: post4, likes: '156', comments: '22' },
-  { id: 5, img: post1, likes: '98', comments: '8' }, // Repeating for grid effect
-  { id: 6, img: post2, likes: '112', comments: '15' },
+const moments = [
+  { id: 1, image: img1, caption: 'NOSSA IDENTIDADE' },
+  { id: 2, image: img2, caption: 'NOVA COLEÇÃO' },
+  { id: 3, image: img3, caption: 'GESTÃO 2026' },
+  { id: 4, image: img4, caption: 'ESPORTES' },
 ];
 
 export default function Gallery() {
   return (
     <section className="py-24 bg-white border-t border-black" id="gallery">
-      <div className="max-w-4xl mx-auto px-6">
+      <div className="max-w-7xl mx-auto px-6">
         
         <FadeIn>
-            <div className="flex flex-col md:flex-row items-center md:items-start gap-8 md:gap-12 mb-16">
-                {/* Profile Picture */}
-                <div className="w-32 h-32 md:w-40 md:h-40 rounded-full p-1 border border-gray-200 shrink-0">
-                    <img src={federadaProfile} alt="Profile" className="w-full h-full rounded-full object-cover" />
-                </div>
-
-                {/* Profile Info */}
-                <div className="flex-1 text-center md:text-left">
-                    <div className="flex flex-col md:flex-row items-center gap-4 mb-4">
-                        <h2 className="text-2xl font-sans text-gray-800">federadaifro</h2>
-                        <div className="flex gap-2">
-                            <a 
-                                href="https://instagram.com/federadaifro" 
-                                target="_blank" 
-                                rel="noopener noreferrer"
-                                className="bg-blue-500 text-white px-6 py-1.5 rounded font-bold text-sm hover:bg-blue-600 transition-colors"
-                            >
-                                Seguir
-                            </a>
-                            <button className="bg-gray-100 text-black px-4 py-1.5 rounded font-bold text-sm hover:bg-gray-200 transition-colors">
-                                Mensagem
-                            </button>
-                        </div>
-                    </div>
-
-                    {/* Stats */}
-                    <div className="flex justify-center md:justify-start gap-8 mb-4 font-sans text-base">
-                        <span><strong>24</strong> publicações</span>
-                        <span><strong>1.2k</strong> seguidores</span>
-                        <span><strong>450</strong> seguindo</span>
-                    </div>
-
-                    {/* Bio */}
-                    <div className="font-sans text-sm leading-relaxed">
-                        <strong>Atlética Federada 🐻‍❄️</strong> <br/>
-                        🎓 Análise e Desenvolvimento de Sistemas - IFRO <br/>
-                        🚀 High Performance Code & Gear <br/>
-                        📍 Ji-Paraná, RO
-                    </div>
-                </div>
+          <div className="flex flex-col md:flex-row justify-between items-end mb-12">
+            <div>
+              <h2 className="text-4xl md:text-5xl tracking-normal mb-2">
+                <span className="glitch" data-text="LEGADO FEDERADA">LEGADO FEDERADA</span>
+              </h2>
+              <p className="text-gray-500 font-sans text-lg">Acompanhe nossa rotina no Instagram.</p>
             </div>
+            <a 
+              href="https://instagram.com/federadaifro" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="hidden md:flex items-center gap-2 text-sm font-bold border-b border-black pb-1 hover:text-gray-600 transition-colors"
+            >
+              <Instagram size={16} />
+              @FEDERADAIFRO
+            </a>
+          </div>
         </FadeIn>
 
-        {/* Tabs */}
-        <div className="border-t border-gray-200 flex justify-center gap-12 mb-4">
-            <button className="flex items-center gap-2 border-t border-black pt-4 text-xs font-bold tracking-widest uppercase">
-                <Grid size={12} /> Publicações
-            </button>
-            <button className="flex items-center gap-2 pt-4 text-xs font-bold tracking-widest uppercase text-gray-400">
-                Reels
-            </button>
-            <button className="flex items-center gap-2 pt-4 text-xs font-bold tracking-widest uppercase text-gray-400">
-                Marcados
-            </button>
-        </div>
-
-        {/* Grid */}
-        <div className="grid grid-cols-3 gap-1 md:gap-8">
-          {posts.map((post, i) => (
-            <FadeIn key={post.id} delay={i * 100}>
-              <div className="group relative aspect-square bg-gray-100 cursor-pointer overflow-hidden">
-                <img src={post.img} alt={`Post ${post.id}`} className="w-full h-full object-cover" />
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          {moments.map((moment, i) => (
+            <FadeIn key={moment.id} delay={i * 100}>
+              <a 
+                href="https://instagram.com/federadaifro"
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="group relative aspect-square overflow-hidden cursor-pointer bg-neutral-100 border border-gray-200 block"
+              >
+                {/* Image */}
+                <img 
+                    src={moment.image} 
+                    alt={moment.caption} 
+                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 grayscale group-hover:grayscale-0"
+                />
                 
-                {/* Hover Overlay */}
-                <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-6 text-white font-bold">
-                    <div className="flex items-center gap-1">
-                        <Heart fill="white" size={20} /> {post.likes}
-                    </div>
-                    <div className="flex items-center gap-1">
-                        <MessageCircle fill="white" size={20} /> {post.comments}
-                    </div>
+                {/* Overlay Info */}
+                <div className="absolute inset-0 flex flex-col justify-end p-6 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                  <span className="text-white font-bold text-lg tracking-wide mb-1">{moment.caption}</span>
+                  <div className="flex items-center gap-2 text-white/80 text-xs font-mono">
+                    <span>VER POST</span>
+                    <ArrowUpRight size={12} />
+                  </div>
                 </div>
-              </div>
+              </a>
             </FadeIn>
           ))}
+        </div>
+
+        <div className="mt-12 text-center md:hidden">
+            <a 
+              href="https://instagram.com/federadaifro" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 text-sm font-bold border border-black px-6 py-3 hover:bg-black hover:text-white transition-colors"
+            >
+              <Instagram size={16} />
+              SEGUIR NO INSTAGRAM
+            </a>
         </div>
 
       </div>
