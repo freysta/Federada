@@ -1,24 +1,27 @@
+import hyagoImg from '../assets/membros/hyago.png';
+import gabrielImg from '../assets/membros/gabriel.jpg';
+import pedroImg from '../assets/membros/pedro.png';
+
 export default function Team() {
   const members = [
     {
-      name: 'Nome do Diretor',
-      role: 'CEO',
-      image: 'bg-neutral-200'
+      name: 'HYAGO',
+      roles: [
+        'Presidente da Atlética Federada',
+        'Presidente do Centro Acadêmico de ADS',
+        'Representante do Colegiado'
+      ],
+      image: hyagoImg
     },
     {
-      name: 'Nome do Diretor',
-      role: 'LEAD DEVELOPER',
-      image: 'bg-neutral-300'
+      name: 'GABRIEL',
+      roles: ['Diretor de Esportes da Atlética'],
+      image: gabrielImg
     },
     {
-      name: 'Nome do Diretor',
-      role: 'HEAD OF MARKETING',
-      image: 'bg-neutral-400'
-    },
-     {
-      name: 'Nome do Diretor',
-      role: 'FINANCIAL OFFICER',
-      image: 'bg-neutral-200'
+      name: 'PEDRO',
+      roles: ['Vice-Presidente do Centro Acadêmico'],
+      image: pedroImg
     }
   ];
 
@@ -29,8 +32,8 @@ export default function Team() {
         {/* Manifesto */}
         <div className="grid md:grid-cols-2 gap-16 mb-24">
             <div>
-                <h2 className="text-4xl md:text-5xl tracking-normal mb-8">EQUIPE FEDERADA</h2>
-                <span className="font-mono text-xs block mb-2">// QUEM SOMOS</span>
+                <h2 className="text-4xl md:text-5xl tracking-normal mb-8 uppercase">Equipe Federada</h2>
+                <span className="font-mono text-xs block mb-2 text-gray-400">// LIDERANÇA E ESTRATÉGIA</span>
             </div>
             <div>
                 <p className="font-serif text-2xl md:text-3xl leading-relaxed text-gray-800 tracking-wide">
@@ -44,19 +47,26 @@ export default function Team() {
         </div>
 
         {/* Team Grid */}
-        <div className="grid md:grid-cols-4 gap-8">
+        <div className="grid md:grid-cols-3 gap-12">
             {members.map((member, i) => (
                 <div key={i} className="group">
-                    <div className={`aspect-square ${member.image} mb-4 grayscale hover:grayscale-0 transition-all duration-500 overflow-hidden relative`}>
-                         <div className="absolute inset-0 bg-black/10 mix-blend-multiply"></div>
-                         {/* Placeholder for real image */}
-                         <div className="absolute inset-0 flex items-center justify-center">
-                            <span className="font-mono text-xs opacity-30 text-black">PHOTO_PLACEHOLDER</span>
-                         </div>
+                    <div className="aspect-[4/5] bg-neutral-100 mb-6 grayscale hover:grayscale-0 transition-all duration-500 overflow-hidden relative border border-gray-200">
+                         <img 
+                            src={member.image} 
+                            alt={member.name} 
+                            className="w-full h-full object-cover"
+                         />
+                         <div className="absolute inset-0 bg-black/5 mix-blend-multiply group-hover:bg-transparent transition-colors"></div>
                     </div>
-                    <div className="border-l-2 border-black pl-3">
-                        <h4 className="font-bold text-lg uppercase tracking-wide">{member.name}</h4>
-                        <span className="font-mono text-xs text-gray-500 block mt-1">[{member.role}]</span>
+                    <div className="border-l-4 border-black pl-4">
+                        <h4 className="font-bold text-2xl uppercase tracking-wide mb-2">{member.name}</h4>
+                        <div className="space-y-1">
+                            {member.roles.map((role, ri) => (
+                                <span key={ri} className="font-sans text-xs font-bold text-gray-500 block uppercase tracking-tight">
+                                    {role}
+                                </span>
+                            ))}
+                        </div>
                     </div>
                 </div>
             ))}
