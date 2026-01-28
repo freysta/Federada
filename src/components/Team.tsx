@@ -50,31 +50,18 @@ export default function Team() {
         <div className="grid md:grid-cols-3 gap-12">
             {members.map((member, i) => (
                 <div key={i} className="group">
-                    {/* Image Container with Tech Effect */}
+                    {/* Image Container */}
                     <div className="aspect-[4/5] bg-neutral-100 mb-6 relative overflow-hidden border border-gray-200">
                          {/* Base Image */}
                          <img 
                             src={member.image} 
                             alt={member.name} 
-                            className="w-full h-full object-cover grayscale transition-all duration-300 group-hover:grayscale-0 group-hover:contrast-125"
+                            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                          />
-                         
-                         {/* Informatics Hover Effect (Green Tint + Scanlines) */}
-                         <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
-                            {/* Green Tint */}
-                            <div className="absolute inset-0 bg-green-500/20 mix-blend-overlay"></div>
-                            {/* Scanlines Pattern */}
-                            <div className="absolute inset-0" style={{
-                                backgroundImage: 'linear-gradient(transparent 50%, rgba(0, 255, 0, 0.25) 50%)',
-                                backgroundSize: '100% 4px'
-                            }}></div>
-                            {/* Glitch Border */}
-                            <div className="absolute inset-0 border-2 border-green-500/50"></div>
-                         </div>
                     </div>
 
-                    <div className="border-l-4 border-black pl-4 group-hover:border-green-500 transition-colors duration-300">
-                        <h4 className="font-bold text-2xl uppercase tracking-wide mb-2 group-hover:text-green-600 transition-colors">{member.name}</h4>
+                    <div className="border-l-4 border-black pl-4">
+                        <h4 className="font-bold text-2xl uppercase tracking-wide mb-2">{member.name}</h4>
                         <div className="space-y-1">
                             {member.roles.map((role, ri) => (
                                 <span key={ri} className="font-sans text-xs font-bold text-gray-500 block uppercase tracking-tight">
