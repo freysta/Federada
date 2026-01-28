@@ -20,6 +20,7 @@ export default function Navbar() {
             <a href="#" className="hover:underline underline-offset-4">INÍCIO</a>
             <a href="#news" className="hover:underline underline-offset-4">NOTÍCIAS</a>
             <a href="#merch" className="hover:underline underline-offset-4">LOJA</a>
+            <a href="#caads" className="hover:underline underline-offset-4 text-gray-500 hover:text-black transition-colors">C.A. ADS</a>
             <a href="#about" className="hover:underline underline-offset-4">SOBRE</a>
             
             <div className="h-4 w-[1px] bg-gray-300 mx-2"></div>

@@ -5,6 +5,7 @@ import Gallery from './components/Gallery';
 import ProductGrid from './components/ProductGrid';
 import Roadmap from './components/Roadmap';
 import Team from './components/Team';
+import CAADS from './components/CAADS';
 import Footer from './components/Footer';
 import TerminalWidget from './components/TerminalWidget';
 
@@ -19,6 +20,7 @@ function App() {
         <ProductGrid />
         <Roadmap />
         <Team />
+        <CAADS />
       </main>
       <Footer />
       <TerminalWidget />

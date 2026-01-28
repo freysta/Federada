@@ -50,7 +50,7 @@ export default function Footer() {
 							// NAVEGAÇÃO
 						</h3>
 						<ul className="space-y-4 font-bold text-xl">
-							{["INÍCIO", "LOJA OFICIAL", "NOTÍCIAS", "SOBRE NÓS"].map(
+							{["INÍCIO", "LOJA OFICIAL", "NOTÍCIAS", "CENTRO ACADÊMICO", "SOBRE NÓS"].map(
 								(item, i) => (
 									<li key={i}>
 										<a
