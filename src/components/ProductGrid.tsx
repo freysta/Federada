@@ -51,7 +51,9 @@ export default function ProductGrid() {
         <FadeIn>
             <div className="flex items-end justify-between mb-16 border-b border-black pb-4">
             <div>
-                <h2 className="text-5xl md:text-6xl tracking-normal mb-2">LOJA OFICIAL</h2>
+                <h2 className="text-5xl md:text-6xl tracking-normal mb-2">
+                    <span className="glitch" data-text="LOJA OFICIAL">LOJA OFICIAL</span>
+                </h2>
                 <p className="text-gray-600 text-lg">Produtos exclusivos da Atlética</p>
             </div>
             <span className="font-mono text-sm mb-2 text-gray-500 hidden md:block">

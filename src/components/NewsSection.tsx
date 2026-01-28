@@ -10,7 +10,9 @@ export default function NewsSection() {
         <FadeIn>
             <div className="flex items-center gap-4 mb-12">
                 <div className="w-3 h-3 bg-red-500 animate-pulse rounded-full"></div>
-                <h2 className="text-4xl tracking-normal">CENTRAL DE NOTÍCIAS</h2>
+                <h2 className="text-4xl tracking-normal">
+                    <span className="glitch" data-text="CENTRAL DE NOTÍCIAS">CENTRAL DE NOTÍCIAS</span>
+                </h2>
                 <span className="font-mono text-xs text-gray-400">ATUALIZAÇÕES DO C.A.</span>
             </div>
         </FadeIn>

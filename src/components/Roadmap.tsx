@@ -34,8 +34,8 @@ export default function Roadmap() {
       <div className="max-w-4xl mx-auto px-6 relative z-10">
         <FadeIn>
             <h2 className="text-4xl md:text-5xl mb-16 text-center tracking-normal">
-                CALENDÁRIO <br/>
-                DE EVENTOS
+                <span className="glitch" data-text="CALENDÁRIO">CALENDÁRIO</span> <br/>
+                <span className="glitch" data-text="DE EVENTOS">DE EVENTOS</span>
             </h2>
         </FadeIn>
 

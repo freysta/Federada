@@ -34,7 +34,9 @@ export default function Team() {
         <div className="grid md:grid-cols-2 gap-16 mb-24">
             <FadeIn>
                 <div>
-                    <h2 className="text-4xl md:text-5xl tracking-normal mb-8 uppercase">Equipe Federada</h2>
+                    <h2 className="text-4xl md:text-5xl tracking-normal mb-8 uppercase">
+                        <span className="glitch" data-text="Equipe Federada">Equipe Federada</span>
+                    </h2>
                     <span className="font-mono text-xs block mb-2 text-gray-400">// LIDERANÇA E ESTRATÉGIA</span>
                 </div>
             </FadeIn>

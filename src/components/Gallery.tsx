@@ -17,7 +17,9 @@ export default function Gallery() {
         <FadeIn>
           <div className="flex flex-col md:flex-row justify-between items-end mb-12">
             <div>
-              <h2 className="text-4xl md:text-5xl tracking-normal mb-2">LEGADO FEDERADA</h2>
+              <h2 className="text-4xl md:text-5xl tracking-normal mb-2">
+                <span className="glitch" data-text="LEGADO FEDERADA">LEGADO FEDERADA</span>
+              </h2>
               <p className="text-gray-500 font-sans text-lg">Momentos que definem nossa história.</p>
             </div>
             <a 
