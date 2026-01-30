@@ -21,30 +21,46 @@ export default function TerminalWidget() {
 
     switch (cleanCmd) {
       case 'help':
-        response = 'Available commands: help, about, merch, contact, clear, date, exit';
+      case 'ajuda':
+        response = 'Comandos: help, about, merch, contact, clear, date, dev, exit';
         break;
       case 'about':
         response = 'Federada: Otimizando a experiência acadêmica desde 2024.';
         window.location.hash = '#about';
         break;
       case 'merch':
-        response = 'Navigating to Merchandise store...';
+        response = 'Acessando Loja Oficial...';
         window.location.hash = '#merch';
         break;
       case 'contact':
-        response = 'Contact us via Instagram @federada or GitHub.';
+        response = 'Instagram: @federadaifro';
+        break;
+      case 'dev':
+      case 'credits':
+      case 'autor':
+        response = 'ACCESS GRANTED: Exibindo contato do desenvolvedor...';
+        setTimeout(() => {
+          setHistory(prev => [...prev, 
+            '--- SYSTEM CREATOR ---',
+            '> IAD TECH',
+            '> SOFTWARE STUDIO',
+            '> STATUS: ONLINE',
+            '> CONTATO: Abrindo canal seguro...'
+          ]);
+          window.open('https://wa.me/5569993242656', '_blank');
+        }, 500);
         break;
       case 'clear':
         setHistory([]);
         return;
       case 'date':
-        response = new Date().toString();
+        response = new Date().toLocaleTimeString();
         break;
       case 'exit':
         setIsOpen(false);
         return;
       default:
-        response = `Command not found: ${cleanCmd}. Type "help" for list.`;
+        response = `Comando desconhecido: ${cleanCmd}. Digite "help".`;
     }
 
     setHistory(prev => [...prev, `> ${cmd}`, response]);

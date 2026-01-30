@@ -41,7 +41,7 @@ export default function Footer() {
 							<img
 								src={federadaLogo}
 								alt="Federada Logo"
-								className="h-14 invert opacity-90"
+								className="h-14 brightness-0 invert opacity-90"
 							/>
 							<div className="text-right">
 								<h2 className="font-mono text-xs text-gray-500 mb-1">Afiliação</h2>
@@ -102,7 +102,7 @@ export default function Footer() {
 						</h3>
 						<div className="space-y-6">
 							<a
-								href="https://instagram.com"
+								href="https://instagram.com/federadaifro"
 								target="_blank"
 								rel="noopener noreferrer" 
 								className="block bg-white/5 hover:bg-white/10 border border-white/10 p-4 transition-all group"
@@ -111,7 +111,7 @@ export default function Footer() {
 									<span className="font-mono text-xs text-gray-500">PROTOCOLO: INSTAGRAM</span>
 									<ArrowUpRight size={14} className="text-gray-500 group-hover:text-white" />
 								</div>
-								<div className="font-bold text-lg">@FEDERADA</div>
+								<div className="font-bold text-lg">@FEDERADAIFRO</div>
 							</a>
 
 							<a
@@ -145,8 +145,16 @@ export default function Footer() {
 						</div>
 					</div>
 					
-					<div className="text-center md:text-right">
+					<div className="text-center md:text-right flex flex-col md:items-end gap-1">
 						<span>© 2026 SISTEMA FEDERADA. TODOS OS DIREITOS RESERVADOS.</span>
+						<a 
+							href="https://wa.me/5569993242656" 
+							target="_blank" 
+							rel="noopener noreferrer"
+							className="text-[9px] text-gray-700 hover:text-neon-cyan transition-colors tracking-widest"
+						>
+							DEVELOPED BY IAD TECH_
+						</a>
 					</div>
 				</div>
 			</div>

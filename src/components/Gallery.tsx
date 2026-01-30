@@ -3,21 +3,28 @@ import FadeIn from './FadeIn';
 
 export default function Gallery() {
   useEffect(() => {
-    // Carrega o script do Instagram se ele ainda não existir
-    if (!document.getElementById('instagram-embed-script')) {
-      const script = document.createElement('script');
-      script.id = 'instagram-embed-script';
-      script.src = "https://www.instagram.com/embed.js";
-      script.async = true;
-      document.body.appendChild(script);
-    } else {
-      // Se já existir, força o re-processamento do post
+    const processEmbeds = () => {
       // @ts-ignore
       if (window.instgrm) {
         // @ts-ignore
         window.instgrm.Embeds.process();
       }
+    };
+
+    if (!document.getElementById('instagram-embed-script')) {
+      const script = document.createElement('script');
+      script.id = 'instagram-embed-script';
+      script.src = "//www.instagram.com/embed.js";
+      script.async = true;
+      script.onload = processEmbeds;
+      document.body.appendChild(script);
+    } else {
+      processEmbeds();
     }
+    
+    // Fallback extra para garantir renderização em re-navegação
+    const timer = setTimeout(processEmbeds, 1000);
+    return () => clearTimeout(timer);
   }, []);
 
   return (

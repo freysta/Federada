@@ -81,10 +81,18 @@ export default function Hero() {
 
       </div>
 
-      {/* Decorative Elements */}
-      <div className="absolute bottom-10 right-6 font-mono text-xs text-gray-400 opacity-50">
-        ROLANDO PARA BAIXO...
-      </div>
+      {/* Scroll Indicator */}
+      <button 
+        onClick={() => window.scrollTo({ top: window.innerHeight, behavior: 'smooth' })}
+        className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-3 z-20 group cursor-pointer"
+      >
+        <div className="w-6 h-10 border-2 border-black/20 rounded-full flex justify-center p-1 group-hover:border-black/50 transition-colors">
+            <div className="w-1 h-2 bg-black rounded-full animate-bounce"></div>
+        </div>
+        <span className="font-mono text-[10px] tracking-[0.2em] text-gray-400 group-hover:text-black transition-colors uppercase">
+            Explorar Sistema
+        </span>
+      </button>
     </section>
   );
 }
