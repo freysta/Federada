@@ -1,4 +1,4 @@
-import { ShoppingBag, ArrowRight } from "lucide-react";
+import { ShoppingBag } from "lucide-react";
 import { useState } from "react";
 import CheckoutModal from "./CheckoutModal";
 import FadeIn from "./FadeIn";

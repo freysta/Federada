@@ -88,7 +88,7 @@ export default function TerminalWidget() {
         setIsOpen(false);
         return;
       default:
-        response = `Comando desconhecido: ${cleanCmd}. Digite "help".`;
+        response = `Comando desconhecido: ${commandName}. Digite "help".`;
     }
 
     setHistory(prev => [...prev, `> ${cmd}`, response]);
