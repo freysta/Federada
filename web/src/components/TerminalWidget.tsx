@@ -15,14 +15,42 @@ export default function TerminalWidget() {
     }
   }, [history, isOpen]);
 
-  const handleCommand = (cmd: string) => {
-    const cleanCmd = cmd.trim().toLowerCase();
+  const handleCommand = async (cmd: string) => {
+    const parts = cmd.trim().split(' ');
+    const commandName = parts[0].toLowerCase();
+    const args = parts.slice(1);
+    
     let response = '';
 
-    switch (cleanCmd) {
+    switch (commandName) {
       case 'help':
       case 'ajuda':
-        response = 'Comandos: help, about, merch, contact, clear, date, dev, exit';
+        response = 'Comandos: help, status <id>, about, merch, contact, clear, date, exit';
+        break;
+      case 'status':
+        if (args.length === 0) {
+          response = 'Uso: status <id_do_pedido>';
+        } else {
+          const orderId = args[0];
+          setHistory(prev => [...prev, `> ${cmd}`, 'FETCHING_ORDER_DATA...']);
+          try {
+            const res = await fetch(`http://localhost:3000/orders/${orderId}`);
+            if (!res.ok) throw new Error();
+            const order = await res.json();
+            
+            setHistory(prev => [...prev, 
+              `--- PEDIDO: ${order.id.slice(0,8)}... ---`,
+              `> PRODUTO: ${order.productName}`,
+              `> TAMANHO: ${order.productSize || 'N/A'}`,
+              `> STATUS: ${order.status}`,
+              `> DATA: ${new Date(order.createdAt).toLocaleDateString()}`,
+              `-------------------------`
+            ]);
+            return;
+          } catch (err) {
+            response = `ERROR: Pedido ${orderId} não encontrado ou servidor offline.`;
+          }
+        }
         break;
       case 'about':
         response = 'Federada: Otimizando a experiência acadêmica desde 2024.';

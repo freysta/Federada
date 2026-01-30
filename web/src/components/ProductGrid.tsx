@@ -1,6 +1,6 @@
-import { ShoppingBag, QrCode } from "lucide-react";
+import { ShoppingBag, ArrowRight } from "lucide-react";
 import { useState } from "react";
-import PixModal from "./PixModal";
+import CheckoutModal from "./CheckoutModal";
 import FadeIn from "./FadeIn";
 
 // Imports das Imagens
@@ -14,6 +14,7 @@ const products = [
 		id: "CAM-ESP-001",
 		name: "CAMISA DRY-FIT FEDERADA",
 		price: "R$ 69,90",
+		rawPrice: 69.90,
 		image: federadaShirtImg,
 		specs: [
 			"Tecido Dry-Fit Tecnológico",
@@ -27,6 +28,7 @@ const products = [
 		id: "CAM-ESP-002",
 		name: "CAMISA DRY-FIT ADS",
 		price: "R$ 69,90",
+		rawPrice: 69.90,
 		image: adsShirtImg,
 		specs: [
 			"Malha Esportiva Premium",
@@ -40,6 +42,7 @@ const products = [
 		id: "CAM-ESP-003",
 		name: "CAMISA OFICIAL ATLÉTICA",
 		price: "R$ 59,90",
+		rawPrice: 59.90,
 		image: atleticaShirtImg,
 		specs: [
 			"Tecido Leve e Respirável",
@@ -53,6 +56,7 @@ const products = [
 		id: "CAN-001",
 		name: "CANECA TÉRMICA FEDERADA",
 		price: "R$ 45,90",
+		rawPrice: 45.90,
 		image: mugImg,
 		specs: [
 			"Cerâmica de Alta Qualidade",
@@ -65,21 +69,7 @@ const products = [
 ];
 
 export default function ProductGrid() {
-	const [pixModalOpen, setPixModalOpen] = useState(false);
-	const [selectedPrice, setSelectedPrice] = useState("");
-
-	const handleReserve = (productName: string) => {
-		const message = `Olá! Quero comprar o item: ${productName}`;
-		window.open(
-			`https://wa.me/5569999999999?text=${encodeURIComponent(message)}`,
-			"_blank",
-		);
-	};
-
-	const openPix = (price: string) => {
-		setSelectedPrice(price);
-		setPixModalOpen(true);
-	};
+	const [checkoutProduct, setCheckoutProduct] = useState<{name: string, price: string, rawPrice: number} | null>(null);
 
 	return (
 		<section className="py-24 bg-white" id="merch">
@@ -105,7 +95,7 @@ export default function ProductGrid() {
 				<div className="grid md:grid-cols-3 gap-12">
 					{products.map((product, index) => (
 						<FadeIn key={product.id} delay={index * 100}>
-							<div className="group cursor-pointer">
+							<div className="group cursor-pointer" onClick={() => setCheckoutProduct(product)}>
 								{/* Image Container */}
 								<div className="relative aspect-[3/4] bg-neutral-100 mb-6 overflow-hidden transition-all duration-500 border border-transparent group-hover:border-black/10 shadow-sm group-hover:shadow-lg">
 									<div className="absolute top-4 left-4 font-bold text-xs bg-black text-white px-3 py-1 z-10">
@@ -126,18 +116,10 @@ export default function ProductGrid() {
 
 									<div className="absolute inset-0 flex flex-col items-center justify-center gap-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-white/95 z-20 p-6">
 										<button
-											onClick={() => handleReserve(product.name)}
 											className="bg-black text-white w-full py-4 font-sans font-bold text-sm hover:bg-neutral-800 transition-colors flex items-center justify-center gap-2 shadow-lg"
 										>
 											<ShoppingBag size={18} />
-											COMPRAR NO WHATSAPP
-										</button>
-										<button
-											onClick={() => openPix(product.price)}
-											className="bg-white text-black border-2 border-black w-full py-3 font-sans font-bold text-xs hover:bg-gray-50 transition-colors flex items-center justify-center gap-2"
-										>
-											<QrCode size={16} />
-											PAGAR COM PIX
+											COMPRAR AGORA
 										</button>
 									</div>
 								</div>
@@ -190,10 +172,10 @@ export default function ProductGrid() {
 				</div>
 			</div>
 
-			<PixModal
-				isOpen={pixModalOpen}
-				onClose={() => setPixModalOpen(false)}
-				amount={selectedPrice}
+			<CheckoutModal
+				isOpen={!!checkoutProduct}
+				onClose={() => setCheckoutProduct(null)}
+				product={checkoutProduct}
 			/>
 		</section>
 	);
