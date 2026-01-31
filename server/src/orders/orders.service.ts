@@ -130,10 +130,15 @@ export class OrdersService {
     console.log('Webhook received:', JSON.stringify(data));
 
     if (data.type === 'payment') {
+      if (!this.mpClient) {
+        console.warn('Mercado Pago Client not initialized. Check MERCADO_PAGO_ACCESS_TOKEN.');
+        return { received: true }; // Return 200/201 to stop MP from retrying
+      }
+
       const paymentId = data.data.id;
-      const payment = new Payment(this.mpClient);
       
       try {
+        const payment = new Payment(this.mpClient);
         const paymentData = await payment.get({ id: paymentId });
         console.log(`Payment ${paymentId} status: ${paymentData.status}`);
         
@@ -154,7 +159,12 @@ export class OrdersService {
           console.warn(`No order found for paymentId: ${paymentId}`);
         }
       } catch (error) {
-        console.error('Webhook processing error:', error);
+        // Ignora erro 404 (comum em testes com ID falso como 123456)
+        if (error.status === 404 || error.cause?.code === 404) {
+             console.warn(`Payment ${paymentId} not found (Test notification?).`);
+        } else {
+             console.error('Webhook processing error:', error);
+        }
       }
     }
     return { received: true };
