@@ -82,10 +82,14 @@ export class OrdersService {
     try {
       const payment = new Payment(this.mpClient);
       
+      const webhookUrl = this.configService.get<string>('WEBHOOK_URL');
+
       const body = {
         transaction_amount: amount,
         description: `${productName}${productSize ? ` - ${productSize}` : ''}`,
         payment_method_id: 'pix',
+        external_reference: order.id,
+        notification_url: webhookUrl ? `${webhookUrl}/orders/webhook` : undefined,
         payer: {
           email: customerEmail,
           first_name: customerName.split(' ')[0],
@@ -123,12 +127,15 @@ export class OrdersService {
   }
 
   async handleWebhook(data: any) {
+    console.log('Webhook received:', JSON.stringify(data));
+
     if (data.type === 'payment') {
       const paymentId = data.data.id;
       const payment = new Payment(this.mpClient);
       
       try {
         const paymentData = await payment.get({ id: paymentId });
+        console.log(`Payment ${paymentId} status: ${paymentData.status}`);
         
         const order = await this.ordersRepository.findOne({
           where: { paymentId: paymentId.toString() },
@@ -137,10 +144,14 @@ export class OrdersService {
         if (order) {
           if (paymentData.status === 'approved') {
             order.status = 'PAID';
+            console.log(`Order ${order.id} marked as PAID`);
           } else if (paymentData.status === 'rejected' || paymentData.status === 'cancelled') {
             order.status = 'CANCELLED';
+            console.log(`Order ${order.id} marked as CANCELLED`);
           }
           await this.ordersRepository.save(order);
+        } else {
+          console.warn(`No order found for paymentId: ${paymentId}`);
         }
       } catch (error) {
         console.error('Webhook processing error:', error);
