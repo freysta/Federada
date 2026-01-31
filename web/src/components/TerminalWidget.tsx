@@ -1,5 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
-import { Terminal as TerminalIcon, X, Maximize2, Minimize2 } from 'lucide-react';
+import { API_URL } from '../config';
 
 export default function TerminalWidget() {
   const [isOpen, setIsOpen] = useState(false);
@@ -34,7 +33,7 @@ export default function TerminalWidget() {
           const orderId = args[0];
           setHistory(prev => [...prev, `> ${cmd}`, 'FETCHING_ORDER_DATA...']);
           try {
-            const res = await fetch(`http://localhost:3000/orders/${orderId}`);
+            const res = await fetch(`${API_URL}/orders/${orderId}`);
             if (!res.ok) throw new Error();
             const order = await res.json();
             

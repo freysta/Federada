@@ -1,59 +1,52 @@
-import { useState } from "react";
-import { X, Loader2, QrCode, CheckCircle, Copy } from "lucide-react";
-import FadeIn from "./FadeIn";
+import { useState } from 'react';
+import { X, Loader2, QrCode, CheckCircle, Copy } from 'lucide-react';
+import FadeIn from './FadeIn';
+import { API_URL } from '../config';
 
 interface CheckoutModalProps {
-	isOpen: boolean;
-	onClose: () => void;
-	product: {
-		name: string;
-		price: string; // e.g., "R$ 69,90"
-		rawPrice: number; // e.g., 69.90
-	} | null;
+  isOpen: boolean;
+  onClose: () => void;
+  product: {
+    name: string;
+    price: string; // e.g., "R$ 69,90"
+    rawPrice: number; // e.g., 69.90
+  } | null;
 }
 
-export default function CheckoutModal({
-	isOpen,
-	onClose,
-	product,
-}: CheckoutModalProps) {
-	const [step, setStep] = useState<"form" | "loading" | "payment">("form");
-	const [formData, setFormData] = useState({
-		name: "",
-		email: "",
-		cpf: "",
-		phone: "",
-		size: "M",
-	});
-	const [pixData, setPixData] = useState<{
-		qrCodeBase64: string;
-		copyPaste: string;
-		orderId: string;
-	} | null>(null);
+export default function CheckoutModal({ isOpen, onClose, product }: CheckoutModalProps) {
+  const [step, setStep] = useState<'form' | 'loading' | 'payment'>('form');
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    cpf: '',
+    phone: '',
+    size: 'M'
+  });
+  const [pixData, setPixData] = useState<{ qrCodeBase64: string, copyPaste: string, orderId: string } | null>(null);
 
-	if (!isOpen || !product) return null;
+  if (!isOpen || !product) return null;
 
-	const handleSubmit = async (e: React.FormEvent) => {
-		e.preventDefault();
-		setStep("loading");
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setStep('loading');
 
-		try {
-			// Simulating API Call to our NestJS Backend
-			const response = await fetch("http://localhost:3001/orders", {
-				method: "POST",
-				headers: {
-					"Content-Type": "application/json",
-				},
-				body: JSON.stringify({
-					customerName: formData.name,
-					customerEmail: formData.email,
-					customerCpf: formData.cpf,
-					customerPhone: formData.phone,
-					productName: product.name,
-					productSize: formData.size,
-					amount: product.rawPrice,
-				}),
-			});
+    try {
+      // Simulating API Call to our NestJS Backend
+      const response = await fetch(`${API_URL}/orders`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          customerName: formData.name,
+          customerEmail: formData.email,
+          customerCpf: formData.cpf,
+          customerPhone: formData.phone,
+          productName: product.name,
+          productSize: formData.size,
+          amount: product.rawPrice
+        }),
+      });
 
 			const data = await response.json();
 

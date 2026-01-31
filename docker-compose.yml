@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  # Backend (NestJS)
+  api:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: federada-api
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      - PORT=3000
+      - MERCADO_PAGO_ACCESS_TOKEN=${MERCADO_PAGO_ACCESS_TOKEN}
+    volumes:
+      - ./server/data:/app/data # Persistência do SQLite
+    networks:
+      - federada-network
+
+  # Frontend (React + Nginx)
+  web:
+    build:
+      context: ./web
+      dockerfile: Dockerfile
+      args:
+        - VITE_API_URL=${VITE_API_URL:-http://localhost:3000}
+    container_name: federada-web
+    restart: always
+    ports:
+      - "80:80"
+    depends_on:
+      - api
+    networks:
+      - federada-network
+
+networks:
+  federada-network:
+    driver: bridge
