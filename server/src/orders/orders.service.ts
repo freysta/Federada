@@ -24,7 +24,7 @@ export class OrdersService {
   }
 
   private async initializeMP() {
-    this.accessToken = this.configService.get<string>('MERCADO_PAGO_ACCESS_TOKEN');
+    this.accessToken = this.configService.get<string>('MERCADO_PAGO_ACCESS_TOKEN') || '';
     
     if (!this.accessToken) {
       console.error('CRITICAL: MERCADO_PAGO_ACCESS_TOKEN not defined');
