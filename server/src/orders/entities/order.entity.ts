@@ -18,10 +18,10 @@ export class Order {
   @Column({ default: 'PENDING' })
   status: string;
 
-  @Column({ nullable: true })
+  @Column({ type: 'text', nullable: true })
   paymentId: string | null;
 
-  @Column({ nullable: true })
+  @Column({ type: 'text', nullable: true })
   pixCopyPaste: string | null;
 
   @CreateDateColumn()
