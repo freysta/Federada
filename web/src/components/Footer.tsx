@@ -1,6 +1,8 @@
-import { ArrowUpRight, MapPin, Terminal, Cpu, Wifi } from "lucide-react";
+import { ArrowUpRight, MapPin, Terminal, Cpu, Wifi, Code2 } from "lucide-react";
 import ifroLogo from "../assets/logos/logo-ifro-branca-white-branco.png.webp";
 import federadaLogo from "../assets/logos/logo-mimalista-federada.png";
+import iadLogo from "../assets/logos/logo-iad-extenso.svg";
+import gabrielImg from "../assets/membros/gabriel.jpg";
 
 export default function Footer() {
 	return (
@@ -35,45 +37,43 @@ export default function Footer() {
 			<div className="max-w-7xl mx-auto border-x border-white/10 relative z-10 bg-black/50 backdrop-blur-sm">
 				<div className="grid md:grid-cols-12 divide-y md:divide-y-0 md:divide-x divide-white/10">
 					
-					{/* Brand & Identity (Cols 1-5) */}
-					<div className="md:col-span-5 p-8 md:p-12 space-y-8">
+					{/* Brand & Identity (Cols 1-4) */}
+					<div className="md:col-span-4 p-8 md:p-10 space-y-6">
 						<div className="flex items-start justify-between">
 							<img
 								src={federadaLogo}
 								alt="Federada Logo"
-								className="h-14 brightness-0 invert opacity-90"
+								className="h-12 brightness-0 invert opacity-90"
 							/>
 							<div className="text-right">
-								<h2 className="font-mono text-xs text-gray-500 mb-1">Afiliação</h2>
+								<h2 className="font-mono text-[10px] text-gray-500 mb-1 uppercase">Afiliação</h2>
 								<img
 									src={ifroLogo}
 									alt="IFRO Logo"
-									className="h-8 opacity-60 ml-auto grayscale hover:grayscale-0 transition-all"
+									className="h-6 opacity-60 ml-auto grayscale hover:grayscale-0 transition-all"
 								/>
 							</div>
 						</div>
 
 						{/* JSON Identity Block */}
-						<div className="font-mono text-xs text-gray-400 bg-white/5 p-4 rounded border border-white/10 overflow-hidden">
+						<div className="font-mono text-[10px] text-gray-400 bg-white/5 p-4 rounded border border-white/10 overflow-hidden">
 							<p className="text-gray-600 mb-2">// MANIFESTO_ENTIDADE.JSON</p>
 							<p><span className="text-purple-400">const</span> <span className="text-yellow-300">federada</span> = {"{"}</p>
 							<div className="pl-4 space-y-1">
 								<p>campus: <span className="text-green-400">"IFRO Ji-Paraná"</span>,</p>
-								<p>foco: <span className="text-green-400">["Tecnologia", "Esportes", "Integração"]</span>,</p>
-								<p>fundação: <span className="text-orange-400">2024</span>,</p>
 								<p>status: <span className="text-blue-400">"ATIVO"</span></p>
 							</div>
 							<p>{"};"}</p>
 						</div>
 					</div>
 
-					{/* Navigation (Cols 6-9) */}
-					<div className="md:col-span-3 md:col-start-6 p-8 md:p-12 flex flex-col justify-between">
+					{/* Navigation (Cols 5-7) */}
+					<div className="md:col-span-3 p-8 md:p-10 flex flex-col justify-between">
 						<div>
-							<h3 className="font-mono text-xs text-neon-cyan mb-8 border-b border-neon-cyan/30 pb-2 w-max">
-								// NAVEGAÇÃO_SISTEMA
+							<h3 className="font-mono text-[10px] text-neon-cyan mb-6 border-b border-neon-cyan/30 pb-2 w-max uppercase">
+								// NAVEGAÇÃO
 							</h3>
-							<ul className="space-y-4 font-mono text-sm">
+							<ul className="space-y-3 font-mono text-xs">
 								{[
 									{ name: "INÍCIO", path: "/" },
 									{ name: "LOJA", path: "#store" },
@@ -95,35 +95,66 @@ export default function Footer() {
 						</div>
 					</div>
 
-					{/* Connection (Cols 10-12) */}
-					<div className="md:col-span-4 p-8 md:p-12">
-						<h3 className="font-mono text-xs text-neon-cyan mb-8 border-b border-neon-cyan/30 pb-2 w-max">
-							// CONEXÕES
-						</h3>
-						<div className="space-y-6">
-							<a
-								href="https://instagram.com/federadaifro"
-								target="_blank"
-								rel="noopener noreferrer" 
-								className="block bg-white/5 hover:bg-white/10 border border-white/10 p-4 transition-all group"
-							>
-								<div className="flex justify-between items-center mb-2">
-									<span className="font-mono text-xs text-gray-500">PROTOCOLO: INSTAGRAM</span>
-									<ArrowUpRight size={14} className="text-gray-500 group-hover:text-white" />
-								</div>
-								<div className="font-bold text-lg">@FEDERADAIFRO</div>
-							</a>
+					{/* Connection (Cols 8-12) */}
+					<div className="md:col-span-5 p-8 md:p-10 grid grid-cols-1 md:grid-cols-2 gap-8">
+						<div>
+							<h3 className="font-mono text-[10px] text-neon-cyan mb-6 border-b border-neon-cyan/30 pb-2 w-max uppercase">
+								// CONEXÕES
+							</h3>
+							<div className="space-y-4">
+								<a
+									href="https://instagram.com/federadaifro"
+									target="_blank"
+									rel="noopener noreferrer" 
+									className="block bg-white/5 hover:bg-white/10 border border-white/10 p-3 transition-all group"
+								>
+									<div className="flex justify-between items-center mb-1">
+										<span className="font-mono text-[9px] text-gray-500">INSTAGRAM</span>
+										<ArrowUpRight size={12} className="text-gray-500 group-hover:text-white" />
+									</div>
+									<div className="font-bold text-sm">@FEDERADAIFRO</div>
+								</a>
+							</div>
+						</div>
 
-							<a
-								href="#"
-								className="block bg-white/5 hover:bg-white/10 border border-white/10 p-4 transition-all group"
-							>
-								<div className="flex justify-between items-center mb-2">
-									<span className="font-mono text-xs text-gray-500">PROTOCOLO: WHATSAPP</span>
-									<ArrowUpRight size={14} className="text-gray-500 group-hover:text-white" />
+						{/* Developer Section */}
+						<div>
+							<h3 className="font-mono text-[10px] text-neon-cyan mb-6 border-b border-neon-cyan/30 pb-2 w-max uppercase">
+								// DEVELOPER_INFO
+							</h3>
+							<div className="bg-white/5 border border-white/10 p-4 rounded-sm space-y-4">
+								<div className="flex items-center gap-3">
+									<img 
+										src={gabrielImg} 
+										alt="Gabriel Lucena" 
+										className="w-10 h-10 rounded-full border border-neon-cyan/30 object-cover transition-all duration-300" 
+									/>
+									<div>
+										<p className="text-[10px] text-gray-500 font-mono">ENGINEER</p>
+										<p className="text-xs font-bold uppercase">Gabriel Lucena</p>
+									</div>
 								</div>
-								<div className="font-bold text-lg">CONTATO DIRETO</div>
-							</a>
+
+								<a 
+									href="https://wa.me/5569993242656" 
+									target="_blank" 
+									rel="noopener noreferrer"
+									className="group block"
+								>
+									<div className="flex items-center justify-between mb-2">
+										<img 
+											src={iadLogo} 
+											alt="IAD Tech" 
+											className="h-4 opacity-80 group-hover:opacity-100 transition-opacity brightness-0 invert" 
+										/>
+										<Code2 size={14} className="text-gray-600 group-hover:text-neon-cyan" />
+									</div>
+									<div className="flex items-center justify-between text-[10px] font-mono text-gray-400 group-hover:text-white transition-colors">
+										<span>ESTABELECER_CONTATO</span>
+										<ArrowUpRight size={10} />
+									</div>
+								</a>
+							</div>
 						</div>
 					</div>
 				</div>
@@ -147,14 +178,7 @@ export default function Footer() {
 					
 					<div className="text-center md:text-right flex flex-col md:items-end gap-1">
 						<span>© 2026 SISTEMA FEDERADA. TODOS OS DIREITOS RESERVADOS.</span>
-						<a 
-							href="https://wa.me/5569993242656" 
-							target="_blank" 
-							rel="noopener noreferrer"
-							className="text-[9px] text-gray-700 hover:text-neon-cyan transition-colors tracking-widest"
-						>
-							DEVELOPED BY IAD TECH_
-						</a>
+						<span className="text-[9px] text-gray-800 tracking-widest">DEPLOYED_VIA_IAD_CORE_V1</span>
 					</div>
 				</div>
 			</div>
