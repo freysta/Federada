@@ -24,29 +24,11 @@ export class OrdersService {
   }
 
   private async initializeMP() {
-    const staticToken = this.configService.get<string>('MERCADO_PAGO_ACCESS_TOKEN');
-    const clientId = this.configService.get<string>('MP_CLIENT_ID');
-    const clientSecret = this.configService.get<string>('MP_CLIENT_SECRET');
-
-    if (clientId && clientSecret && clientId !== 'seu_client_id') {
-      try {
-        const response = await fetch('https://api.mercadopago.com/oauth/token', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            client_id: clientId,
-            client_secret: clientSecret,
-            grant_type: 'client_credentials',
-          }),
-        });
-        const data = await response.json();
-        this.accessToken = data.access_token;
-      } catch (error) {
-        console.error('Falha ao obter token OAuth:', error);
-        this.accessToken = staticToken || '';
-      }
-    } else {
-      this.accessToken = staticToken || '';
+    this.accessToken = this.configService.get<string>('MERCADO_PAGO_ACCESS_TOKEN');
+    
+    if (!this.accessToken) {
+      console.error('CRITICAL: MERCADO_PAGO_ACCESS_TOKEN not defined');
+      return;
     }
 
     this.mpClient = new MercadoPagoConfig({
@@ -55,7 +37,6 @@ export class OrdersService {
   }
 
   async create(createOrderDto: CreateOrderDto) {
-    // Garante que o cliente esteja inicializado (útil se o token expirar ou se for a primeira chamada)
     if (!this.mpClient) await this.initializeMP();
     
     const {
@@ -70,7 +51,10 @@ export class OrdersService {
 
     // 1. Find or Create User
     let user = await this.usersRepository.findOne({
-      where: { email: customerEmail },
+      where: [
+        { email: customerEmail },
+        { cpf: customerCpf }
+      ],
     });
 
     if (!user) {
@@ -97,29 +81,28 @@ export class OrdersService {
     // 3. Generate Mercado Pago Payment
     try {
       const payment = new Payment(this.mpClient);
-
-      const paymentResponse = await payment.create({
-        body: {
-          transaction_amount: amount,
-          description: `${productName}${productSize ? ` - ${productSize}` : ''}`,
-          payment_method_id: 'pix',
-          payer: {
-            email: customerEmail,
-            first_name: customerName.split(' ')[0],
-            last_name: customerName.split(' ').slice(1).join(' ') || 'Customer',
-            identification: {
-              type: 'CPF',
-              number: customerCpf.replace(/\D/g, ''),
-            },
+      
+      const body = {
+        transaction_amount: amount,
+        description: `${productName}${productSize ? ` - ${productSize}` : ''}`,
+        payment_method_id: 'pix',
+        payer: {
+          email: customerEmail,
+          first_name: customerName.split(' ')[0],
+          last_name: customerName.split(' ').slice(1).join(' ') || 'Customer',
+          identification: {
+            type: 'CPF',
+            number: customerCpf.replace(/\D/g, ''),
           },
         },
-      });
+      };
+
+      const paymentResponse = await payment.create({ body });
 
       const pointOfInteraction = paymentResponse.point_of_interaction;
       const pixCopyPaste = pointOfInteraction?.transaction_data?.qr_code;
       const qrCodeBase64 = pointOfInteraction?.transaction_data?.qr_code_base64;
 
-      // Update order with payment details
       order.paymentId = paymentResponse.id?.toString() ?? null;
       order.pixCopyPaste = pixCopyPaste ?? null;
       await this.ordersRepository.save(order);
@@ -135,7 +118,7 @@ export class OrdersService {
       };
     } catch (error) {
       console.error('Mercado Pago Error:', error);
-      throw new InternalServerErrorException('Error generating payment');
+      throw new InternalServerErrorException('Error generating payment with Mercado Pago');
     }
   }
 
@@ -144,19 +127,23 @@ export class OrdersService {
       const paymentId = data.data.id;
       const payment = new Payment(this.mpClient);
       
-      const paymentData = await payment.get({ id: paymentId });
-      
-      const order = await this.ordersRepository.findOne({
-        where: { paymentId: paymentId.toString() },
-      });
+      try {
+        const paymentData = await payment.get({ id: paymentId });
+        
+        const order = await this.ordersRepository.findOne({
+          where: { paymentId: paymentId.toString() },
+        });
 
-      if (order) {
-        if (paymentData.status === 'approved') {
-          order.status = 'PAID';
-        } else if (paymentData.status === 'rejected' || paymentData.status === 'cancelled') {
-          order.status = 'CANCELLED';
+        if (order) {
+          if (paymentData.status === 'approved') {
+            order.status = 'PAID';
+          } else if (paymentData.status === 'rejected' || paymentData.status === 'cancelled') {
+            order.status = 'CANCELLED';
+          }
+          await this.ordersRepository.save(order);
         }
-        await this.ordersRepository.save(order);
+      } catch (error) {
+        console.error('Webhook processing error:', error);
       }
     }
     return { received: true };
