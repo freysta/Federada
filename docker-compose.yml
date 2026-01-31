@@ -28,7 +28,7 @@ services:
     container_name: federada-web
     restart: always
     ports:
-      - "80:80"
+      - "3001:80"
     depends_on:
       - api
     networks:
