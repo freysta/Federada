@@ -34,14 +34,13 @@ services:
     networks:
       - federada-network
 
-  # Reverse Proxy & SSL (Caddy)
+  # Reverse Proxy & SSL (Caddy managed via Cloudflare)
   caddy:
     image: caddy:2-alpine
     container_name: federada-caddy
     restart: always
     ports:
       - "8080:80"
-      - "8443:443"
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile
       - caddy_data:/data

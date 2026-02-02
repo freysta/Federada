@@ -1,9 +1,4 @@
-{
-    http_port 80
-    https_port 443
-}
-
-federada.com.br {
+http://federada.com.br {
     # Backend API
     handle_path /api/* {
         reverse_proxy api:3000
