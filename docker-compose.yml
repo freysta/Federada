@@ -8,13 +8,13 @@ services:
       dockerfile: Dockerfile
     container_name: federada-api
     restart: always
-    ports:
-      - "3002:3000"
+    expose:
+      - "3000"
     environment:
       - PORT=3000
       - MERCADO_PAGO_ACCESS_TOKEN=${MERCADO_PAGO_ACCESS_TOKEN}
     volumes:
-      - ./server/data:/app/data # Persistência do SQLite
+      - ./server/data:/app/data
     networks:
       - federada-network
 
@@ -24,15 +24,37 @@ services:
       context: ./web
       dockerfile: Dockerfile
       args:
-        - VITE_API_URL=${VITE_API_URL:-http://localhost:3000}
+        - VITE_API_URL=${VITE_API_URL:-https://federada.com.br/api}
     container_name: federada-web
     restart: always
-    ports:
-      - "3001:80"
+    expose:
+      - "80"
     depends_on:
       - api
     networks:
       - federada-network
+
+  # Reverse Proxy & SSL (Caddy)
+  caddy:
+    image: caddy:2-alpine
+    container_name: federada-caddy
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - api
+      - web
+    networks:
+      - federada-network
+
+volumes:
+  caddy_data:
+  caddy_config:
 
 networks:
   federada-network:
