@@ -1,12 +1,15 @@
+{
+    http_port 80
+    https_port 443
+}
+
 federada.com.br {
     # Backend API
-    # Quando acessar /api/*, remove o prefixo e manda para o backend
     handle_path /api/* {
         reverse_proxy api:3000
     }
 
     # Frontend (React)
-    # Qualquer outra rota vai para o site
     handle {
         reverse_proxy web:80
     }

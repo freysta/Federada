@@ -6,7 +6,7 @@ async function bootstrap() {
   
   // Enable CORS for Frontend communication
   app.enableCors({
-    origin: process.env.CORS_ORIGIN ? process.env.CORS_ORIGIN.split(',') : ['https://federada.com.br', 'http://localhost:5173'],
+    origin: process.env.CORS_ORIGIN ? process.env.CORS_ORIGIN.split(',') : ['https://federada.com.br:8443', 'http://federada.com.br:8080', 'http://localhost:5173'],
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true,
   });
