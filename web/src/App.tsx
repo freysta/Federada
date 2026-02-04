@@ -8,6 +8,7 @@ import Roadmap from "./components/Roadmap";
 import Team from "./components/Team";
 import Footer from "./components/Footer";
 import TerminalWidget from "./components/TerminalWidget";
+import CAADS from "./components/CAADS";
 
 function App() {
 	return (
@@ -19,6 +20,7 @@ function App() {
 				<ProductGrid />
 				<Gallery />
 				<NewsSection />
+				<CAADS />
 				<Roadmap />
 				<Team />
 			</main>

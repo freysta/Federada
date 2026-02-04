@@ -22,6 +22,9 @@ export default function Navbar() {
 					<a href="#news" className="hover:underline underline-offset-4">
 						NOTÍCIAS
 					</a>
+					<a href="#caads" className="hover:underline underline-offset-4">
+						CAADS
+					</a>
 					<a href="#merch" className="hover:underline underline-offset-4">
 						LOJA
 					</a>
@@ -58,6 +61,9 @@ export default function Navbar() {
 					</a>
 					<a href="#news" onClick={() => setIsOpen(false)}>
 						NOTÍCIAS
+					</a>
+					<a href="#caads" onClick={() => setIsOpen(false)}>
+						CAADS
 					</a>
 					<a href="#merch" onClick={() => setIsOpen(false)}>
 						LOJA
