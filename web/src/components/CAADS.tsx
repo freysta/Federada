@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { GraduationCap, Users, Zap, Trophy, Target, Instagram, User, ArrowUpRight } from 'lucide-react';
+import { Users, Zap, Trophy, Target, Instagram, User, ArrowUpRight } from 'lucide-react';
 import FadeIn from './FadeIn';
 
 // Imports de imagens do CAADS
