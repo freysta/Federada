@@ -4,6 +4,7 @@ import { CartProvider } from "./contexts/CartContext";
 
 import StoreFront from "./pages/StoreFront";
 import Forum from "./pages/Forum";
+import GalleryPage from "./pages/GalleryPage";
 import AdminLayout from "./pages/admin/AdminLayout";
 import AdminOverview from "./pages/admin/AdminOverview";
 import AdminProducts from "./pages/admin/AdminProducts";
@@ -23,6 +24,7 @@ function App() {
           {/* Rota Principal da Loja */}
           <Route path="/" element={<StoreFront />} />
           <Route path="/forum" element={<Forum />} />
+          <Route path="/gallery" element={<GalleryPage />} />
 
           {/* Rotas do Painel Administrativo */}
           <Route path="/admin" element={<AdminLayout />}>

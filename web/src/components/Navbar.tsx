@@ -31,6 +31,9 @@ export default function Navbar() {
 					<Link to="/forum" className="hover:underline underline-offset-4">
 						FÓRUM
 					</Link>
+					<Link to="/gallery" className="hover:underline underline-offset-4">
+						GALERIA
+					</Link>
 					<a href="#caads" className="hover:underline underline-offset-4">
 						CAADS
 					</a>
@@ -96,6 +99,9 @@ export default function Navbar() {
 					</Link>
 					<Link to="/forum" onClick={() => setIsOpen(false)}>
 						FÓRUM
+					</Link>
+					<Link to="/gallery" onClick={() => setIsOpen(false)}>
+						GALERIA
 					</Link>
 					<a href="#caads" onClick={() => setIsOpen(false)}>
 						CAADS

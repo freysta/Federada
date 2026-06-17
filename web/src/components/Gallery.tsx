@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import FadeIn from './FadeIn';
 
 export default function Gallery() {
@@ -102,14 +103,20 @@ export default function Gallery() {
 
         </div>
 
-        <div className="mt-16 text-center">
+        <div className="mt-16 text-center flex flex-col sm:flex-row items-center justify-center gap-4">
+            <Link 
+                to="/gallery" 
+                className="inline-flex items-center justify-center gap-4 bg-black text-white px-8 py-4 font-bold hover:bg-neutral-800 transition-all w-full sm:w-auto"
+            >
+                VER GALERIA INTERATIVA
+            </Link>
             <a 
                 href="https://instagram.com/federadaifro" 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-4 bg-black text-white px-8 py-4 font-bold hover:bg-neutral-800 transition-all"
+                className="inline-flex items-center justify-center gap-4 border border-black text-black px-8 py-4 font-bold hover:bg-gray-100 transition-all w-full sm:w-auto"
             >
-                VER PERFIL COMPLETO NO INSTAGRAM
+                PERFIL NO INSTAGRAM
             </a>
         </div>
 
