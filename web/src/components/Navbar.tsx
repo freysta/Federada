@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { Menu, X, ShoppingBag, User as UserIcon } from "lucide-react";
 import { useState } from "react";
 import ifroLogo from "../assets/logos/logo-ifro-branca-white-branco.png.webp";
@@ -24,12 +25,12 @@ export default function Navbar() {
 
 				{/* Desktop Menu */}
 				<div className="hidden md:flex items-center gap-8 font-mono text-sm">
-					<a href="#" className="hover:underline underline-offset-4">
+					<Link to="/" className="hover:underline underline-offset-4">
 						INÍCIO
-					</a>
-					<a href="#news" className="hover:underline underline-offset-4">
-						NOTÍCIAS
-					</a>
+					</Link>
+					<Link to="/forum" className="hover:underline underline-offset-4">
+						FÓRUM
+					</Link>
 					<a href="#caads" className="hover:underline underline-offset-4">
 						CAADS
 					</a>
@@ -90,12 +91,12 @@ export default function Navbar() {
 			{/* Mobile Menu */}
 			{isOpen && (
 				<div className="md:hidden bg-white border-b border-black/10 p-6 flex flex-col gap-4 font-mono text-sm">
-					<a href="#" onClick={() => setIsOpen(false)}>
+					<Link to="/" onClick={() => setIsOpen(false)}>
 						INÍCIO
-					</a>
-					<a href="#news" onClick={() => setIsOpen(false)}>
-						NOTÍCIAS
-					</a>
+					</Link>
+					<Link to="/forum" onClick={() => setIsOpen(false)}>
+						FÓRUM
+					</Link>
 					<a href="#caads" onClick={() => setIsOpen(false)}>
 						CAADS
 					</a>

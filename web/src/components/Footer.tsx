@@ -14,7 +14,7 @@ export default function Footer() {
 
 			{/* Massive Background Signature - Fixed Stroke */}
 			<div className="absolute bottom-[-2%] left-0 w-full select-none pointer-events-none opacity-5 z-0">
-				<h1 className="text-[18vw] leading-none font-bold text-center tracking-tighter text-transparent" style={{ WebkitTextStroke: '1px white' }}>
+				<h1 className="text-[18vw] leading-none font-bold text-center tracking-normal text-transparent" style={{ WebkitTextStroke: '1px white' }}>
 					FEDERADA
 				</h1>
 			</div>

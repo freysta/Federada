@@ -80,7 +80,7 @@ export default function CAADS() {
                 <span className="w-2 h-2 bg-blue-600 rounded-full animate-pulse"></span>
                 Academic_Core_System
               </div>
-              <h2 className="text-5xl md:text-7xl tracking-tighter mb-6 font-bold">
+              <h2 className="text-5xl md:text-7xl mb-6 font-bold tracking-normal leading-none">
                 CAADS<span className="text-blue-600">.</span>
               </h2>
               <p className="text-lg md:text-xl font-medium leading-relaxed text-gray-800">

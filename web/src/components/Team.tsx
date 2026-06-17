@@ -48,7 +48,7 @@ export default function Team() {
                        <span className="w-2 h-2 bg-black animate-pulse"></span>
                        <span className="font-mono text-xs tracking-widest text-black">OPERATIVE_DIRECTORY_V2.0</span>
                     </div>
-                    <h2 className="text-5xl md:text-7xl tracking-tighter uppercase leading-[0.8]">
+                    <h2 className="text-5xl md:text-7xl tracking-normal uppercase leading-none">
                         EQUIPE<br/><span className="text-transparent stroke-text">PRINCIPAL</span>
                     </h2>
                 </div>

@@ -3,6 +3,7 @@ import { Toaster } from "react-hot-toast";
 import { CartProvider } from "./contexts/CartContext";
 
 import StoreFront from "./pages/StoreFront";
+import Forum from "./pages/Forum";
 import AdminLayout from "./pages/admin/AdminLayout";
 import AdminOverview from "./pages/admin/AdminOverview";
 import AdminProducts from "./pages/admin/AdminProducts";
@@ -21,6 +22,7 @@ function App() {
         <Routes>
           {/* Rota Principal da Loja */}
           <Route path="/" element={<StoreFront />} />
+          <Route path="/forum" element={<Forum />} />
 
           {/* Rotas do Painel Administrativo */}
           <Route path="/admin" element={<AdminLayout />}>
