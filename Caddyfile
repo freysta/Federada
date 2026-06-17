@@ -1,4 +1,4 @@
-http://federada.com.br {
+http://localhost, http://federada.com.br {
     # Backend API
     handle_path /api/* {
         reverse_proxy api:3000

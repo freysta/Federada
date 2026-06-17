@@ -1,81 +1,127 @@
 import { useState } from 'react';
-import { X, Loader2, MessageCircle, AlertCircle } from 'lucide-react';
+import { X, Loader2, CreditCard, AlertCircle } from 'lucide-react';
+import { useAuth } from '../contexts/AuthContext';
+import { useCart } from '../contexts/CartContext';
+import { API_URL } from '../config';
+import PixModal from './PixModal';
+import toast from 'react-hot-toast';
+import { createPortal } from 'react-dom';
 
 interface CheckoutModalProps {
   isOpen: boolean;
   onClose: () => void;
-  product: {
-    name: string;
-    price: string; // e.g., "R$ 69,90"
-    rawPrice: number; // e.g., 69.90
-  } | null;
 }
 
-// Número de contato para vendas (Pode ser movido para config depois)
-const WHATSAPP_NUMBER = "5569993242656";
-
-export default function CheckoutModal({ isOpen, onClose, product }: CheckoutModalProps) {
-  const [step, setStep] = useState<'form' | 'loading'>('form');
+export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
+  const { user, token, login } = useAuth();
+  const { items, totalPrice, clearCart } = useCart();
+  const [step, setStep] = useState<'form' | 'loading' | 'pix'>('form');
+  const [pixData, setPixData] = useState<{ qrCode: string, copyPaste: string, orderId: string } | null>(null);
+  const [errorMsg, setErrorMsg] = useState('');
+  
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
+    name: user?.name || '',
+    email: user?.email || '',
     cpf: '',
     phone: '',
-    size: 'M'
+    password: ''
   });
 
-  if (!isOpen || !product) return null;
+  if (!isOpen || items.length === 0) return null;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setStep('loading');
+    setErrorMsg('');
 
-    // Simulate a small delay for UX
-    await new Promise(resolve => setTimeout(resolve, 800));
+    try {
+      let currentToken = token;
 
-    const message = `
-*NOVO PEDIDO - LOJA FEDERADA*
----------------------------
-*ITEM:* ${product.name}
-*VALOR:* ${product.price}
-*TAMANHO:* ${formData.size}
----------------------------
-*DADOS DO CLIENTE:*
-*Nome:* ${formData.name}
-*CPF:* ${formData.cpf}
-*E-mail:* ${formData.email}
-*Celular:* ${formData.phone}
----------------------------
-_Gostaria de prosseguir com o pagamento._
-    `.trim();
+      // Se não estiver logado, faz o registro
+      if (!user) {
+        const registerRes = await fetch(`${API_URL}/auth/register`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name: formData.name,
+            email: formData.email,
+            cpf: formData.cpf,
+            phone: formData.phone,
+            password: formData.password || '123456'
+          })
+        });
 
-    const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
-    
-    window.open(url, '_blank');
+        if (!registerRes.ok) {
+          const errData = await registerRes.json();
+          throw new Error(errData.message || 'Erro ao registrar usuário. Email ou CPF já existem.');
+        }
+
+        const data = await registerRes.json();
+        currentToken = data.access_token;
+        login(data.access_token, data.user);
+      }
+
+      // Cria o Pedido com array de itens do carrinho
+      const orderItems = items.map(item => ({
+        productId: item.productId,
+        size: item.size,
+        quantity: item.quantity
+      }));
+
+      const orderRes = await fetch(`${API_URL}/orders`, {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${currentToken}`
+        },
+        body: JSON.stringify({ items: orderItems })
+      });
+
+      if (!orderRes.ok) {
+        throw new Error('Erro ao gerar pagamento PIX.');
+      }
+
+      const orderData = await orderRes.json();
+      
+      toast.success('Pedido criado! Pague o PIX para garantir.');
+      
+      setPixData({
+        orderId: orderData.orderId,
+        qrCode: orderData.pix.qrCodeBase64,
+        copyPaste: orderData.pix.copyPaste
+      });
+      setStep('pix');
+
+    } catch (err: any) {
+      console.error(err);
+      setErrorMsg(err.message);
+      setStep('form');
+    }
+  };
+
+  const handleClose = () => {
     setStep('form');
+    setPixData(null);
     onClose();
   };
 
-  return (
-    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
-      <div
-        className="absolute inset-0 bg-black/90 backdrop-blur-md"
-        onClick={onClose}
-      ></div>
+  if (step === 'pix' && pixData) {
+    return <PixModal isOpen={true} onClose={() => { clearCart(); handleClose(); }} pixData={pixData} amount={`R$ ${totalPrice.toFixed(2).replace('.', ',')}`} />;
+  }
+
+  const modalContent = (
+    <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
+      <div className="absolute inset-0 bg-black/90 backdrop-blur-md" onClick={handleClose}></div>
 
       <div className="relative bg-white w-full max-w-md shadow-2xl border border-black flex flex-col max-h-[90vh]">
-        {/* Technical Header */}
         <div className="bg-black text-white p-3 flex justify-between items-center border-b border-white/20 shrink-0">
           <div className="flex items-center gap-2">
             <div className="w-2 h-2 bg-green-500 animate-pulse rounded-full"></div>
             <h3 className="font-mono text-xs tracking-[0.2em] uppercase text-gray-300">
-              SECURE_CHECKOUT_V2
+              SECURE_CHECKOUT
             </h3>
           </div>
-          <button
-            onClick={onClose}
-            className="text-gray-400 hover:text-white transition-colors hover:rotate-90 duration-300"
-          >
+          <button onClick={handleClose} className="text-gray-400 hover:text-white transition-colors hover:rotate-90 duration-300">
             <X size={18} />
           </button>
         </div>
@@ -83,156 +129,82 @@ _Gostaria de prosseguir com o pagamento._
         <div className="p-6 overflow-y-auto custom-scrollbar">
           {step === "form" && (
             <form onSubmit={handleSubmit} className="space-y-6">
-              {/* Product Summary Ticket */}
-              <div className="bg-neutral-50 border border-black p-4 relative overflow-hidden">
-                <div className="absolute top-0 right-0 p-1">
-                  <div className="w-16 h-16 border-t-2 border-r-2 border-black/10 -mt-2 -mr-2"></div>
-                </div>
-                <div className="relative z-10">
-                  <p className="font-mono text-[10px] text-gray-400 mb-1 uppercase tracking-widest">
-                    ITEM_SELECIONADO
-                  </p>
-                  <p className="font-bold text-lg leading-tight uppercase mb-2">{product.name}</p>
-                  <div className="flex justify-between items-end border-t border-dashed border-gray-300 pt-2">
-                     <span className="font-mono text-xl font-bold">{product.price}</span>
-                     <span className="text-[10px] bg-black text-white px-1 font-mono">EM ESTOQUE</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Form Fields */}
-              <div className="space-y-4">
-                <div className="group">
-                  <label className="block text-[10px] font-bold uppercase tracking-widest mb-1 text-gray-500 group-focus-within:text-black transition-colors">
-                    // NOME_COMPLETO
-                  </label>
-                  <input
-                    required
-                    type="text"
-                    className="w-full bg-white border border-gray-300 p-3 text-sm font-mono focus:border-black focus:ring-0 outline-none transition-all placeholder:text-gray-200"
-                    placeholder="DIGITE SEU NOME..."
-                    value={formData.name}
-                    onChange={(e) =>
-                      setFormData({ ...formData, name: e.target.value })
-                    }
-                  />
-                </div>
-
-                <div className="group">
-                  <label className="block text-[10px] font-bold uppercase tracking-widest mb-1 text-gray-500 group-focus-within:text-black transition-colors">
-                    // E-MAIL_CONTATO
-                  </label>
-                  <input
-                    required
-                    type="email"
-                    className="w-full bg-white border border-gray-300 p-3 text-sm font-mono focus:border-black focus:ring-0 outline-none transition-all placeholder:text-gray-200"
-                    placeholder="SEU@EMAIL.COM"
-                    value={formData.email}
-                    onChange={(e) =>
-                      setFormData({ ...formData, email: e.target.value })
-                    }
-                  />
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="group">
-                    <label className="block text-[10px] font-bold uppercase tracking-widest mb-1 text-gray-500 group-focus-within:text-black transition-colors">
-                      // CPF
-                    </label>
-                    <input
-                      required
-                      type="text"
-                      placeholder="000.000.000-00"
-                      className="w-full bg-white border border-gray-300 p-3 text-sm font-mono focus:border-black focus:ring-0 outline-none transition-all placeholder:text-gray-200"
-                      value={formData.cpf}
-                      onChange={(e) =>
-                        setFormData({ ...formData, cpf: e.target.value })
-                      }
-                    />
-                  </div>
-
-                  <div className="group">
-                    <label className="block text-[10px] font-bold uppercase tracking-widest mb-1 text-gray-500 group-focus-within:text-black transition-colors">
-                      // WHATSAPP
-                    </label>
-                    <input
-                      required
-                      type="tel"
-                      placeholder="(69) 9..."
-                      className="w-full bg-white border border-gray-300 p-3 text-sm font-mono focus:border-black focus:ring-0 outline-none transition-all placeholder:text-gray-200"
-                      value={formData.phone}
-                      onChange={(e) =>
-                        setFormData({ ...formData, phone: e.target.value })
-                      }
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-[10px] font-bold uppercase tracking-widest mb-2 text-gray-500">
-                    // SELECIONE_TAMANHO
-                  </label>
-                  <div className="flex gap-2">
-                    {["P", "M", "G", "GG"].map((s) => (
-                      <button
-                        key={s}
-                        type="button"
-                        onClick={() => setFormData({ ...formData, size: s })}
-                        className={`flex-1 relative h-12 flex items-center justify-center text-sm font-bold border transition-all duration-200 group
-                          ${formData.size === s 
-                            ? "bg-black text-white border-black" 
-                            : "bg-white text-gray-400 border-gray-200 hover:border-gray-400 hover:text-black"
-                          }`}
-                      >
-                        {formData.size === s && (
-                          <span className="absolute top-1 right-1 w-1.5 h-1.5 bg-green-500"></span>
-                        )}
-                        <span className="font-mono">{s}</span>
-                      </button>
+              <div className="bg-neutral-50 border border-black p-4 relative overflow-hidden flex flex-col gap-3">
+                  <p className="font-mono text-[10px] text-gray-400 uppercase tracking-widest">RESUMO DO PEDIDO ({items.length} itens)</p>
+                  
+                  <div className="space-y-3 max-h-40 overflow-y-auto custom-scrollbar pr-2">
+                    {items.map((item, idx) => (
+                      <div key={idx} className="flex justify-between items-center text-sm border-b border-gray-200 pb-2 last:border-0 last:pb-0">
+                        <div className="flex flex-col">
+                          <span className="font-bold uppercase line-clamp-1 max-w-[220px] leading-tight">{item.quantity}x {item.name}</span>
+                          {item.size && <span className="font-mono text-[10px] text-gray-500 mt-0.5">TAM: {item.size}</span>}
+                        </div>
+                        <span className="font-mono font-bold">R$ {(item.price * item.quantity).toFixed(2).replace('.', ',')}</span>
+                      </div>
                     ))}
                   </div>
+
+                  <div className="flex justify-between items-end border-t border-dashed border-gray-300 pt-3 mt-1">
+                     <div className="flex flex-col">
+                       <span className="text-[10px] text-gray-500 font-mono">TOTAL A PAGAR</span>
+                       <span className="font-mono text-xl font-bold leading-tight">R$ {totalPrice.toFixed(2).replace('.', ',')}</span>
+                     </div>
+                     <span className="text-[10px] bg-black text-white px-2 py-1 font-mono font-bold tracking-widest">SOB DEMANDA</span>
+                  </div>
+              </div>
+              
+              <div className="bg-[#00f0ff]/10 border border-[#00f0ff] p-3 text-xs font-mono text-gray-800 space-y-1">
+                <p><strong>PRODUÇÃO:</strong> Em até 15 dias úteis.</p>
+                <p><strong>ENTREGA:</strong> Retirada presencial na faculdade (Centro Acadêmico).</p>
+              </div>
+
+              {errorMsg && (
+                <div className="bg-red-50 text-red-600 border border-red-200 p-3 text-xs font-mono flex items-center gap-2">
+                  <AlertCircle size={14} />
+                  {errorMsg}
                 </div>
-              </div>
+              )}
 
-              {/* Info Alert */}
-              <div className="flex items-start gap-3 bg-neutral-50 p-3 border border-dashed border-gray-300 text-xs text-gray-500 font-mono">
-                 <AlertCircle size={14} className="mt-0.5 shrink-0" />
-                 <p>Ao continuar, você será redirecionado para o WhatsApp oficial para concluir o pagamento via Pix.</p>
-              </div>
+              {!user ? (
+                <div className="space-y-4">
+                  <p className="text-xs font-mono text-gray-500">// DADOS_COMPRADOR (Criação de Conta)</p>
+                  <div className="group">
+                    <input required type="text" className="w-full bg-white border border-gray-300 p-3 text-sm font-mono focus:border-black focus:ring-0 outline-none" placeholder="NOME COMPLETO" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} />
+                  </div>
+                  <div className="group">
+                    <input required type="email" className="w-full bg-white border border-gray-300 p-3 text-sm font-mono focus:border-black focus:ring-0 outline-none" placeholder="SEU@EMAIL.COM" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} />
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <input required type="text" inputMode="numeric" placeholder="CPF" className="w-full bg-white border border-gray-300 p-3 text-sm font-mono focus:border-black focus:ring-0 outline-none" value={formData.cpf} onChange={(e) => setFormData({ ...formData, cpf: e.target.value })} />
+                    <input required type="tel" inputMode="numeric" placeholder="WHATSAPP" className="w-full bg-white border border-gray-300 p-3 text-sm font-mono focus:border-black focus:ring-0 outline-none" value={formData.phone} onChange={(e) => setFormData({ ...formData, phone: e.target.value })} />
+                  </div>
+                  <div className="group">
+                    <input required type="password" minLength={6} className="w-full bg-white border border-gray-300 p-3 text-sm font-mono focus:border-black focus:ring-0 outline-none" placeholder="CRIE UMA SENHA" value={formData.password} onChange={(e) => setFormData({ ...formData, password: e.target.value })} />
+                  </div>
+                </div>
+              ) : (
+                <div className="bg-green-50 text-green-800 p-3 text-xs font-mono border border-green-200">
+                  Logado como: <strong>{user.name}</strong> ({user.email})
+                </div>
+              )}
 
-              <button
-                type="submit"
-                className="w-full bg-[#25D366] text-white font-bold py-4 hover:bg-[#20bd5a] transition-all border border-black/10 hover:border-black flex items-center justify-center gap-3 group relative overflow-hidden"
-              >
-                <div className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:animate-shimmer"></div>
-                <MessageCircle size={20} />
-                <span className="tracking-widest">INICIAR_ATENDIMENTO</span>
+              <button type="submit" className="w-full bg-black text-white font-bold py-4 hover:bg-neutral-800 transition-all border border-black flex items-center justify-center gap-3">
+                <CreditCard size={20} />
+                <span className="tracking-widest">GERAR PIX</span>
               </button>
             </form>
           )}
 
           {step === "loading" && (
             <div className="py-20 flex flex-col items-center justify-center text-center">
-              <div className="relative">
-                <div className="absolute inset-0 bg-green-500/20 blur-xl rounded-full"></div>
-                <Loader2 size={64} className="animate-spin text-black relative z-10" />
-              </div>
-              <p className="font-mono text-sm mt-8 animate-pulse tracking-widest">
-                ESTABELECENDO_CONEXÃO...
-              </p>
-              <p className="text-[10px] font-mono text-gray-400 mt-2 uppercase">
-                Aguarde o redirecionamento
-              </p>
+              <Loader2 size={48} className="animate-spin text-black mb-4" />
+              <p className="font-mono text-sm animate-pulse tracking-widest">PROCESSANDO...</p>
             </div>
           )}
-        </div>
-        
-        {/* Footer Decorator */}
-        <div className="bg-neutral-100 border-t border-gray-200 p-2 flex justify-between items-center text-[9px] font-mono text-gray-400 shrink-0">
-           <span>SECURE_ENCLAVE_ID: 0x8291A</span>
-           <span>STATUS: ONLINE</span>
         </div>
       </div>
     </div>
   );
+
+  return createPortal(modalContent, document.body);
 }

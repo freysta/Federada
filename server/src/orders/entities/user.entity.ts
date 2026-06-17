@@ -18,6 +18,9 @@ export class User {
   @Column({ nullable: true })
   phone: string;
 
+  @Column({ nullable: true })
+  password?: string;
+
   @Column({ default: 'CUSTOMER' })
   role: string;
 

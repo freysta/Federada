@@ -24,7 +24,7 @@ services:
       context: ./web
       dockerfile: Dockerfile
       args:
-        - VITE_API_URL=${VITE_API_URL:-https://federada.com.br/api}
+        - VITE_API_URL=${VITE_API_URL:-http://localhost:8080/api}
     container_name: federada-web
     restart: always
     expose:

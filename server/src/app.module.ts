@@ -5,7 +5,11 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { OrdersModule } from './orders/orders.module';
 import { Order } from './orders/entities/order.entity';
+import { OrderItem } from './orders/entities/order-item.entity';
 import { User } from './orders/entities/user.entity';
+import { ProductsModule } from './products/products.module';
+import { Product } from './products/entities/product.entity';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -14,11 +18,13 @@ import { User } from './orders/entities/user.entity';
     }),
     TypeOrmModule.forRoot({
       type: 'sqlite',
-      database: 'database.sqlite',
-      entities: [Order, User],
+      database: 'data/database.sqlite',
+      entities: [Order, OrderItem, User, Product],
       synchronize: true, // Only for development
     }),
     OrdersModule,
+    ProductsModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],

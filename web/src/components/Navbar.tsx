@@ -1,10 +1,18 @@
-import { Menu, X, ShoppingBag } from "lucide-react";
+import { Menu, X, ShoppingBag, User as UserIcon } from "lucide-react";
 import { useState } from "react";
 import ifroLogo from "../assets/logos/logo-ifro-branca-white-branco.png.webp";
 import federadaIcon from "../assets/logos/logo-sem-nome.png";
+import { useAuth } from "../contexts/AuthContext";
+import { useCart } from "../contexts/CartContext";
+import LoginModal from "./LoginModal";
+import DashboardModal from "./DashboardModal";
 
 export default function Navbar() {
 	const [isOpen, setIsOpen] = useState(false);
+	const { user } = useAuth();
+	const { totalItems, setIsCartOpen } = useCart();
+	const [isLoginOpen, setIsLoginOpen] = useState(false);
+	const [isDashboardOpen, setIsDashboardOpen] = useState(false);
 
 	return (
 		<nav className="fixed w-full z-50 bg-white/90 backdrop-blur border-b border-black/5">
@@ -41,16 +49,42 @@ export default function Navbar() {
 						className="h-8 opacity-80 hover:opacity-100 transition-opacity invert"
 					/>
 
-					<button className="bg-black text-white px-6 py-2 flex items-center gap-2 hover:bg-neutral-800 transition-colors">
+					{user ? (
+						<button onClick={() => setIsDashboardOpen(true)} className="bg-black text-white px-4 py-2 flex items-center gap-2 hover:bg-neutral-800 transition-colors">
+							<UserIcon size={16} />
+							<span className="font-sans font-bold tracking-wide uppercase">{user.name.split(' ')[0]}</span>
+						</button>
+					) : (
+						<button onClick={() => setIsLoginOpen(true)} className="bg-white border border-black text-black px-4 py-2 flex items-center gap-2 hover:bg-gray-100 transition-colors">
+							<UserIcon size={16} />
+							<span className="font-sans font-bold tracking-wide">LOGIN</span>
+						</button>
+					)}
+					
+					<button onClick={() => setIsCartOpen(true)} className="bg-black text-white px-4 py-2 flex items-center gap-2 hover:bg-neutral-800 transition-colors relative">
 						<ShoppingBag size={16} />
-						<span className="font-sans font-bold tracking-wide">LOJA</span>
+						<span className="font-sans font-bold tracking-wide">CARRINHO</span>
+						{totalItems > 0 && (
+							<span className="absolute -top-2 -right-2 bg-[#00f0ff] text-black text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center border border-black shadow-sm">
+								{totalItems}
+							</span>
+						)}
 					</button>
 				</div>
 
-				{/* Mobile Toggle */}
-				<button className="md:hidden" onClick={() => setIsOpen(!isOpen)}>
-					{isOpen ? <X /> : <Menu />}
-				</button>
+				<div className="md:hidden flex items-center gap-4">
+					<button onClick={() => setIsCartOpen(true)} className="relative p-2">
+						<ShoppingBag size={20} />
+						{totalItems > 0 && (
+							<span className="absolute top-0 right-0 bg-[#00f0ff] text-black text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center border border-black shadow-sm">
+								{totalItems}
+							</span>
+						)}
+					</button>
+					<button onClick={() => setIsOpen(!isOpen)}>
+						{isOpen ? <X /> : <Menu />}
+					</button>
+				</div>
 			</div>
 
 			{/* Mobile Menu */}
@@ -78,8 +112,25 @@ export default function Navbar() {
 							className="h-6 opacity-60 invert"
 						/>
 					</div>
+					
+					<div className="pt-2">
+					    {user ? (
+							<button onClick={() => { setIsOpen(false); setIsDashboardOpen(true); }} className="w-full bg-black text-white px-4 py-3 flex justify-center items-center gap-2 hover:bg-neutral-800 transition-colors">
+								<UserIcon size={16} />
+								<span className="font-sans font-bold tracking-wide uppercase">MINHA CONTA</span>
+							</button>
+						) : (
+							<button onClick={() => { setIsOpen(false); setIsLoginOpen(true); }} className="w-full bg-white border border-black text-black px-4 py-3 flex justify-center items-center gap-2 hover:bg-gray-100 transition-colors">
+								<UserIcon size={16} />
+								<span className="font-sans font-bold tracking-wide">LOGIN</span>
+							</button>
+						)}
+					</div>
 				</div>
 			)}
+			
+			<LoginModal isOpen={isLoginOpen} onClose={() => setIsLoginOpen(false)} />
+			<DashboardModal isOpen={isDashboardOpen} onClose={() => setIsDashboardOpen(false)} />
 		</nav>
 	);
 }

@@ -5,8 +5,10 @@ import { ConfigService } from '@nestjs/config';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { Order } from './entities/order.entity';
+import { OrderItem } from './entities/order-item.entity';
 import { User } from './entities/user.entity';
 import { MercadoPagoConfig, Payment } from 'mercadopago';
+import { ProductsService } from '../products/products.service';
 
 @Injectable()
 export class OrdersService {
@@ -19,6 +21,7 @@ export class OrdersService {
     @InjectRepository(User)
     private usersRepository: Repository<User>,
     private configService: ConfigService,
+    private productsService: ProductsService,
   ) {
     this.initializeMP();
   }
@@ -36,67 +39,62 @@ export class OrdersService {
     });
   }
 
-  async create(createOrderDto: CreateOrderDto) {
+  async create(userId: string, createOrderDto: CreateOrderDto) {
     if (!this.mpClient) await this.initializeMP();
     
-    const {
-      customerName,
-      customerEmail,
-      customerCpf,
-      customerPhone,
-      productName,
-      productSize,
-      amount,
-    } = createOrderDto;
+    // 1. Find User
+    const user = await this.usersRepository.findOne({ where: { id: userId } });
+    if (!user) throw new InternalServerErrorException('User not found');
 
-    // 1. Find or Create User
-    let user = await this.usersRepository.findOne({
-      where: [
-        { email: customerEmail },
-        { cpf: customerCpf }
-      ],
-    });
+    // 2. Validate Items & Calculate Total
+    let totalAmount = 0;
+    const orderItemsToCreate: Partial<OrderItem>[] = [];
 
-    if (!user) {
-      user = this.usersRepository.create({
-        email: customerEmail,
-        cpf: customerCpf,
-        name: customerName,
-        phone: customerPhone,
+    for (const itemDto of createOrderDto.items) {
+      const product = await this.productsService.findOne(itemDto.productId);
+      if (!product) throw new InternalServerErrorException(`Product ${itemDto.productId} not found`);
+
+      totalAmount += Number(product.price) * itemDto.quantity;
+
+      orderItemsToCreate.push({
+        productId: product.id,
+        productName: product.name,
+        productSize: itemDto.size || undefined,
+        price: Number(product.price),
+        quantity: itemDto.quantity,
       });
-      await this.usersRepository.save(user);
     }
 
-    // 2. Create Order (Initial)
+    // 3. Create Order
     const order = this.ordersRepository.create({
       user: user,
-      productName: productName,
-      productSize: productSize,
-      amount: amount,
+      amount: totalAmount,
       status: 'PENDING',
+      items: orderItemsToCreate,
     });
 
     await this.ordersRepository.save(order);
 
-    // 3. Generate Mercado Pago Payment
+    // 4. Generate Mercado Pago Payment
     try {
       const payment = new Payment(this.mpClient);
       
       const webhookUrl = this.configService.get<string>('WEBHOOK_URL');
+      const itemsDescription = orderItemsToCreate.map(i => `${i.quantity}x ${i.productName}`).join(', ');
 
       const body = {
-        transaction_amount: amount,
-        description: `${productName}${productSize ? ` - ${productSize}` : ''}`,
+        transaction_amount: Number(totalAmount),
+        description: itemsDescription.substring(0, 255),
         payment_method_id: 'pix',
         external_reference: order.id,
         notification_url: webhookUrl ? `${webhookUrl}/orders/webhook` : undefined,
         payer: {
-          email: customerEmail,
-          first_name: customerName.split(' ')[0],
-          last_name: customerName.split(' ').slice(1).join(' ') || 'Customer',
+          email: user.email,
+          first_name: user.name.split(' ')[0],
+          last_name: user.name.split(' ').slice(1).join(' ') || 'Customer',
           identification: {
             type: 'CPF',
-            number: customerCpf.replace(/\D/g, ''),
+            number: user.cpf.replace(/\D/g, ''),
           },
         },
       };
@@ -124,6 +122,14 @@ export class OrdersService {
       console.error('Mercado Pago Error:', error);
       throw new InternalServerErrorException('Error generating payment with Mercado Pago');
     }
+  }
+
+  findMyOrders(userId: string) {
+    return this.ordersRepository.find({
+      where: { user: { id: userId } },
+      relations: ['items'],
+      order: { createdAt: 'DESC' }
+    });
   }
 
   async handleWebhook(data: any) {
@@ -170,19 +176,51 @@ export class OrdersService {
     return { received: true };
   }
 
+  async getDashboardStats() {
+    const orders = await this.ordersRepository.find({ relations: ['items'] });
+    
+    let totalRevenue = 0;
+    let totalItemsSold = 0;
+    let pendingCount = 0;
+    let paidCount = 0;
+    let cancelledCount = 0;
+
+    for (const order of orders) {
+      if (order.status === 'PAID') {
+        totalRevenue += Number(order.amount);
+        totalItemsSold += order.items.reduce((acc, item) => acc + item.quantity, 0);
+        paidCount++;
+      } else if (order.status === 'PENDING') {
+        pendingCount++;
+      } else if (order.status === 'CANCELLED') {
+        cancelledCount++;
+      }
+    }
+
+    return {
+      totalRevenue,
+      totalItemsSold,
+      ordersCount: orders.length,
+      paidCount,
+      pendingCount,
+      cancelledCount,
+      recentOrders: orders.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime()).slice(0, 5)
+    };
+  }
+
   findAll() {
-    return this.ordersRepository.find({ relations: ['user'] });
+    return this.ordersRepository.find({ relations: ['user', 'items'], order: { createdAt: 'DESC' } });
   }
 
   findOne(id: string) {
     return this.ordersRepository.findOne({
       where: { id },
-      relations: ['user'],
+      relations: ['user', 'items'],
     });
   }
 
   async update(id: string, updateOrderDto: UpdateOrderDto) {
-    await this.ordersRepository.update(id, updateOrderDto);
+    await this.ordersRepository.update(id, updateOrderDto as any);
     return this.findOne(id);
   }
 
