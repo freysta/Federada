@@ -35,7 +35,10 @@ export default function DashboardModal({ isOpen, onClose }: { isOpen: boolean; o
       fetch(`${API_URL}/orders/me`, {
         headers: { 'Authorization': `Bearer ${token}` }
       })
-      .then(res => res.json())
+      .then(res => {
+        if (!res.ok) throw new Error('Falha ao buscar pedidos');
+        return res.json();
+      })
       .then(data => {
         setOrders(data);
         setLoading(false);

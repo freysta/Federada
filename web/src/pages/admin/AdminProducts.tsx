@@ -38,6 +38,7 @@ export default function AdminProducts() {
     setLoading(true);
     try {
       const res = await fetch(`${API_URL}/products`);
+      if (!res.ok) throw new Error('Falha');
       const data = await res.json();
       setProducts(data);
     } catch (err) {

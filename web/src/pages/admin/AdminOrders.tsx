@@ -13,7 +13,10 @@ export default function AdminOrders() {
     fetch(`${API_URL}/orders`, {
       headers: { Authorization: `Bearer ${token}` }
     })
-      .then(res => res.json())
+      .then(res => {
+        if (!res.ok) throw new Error('Falha');
+        return res.json();
+      })
       .then(data => {
         setOrders(data);
         setLoading(false);

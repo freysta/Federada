@@ -9,7 +9,10 @@ export default function Team() {
 
   useEffect(() => {
     fetch(`${API_URL}/cms/team`)
-      .then(res => res.json())
+      .then(res => {
+        if (!res.ok) throw new Error('Falha');
+        return res.json();
+      })
       .then(data => {
         setTeamMembers(data);
         setLoading(false);

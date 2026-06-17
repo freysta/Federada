@@ -9,7 +9,10 @@ export default function NewsSection() {
 
   useEffect(() => {
     fetch(`${API_URL}/cms/news`)
-      .then(res => res.json())
+      .then(res => {
+        if (!res.ok) throw new Error('Falha');
+        return res.json();
+      })
       .then(data => {
         setNews(data);
         setLoading(false);

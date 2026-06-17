@@ -25,6 +25,7 @@ export default function AdminUsers() {
       const res = await fetch(`${API_URL}/users`, {
         headers: { Authorization: `Bearer ${token}` }
       });
+      if (!res.ok) throw new Error('Falha na requisição');
       const data = await res.json();
       setUsers(data);
     } catch (err) {

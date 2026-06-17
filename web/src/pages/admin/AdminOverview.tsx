@@ -14,7 +14,10 @@ export default function AdminOverview() {
     fetch(`${API_URL}/orders/dashboard`, {
       headers: { Authorization: `Bearer ${token}` }
     })
-      .then(res => res.json())
+      .then(res => {
+        if (!res.ok) throw new Error('Falha');
+        return res.json();
+      })
       .then(data => {
         setStats(data);
         setLoading(false);

@@ -27,7 +27,10 @@ export default function ProductGrid() {
 
 	useEffect(() => {
 		fetch(`${API_URL}/products`)
-			.then(res => res.json())
+			.then(res => {
+				if (!res.ok) throw new Error('Falha');
+				return res.json();
+			})
 			.then(data => {
 				setProducts(data);
 				setLoading(false);
