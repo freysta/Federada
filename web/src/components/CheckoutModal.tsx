@@ -3,7 +3,6 @@ import { X, Loader2, CreditCard, AlertCircle } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useCart } from '../contexts/CartContext';
 import { API_URL } from '../config';
-import PixModal from './PixModal';
 import toast from 'react-hot-toast';
 import { createPortal } from 'react-dom';
 
@@ -15,8 +14,7 @@ interface CheckoutModalProps {
 export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
   const { user, token, login } = useAuth();
   const { items, totalPrice, clearCart } = useCart();
-  const [step, setStep] = useState<'form' | 'loading' | 'pix'>('form');
-  const [pixData, setPixData] = useState<{ qrCode: string, copyPaste: string, orderId: string } | null>(null);
+  const [step, setStep] = useState<'form' | 'loading'>('form');
   const [errorMsg, setErrorMsg] = useState('');
   
   const [formData, setFormData] = useState({
@@ -86,19 +84,15 @@ export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
       });
 
       if (!orderRes.ok) {
-        throw new Error('Erro ao gerar pagamento PIX.');
+        throw new Error('Erro ao gerar pagamento com Mercado Pago.');
       }
 
       const orderData = await orderRes.json();
       
-      toast.success('Pedido criado! Pague o PIX para garantir.');
+      toast.success('Redirecionando para o Mercado Pago...');
       
-      setPixData({
-        orderId: orderData.orderId,
-        qrCode: orderData.pix.qrCodeBase64,
-        copyPaste: orderData.pix.copyPaste
-      });
-      setStep('pix');
+      clearCart();
+      window.location.href = orderData.initPoint;
 
     } catch (err: any) {
       console.error(err);
@@ -109,13 +103,8 @@ export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
 
   const handleClose = () => {
     setStep('form');
-    setPixData(null);
     onClose();
   };
-
-  if (step === 'pix' && pixData) {
-    return <PixModal isOpen={true} onClose={() => { clearCart(); handleClose(); }} pixData={pixData} amount={`R$ ${totalPrice.toFixed(2).replace('.', ',')}`} />;
-  }
 
   const modalContent = (
     <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
@@ -211,9 +200,9 @@ export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
                 </div>
               )}
 
-              <button type="submit" className="w-full bg-black text-white font-bold py-4 hover:bg-neutral-800 transition-all border border-black flex items-center justify-center gap-3">
+              <button type="submit" className="w-full bg-[#009EE3] text-white font-bold py-4 hover:bg-[#0081BA] transition-all border border-[#009EE3] flex items-center justify-center gap-3">
                 <CreditCard size={20} />
-                <span className="tracking-widest">GERAR PIX</span>
+                <span className="tracking-widest uppercase">PAGAR COM MERCADO PAGO</span>
               </button>
             </form>
           )}

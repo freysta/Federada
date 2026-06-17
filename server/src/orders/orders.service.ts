@@ -7,7 +7,7 @@ import { UpdateOrderDto } from './dto/update-order.dto';
 import { Order } from './entities/order.entity';
 import { OrderItem } from './entities/order-item.entity';
 import { User } from './entities/user.entity';
-import { MercadoPagoConfig, Payment } from 'mercadopago';
+import { MercadoPagoConfig, Payment, Preference } from 'mercadopago';
 import { ProductsService } from '../products/products.service';
 
 @Injectable()
@@ -78,52 +78,51 @@ export class OrdersService {
 
     await this.ordersRepository.save(order);
 
-    // 4. Generate Mercado Pago Payment
+    // 4. Generate Mercado Pago Preference (Checkout Pro)
     try {
-      const payment = new Payment(this.mpClient);
+      const preference = new Preference(this.mpClient);
       
       const webhookUrl = this.configService.get<string>('WEBHOOK_URL');
-      const itemsDescription = orderItemsToCreate.map(i => `${i.quantity}x ${i.productName}`).join(', ');
+      
+      const items = orderItemsToCreate.map(i => ({
+        id: i.productId!.toString(),
+        title: i.productName || 'Produto',
+        quantity: i.quantity || 1,
+        unit_price: Number(i.price) || 0,
+        currency_id: 'BRL',
+      }));
 
       const body = {
-        transaction_amount: Number(totalAmount),
-        description: itemsDescription.substring(0, 255),
-        payment_method_id: 'pix',
+        items,
+        payer: {
+          name: user.name,
+          email: user.email,
+        },
+        back_urls: {
+          success: 'http://localhost:5174/',
+          pending: 'http://localhost:5174/',
+          failure: 'http://localhost:5174/',
+        },
+        auto_return: 'approved',
         external_reference: order.id,
         notification_url: webhookUrl ? `${webhookUrl}/orders/webhook` : undefined,
-        payer: {
-          email: user.email,
-          first_name: user.name.split(' ')[0],
-          last_name: user.name.split(' ').slice(1).join(' ') || 'Customer',
-          identification: {
-            type: 'CPF',
-            number: user.cpf.replace(/\D/g, ''),
-          },
-        },
       };
 
-      const paymentResponse = await payment.create({ body });
+      const prefResponse = await preference.create({ body });
 
-      const pointOfInteraction = paymentResponse.point_of_interaction;
-      const pixCopyPaste = pointOfInteraction?.transaction_data?.qr_code;
-      const qrCodeBase64 = pointOfInteraction?.transaction_data?.qr_code_base64;
-
-      order.paymentId = paymentResponse.id?.toString() ?? null;
-      order.pixCopyPaste = pixCopyPaste ?? null;
+      // Salvamos o ID da preferência no paymentId provisoriamente
+      order.paymentId = prefResponse.id || null; 
       await this.ordersRepository.save(order);
 
       return {
         orderId: order.id,
         customer: user.name,
-        paymentId: order.paymentId,
-        pix: {
-          copyPaste: pixCopyPaste,
-          qrCodeBase64: qrCodeBase64,
-        },
+        paymentId: prefResponse.id,
+        initPoint: prefResponse.init_point, // Redirecionamento para o Checkout Pro
       };
     } catch (error) {
       console.error('Mercado Pago Error:', error);
-      throw new InternalServerErrorException('Error generating payment with Mercado Pago');
+      throw new InternalServerErrorException('Error generating Checkout Pro Preference');
     }
   }
 
@@ -152,12 +151,13 @@ export class OrdersService {
         console.log(`Payment ${paymentId} status: ${paymentData.status}`);
         
         const order = await this.ordersRepository.findOne({
-          where: { paymentId: paymentId.toString() },
+          where: { id: paymentData.external_reference },
         });
 
         if (order) {
           if (paymentData.status === 'approved') {
             order.status = 'PAID';
+            order.paymentId = paymentId.toString(); // Guarda o ID final do pagamento
             console.log(`Order ${order.id} marked as PAID`);
           } else if (paymentData.status === 'rejected' || paymentData.status === 'cancelled') {
             order.status = 'CANCELLED';
@@ -165,7 +165,7 @@ export class OrdersService {
           }
           await this.ordersRepository.save(order);
         } else {
-          console.warn(`No order found for paymentId: ${paymentId}`);
+          console.warn(`No order found with external_reference: ${paymentData.external_reference}`);
         }
       } catch (error) {
         // Ignora erro 404 (comum em testes com ID falso como 123456)

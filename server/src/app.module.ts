@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { OrdersModule } from './orders/orders.module';
@@ -31,11 +31,29 @@ import { News } from './cms/entities/news.entity';
       ttl: 60000,
       limit: 100, // 100 requests per minute per IP
     }]),
-    TypeOrmModule.forRoot({
-      type: 'sqlite',
-      database: 'data/database.sqlite',
-      entities: [Order, OrderItem, User, Product, TeamMember, News],
-      synchronize: process.env.NODE_ENV !== 'production', // Disabled in production
+    TypeOrmModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => {
+        const dbUrl = configService.get<string>('DATABASE_URL');
+        if (dbUrl) {
+          // Use PostgreSQL se a URL existir
+          return {
+            type: 'postgres',
+            url: dbUrl,
+            entities: [Order, OrderItem, User, Product, TeamMember, News],
+            synchronize: process.env.NODE_ENV !== 'production',
+            ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
+          };
+        }
+        // Fallback para SQLite em ambiente de dev local (sem URL de banco)
+        return {
+          type: 'sqlite',
+          database: 'data/database.sqlite',
+          entities: [Order, OrderItem, User, Product, TeamMember, News],
+          synchronize: true,
+        };
+      },
     }),
     OrdersModule,
     ProductsModule,
