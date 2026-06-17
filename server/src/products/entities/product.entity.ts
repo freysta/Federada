@@ -20,6 +20,12 @@ export class Product {
   @Column('simple-json', { nullable: true })
   sizes: string[];
 
+  @Column({ default: 'GERAL' })
+  category: string;
+
+  @Column({ default: false })
+  isCustomizable: boolean;
+
   @Column({ default: true })
   isActive: boolean;
 

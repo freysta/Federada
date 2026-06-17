@@ -60,6 +60,9 @@ export class OrdersService {
         productId: product.id,
         productName: product.name,
         productSize: itemDto.size || undefined,
+        customName: itemDto.customName || undefined,
+        customNumber: itemDto.customNumber || undefined,
+        playerType: itemDto.playerType || undefined,
         price: Number(product.price),
         quantity: itemDto.quantity,
       });

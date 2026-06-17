@@ -11,12 +11,19 @@ interface Product {
   price: number;
   imageUrl: string;
   sizes: string[];
+  category?: string;
+  isCustomizable?: boolean;
 }
 
 export default function ProductGrid() {
 	const [products, setProducts] = useState<Product[]>([]);
 	const [loading, setLoading] = useState(true);
+	const [activeCategory, setActiveCategory] = useState<string>('TODOS');
 	const { addToCart } = useCart();
+	
+	// Customization State
+	const [customizingProduct, setCustomizingProduct] = useState<{product: Product, size?: string} | null>(null);
+	const [customData, setCustomData] = useState({ name: '', number: '', type: 'TORCEDOR' });
 
 	useEffect(() => {
 		fetch(`${API_URL}/products`)
@@ -50,6 +57,19 @@ export default function ProductGrid() {
 							COLEÇÃO 2026
 						</span>
 					</div>
+					
+					{/* Categories */}
+					<div className="flex gap-4 mb-8 overflow-x-auto pb-2 custom-scrollbar">
+						{['TODOS', 'CAMISAS', 'CANECAS', 'ACESSORIOS', 'GERAL'].map(cat => (
+							<button 
+								key={cat}
+								onClick={() => setActiveCategory(cat)}
+								className={`px-4 py-2 font-mono text-sm font-bold whitespace-nowrap transition-colors ${activeCategory === cat ? 'bg-black text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
+							>
+								{cat}
+							</button>
+						))}
+					</div>
 				</FadeIn>
 
 				{loading ? (
@@ -58,7 +78,7 @@ export default function ProductGrid() {
 					</div>
 				) : (
 					<div className="grid md:grid-cols-3 gap-12">
-						{products.map((product, index) => (
+						{products.filter(p => activeCategory === 'TODOS' || p.category === activeCategory).map((product, index) => (
 							<FadeIn key={product.id} delay={index * 100}>
 							<div className="group cursor-pointer">
 								{/* Image Container */}
@@ -74,7 +94,7 @@ export default function ProductGrid() {
 
 									{/* Product Image */}
 									<img
-										src={product.imageUrl}
+										src={product.imageUrl?.startsWith('http') ? product.imageUrl : `${API_URL}${product.imageUrl}`}
 										alt={product.name}
 										className="absolute inset-0 w-full h-full object-cover mix-blend-multiply opacity-95 group-hover:scale-105 transition-transform duration-700"
 									/>
@@ -89,13 +109,17 @@ export default function ProductGrid() {
 															key={size}
 															onClick={(e) => {
 																e.stopPropagation();
-																addToCart({
-																	productId: product.id,
-																	name: product.name,
-																	price: product.price,
-																	imageUrl: product.imageUrl,
-																	size: size
-																});
+																if (product.isCustomizable) {
+																	setCustomizingProduct({ product, size });
+																} else {
+																	addToCart({
+																		productId: product.id,
+																		name: product.name,
+																		price: product.price,
+																		imageUrl: product.imageUrl,
+																		size: size
+																	});
+																}
 															}}
 															className="border border-black bg-white text-black py-2 font-mono text-sm font-bold hover:bg-black hover:text-white transition-colors"
 														>
@@ -108,12 +132,16 @@ export default function ProductGrid() {
 											<button
 												onClick={(e) => {
 													e.stopPropagation();
-													addToCart({
-														productId: product.id,
-														name: product.name,
-														price: product.price,
-														imageUrl: product.imageUrl,
-													});
+													if (product.isCustomizable) {
+														setCustomizingProduct({ product });
+													} else {
+														addToCart({
+															productId: product.id,
+															name: product.name,
+															price: product.price,
+															imageUrl: product.imageUrl,
+														});
+													}
 												}}
 												className="bg-black text-white w-full py-4 font-sans font-bold text-sm hover:bg-neutral-800 transition-colors flex items-center justify-center gap-2 shadow-lg"
 											>
@@ -164,9 +192,68 @@ export default function ProductGrid() {
 							</div>
 						</FadeIn>
 					))}
-				</div>
+					</div>
 				)}
 			</div>
+
+			{/* Customization Modal */}
+			{customizingProduct && (
+				<div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+					<div className="bg-white p-6 max-w-md w-full">
+						<h3 className="text-xl font-bold font-mono uppercase mb-4 tracking-wider">Personalize seu Produto</h3>
+						<p className="text-gray-500 text-sm mb-6">Nome e número serão gravados no seu {customizingProduct.product.name}.</p>
+						
+						<div className="space-y-4">
+							<div>
+								<label className="block text-sm font-bold mb-1">Nome na Camisa</label>
+								<input type="text" maxLength={20} value={customData.name} onChange={e => setCustomData({...customData, name: e.target.value.toUpperCase()})} className="w-full border p-2 font-mono uppercase" placeholder="SEU NOME" />
+							</div>
+							<div>
+								<label className="block text-sm font-bold mb-1">Número</label>
+								<input type="text" maxLength={3} value={customData.number} onChange={e => setCustomData({...customData, number: e.target.value})} className="w-full border p-2 font-mono" placeholder="10" />
+							</div>
+							<div>
+								<label className="block text-sm font-bold mb-1">Você é?</label>
+								<div className="flex gap-4">
+									<label className="flex items-center gap-2 cursor-pointer">
+										<input type="radio" name="type" value="TORCEDOR" checked={customData.type === 'TORCEDOR'} onChange={() => setCustomData({...customData, type: 'TORCEDOR'})} />
+										<span>Torcedor</span>
+									</label>
+									<label className="flex items-center gap-2 cursor-pointer">
+										<input type="radio" name="type" value="ATLETA" checked={customData.type === 'ATLETA'} onChange={() => setCustomData({...customData, type: 'ATLETA'})} />
+										<span>Atleta da Atlética</span>
+									</label>
+								</div>
+							</div>
+						</div>
+
+						<div className="mt-8 flex gap-3">
+							<button onClick={() => setCustomizingProduct(null)} className="flex-1 py-3 border border-black font-bold hover:bg-gray-50">CANCELAR</button>
+							<button 
+								onClick={() => {
+									addToCart({
+										productId: customizingProduct.product.id,
+										name: customizingProduct.product.name,
+										price: customizingProduct.product.price,
+										imageUrl: customizingProduct.product.imageUrl,
+										size: customizingProduct.size,
+										isCustomizable: true,
+										customName: customData.name,
+										customNumber: customData.number,
+										playerType: customData.type
+									});
+									setCustomizingProduct(null);
+									setCustomData({ name: '', number: '', type: 'TORCEDOR' });
+								}} 
+								disabled={!customData.name || !customData.number}
+								className="flex-1 py-3 bg-black text-white font-bold hover:bg-neutral-800 disabled:opacity-50"
+							>
+								ADICIONAR
+							</button>
+						</div>
+					</div>
+				</div>
+			)}
 		</section>
 	);
 }

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { API_URL } from '../../config';
 import { DollarSign, Package, ShoppingCart, XCircle, Clock, CheckCircle } from 'lucide-react';
+import toast from 'react-hot-toast';
 import { Loader2 } from 'lucide-react';
 
 export default function AdminOverview() {
@@ -16,6 +17,10 @@ export default function AdminOverview() {
       .then(res => res.json())
       .then(data => {
         setStats(data);
+        setLoading(false);
+      })
+      .catch(() => {
+        toast.error('Erro ao carregar os dados do painel');
         setLoading(false);
       });
   }, [token]);
@@ -32,7 +37,9 @@ export default function AdminOverview() {
     <div className="space-y-6">
       <h1 className="text-2xl font-bold font-mono tracking-widest uppercase border-b-2 border-black pb-2">// Visão Geral</h1>
       
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      {stats && (
+        <>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         <div className="bg-black text-white p-6 border border-black shadow-lg">
           <div className="flex justify-between items-start mb-4">
             <div>
@@ -108,6 +115,8 @@ export default function AdminOverview() {
           </table>
         </div>
       </div>
+        </>
+      )}
     </div>
   );
 }

@@ -17,8 +17,9 @@ export class RegisterDto {
   phone: string;
 
   @IsString()
+  @IsNotEmpty()
   @MinLength(6)
-  password?: string;
+  password: string;
 }
 
 export class LoginDto {
@@ -27,5 +28,5 @@ export class LoginDto {
 
   @IsString()
   @IsNotEmpty()
-  password?: string;
+  password: string;
 }

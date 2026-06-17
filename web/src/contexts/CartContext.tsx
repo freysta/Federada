@@ -9,12 +9,16 @@ export interface CartItem {
   size?: string;
   quantity: number;
   imageUrl: string;
+  isCustomizable?: boolean;
+  customName?: string;
+  customNumber?: string;
+  playerType?: string;
 }
 
 interface CartContextType {
   items: CartItem[];
   addToCart: (item: Omit<CartItem, 'quantity'>) => void;
-  removeFromCart: (productId: string, size?: string) => void;
+  removeFromCart: (productId: string, size?: string, customName?: string, customNumber?: string) => void;
   updateQuantity: (productId: string, size: string | undefined, delta: number) => void;
   clearCart: () => void;
   isCartOpen: boolean;
@@ -38,10 +42,15 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   const addToCart = (newItem: Omit<CartItem, 'quantity'>) => {
     setItems(current => {
-      const existing = current.find(i => i.productId === newItem.productId && i.size === newItem.size);
+      const existing = current.find(i => 
+        i.productId === newItem.productId && 
+        i.size === newItem.size && 
+        i.customName === newItem.customName && 
+        i.customNumber === newItem.customNumber
+      );
       if (existing) {
         return current.map(i => 
-          (i.productId === newItem.productId && i.size === newItem.size) 
+          (i.productId === newItem.productId && i.size === newItem.size && i.customName === newItem.customName && i.customNumber === newItem.customNumber) 
             ? { ...i, quantity: i.quantity + 1 } 
             : i
         );
@@ -52,8 +61,10 @@ export function CartProvider({ children }: { children: ReactNode }) {
     setIsCartOpen(true);
   };
 
-  const removeFromCart = (productId: string, size?: string) => {
-    setItems(current => current.filter(i => !(i.productId === productId && i.size === size)));
+  const removeFromCart = (productId: string, size?: string, customName?: string, customNumber?: string) => {
+    setItems(current => current.filter(i => 
+      !(i.productId === productId && i.size === size && i.customName === customName && i.customNumber === customNumber)
+    ));
   };
 
   const updateQuantity = (productId: string, size: string | undefined, delta: number) => {

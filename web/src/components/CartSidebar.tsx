@@ -1,6 +1,7 @@
 import { X, Minus, Plus, ShoppingBag, ArrowRight } from 'lucide-react';
 import { useCart } from '../contexts/CartContext';
 import { createPortal } from 'react-dom';
+import { API_URL } from '../config';
 import CheckoutModal from './CheckoutModal';
 import { useState } from 'react';
 
@@ -46,18 +47,24 @@ export default function CartSidebar() {
               items.map((item, index) => (
                 <div key={`${item.productId}-${item.size}-${index}`} className="flex gap-4 border border-gray-200 p-2 bg-gray-50">
                   <div className="w-20 h-24 bg-white border border-gray-200 shrink-0 relative overflow-hidden">
-                    <img src={item.imageUrl} alt={item.name} className="w-full h-full object-cover mix-blend-multiply" />
+                    <img src={item.imageUrl?.startsWith('http') ? item.imageUrl : `${API_URL}${item.imageUrl}`} alt={item.name} className="w-full h-full object-cover mix-blend-multiply" />
                   </div>
                   
                   <div className="flex-1 flex flex-col justify-between py-1">
                     <div>
                       <div className="flex justify-between items-start">
                         <h3 className="font-bold text-sm leading-tight uppercase line-clamp-2">{item.name}</h3>
-                        <button onClick={() => removeFromCart(item.productId, item.size)} className="text-red-500 hover:text-red-700 ml-2">
+                        <button onClick={() => removeFromCart(item.productId, item.size, item.customName, item.customNumber)} className="text-red-500 hover:text-red-700 ml-2">
                           <X size={16} />
                         </button>
                       </div>
                       {item.size && <p className="text-xs text-gray-500 mt-1 font-mono">TAM: {item.size}</p>}
+                      {item.customName && (
+                        <div className="mt-1 text-[10px] text-gray-500 font-mono">
+                          <span>{item.customName} #{item.customNumber}</span>
+                          <span className="ml-1">({item.playerType})</span>
+                        </div>
+                      )}
                     </div>
                     
                     <div className="flex justify-between items-end mt-2">

@@ -15,6 +15,15 @@ export class OrderItem {
   @Column({ nullable: true })
   productSize: string;
 
+  @Column({ nullable: true })
+  customName: string;
+
+  @Column({ nullable: true })
+  customNumber: string;
+
+  @Column({ nullable: true })
+  playerType: string;
+
   @Column('decimal')
   price: number;
 

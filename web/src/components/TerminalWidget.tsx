@@ -35,14 +35,19 @@ export default function TerminalWidget() {
           const orderId = args[0];
           setHistory(prev => [...prev, `> ${cmd}`, 'FETCHING_ORDER_DATA...']);
           try {
-            const res = await fetch(`${API_URL}/orders/${orderId}`);
+            const token = localStorage.getItem('@federada:token');
+            const res = await fetch(`${API_URL}/orders/${orderId}`, {
+              headers: {
+                'Authorization': `Bearer ${token}`
+              }
+            });
             if (!res.ok) throw new Error();
             const order = await res.json();
             
             setHistory(prev => [...prev, 
               `--- PEDIDO: ${order.id.slice(0,8)}... ---`,
-              `> PRODUTO: ${order.productName}`,
-              `> TAMANHO: ${order.productSize || 'N/A'}`,
+              `> ITENS: ${order.items?.length || 0}`,
+              `> VALOR: R$ ${Number(order.amount).toFixed(2)}`,
               `> STATUS: ${order.status}`,
               `> DATA: ${new Date(order.createdAt).toLocaleDateString()}`,
               `-------------------------`

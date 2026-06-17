@@ -23,7 +23,7 @@ export class AuthService {
       throw new BadRequestException('User with this email or CPF already exists');
     }
 
-    const hashedPassword = await bcrypt.hash(registerDto.password || '123456', 10);
+    const hashedPassword = await bcrypt.hash(registerDto.password, 10);
 
     const user = this.usersRepository.create({
       ...registerDto,
@@ -32,7 +32,7 @@ export class AuthService {
 
     await this.usersRepository.save(user);
 
-    return this.login({ email: user.email, password: registerDto.password });
+    return this.login({ email: user.email, password: registerDto.password! });
   }
 
   async login(loginDto: LoginDto) {
@@ -42,11 +42,13 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    if (user.password) {
-      const isPasswordValid = await bcrypt.compare(loginDto.password || '', user.password);
-      if (!isPasswordValid) {
-        throw new UnauthorizedException('Invalid credentials');
-      }
+    if (!user.password) {
+      throw new UnauthorizedException('Credenciais inválidas');
+    }
+
+    const isPasswordValid = await bcrypt.compare(loginDto.password || '', user.password);
+    if (!isPasswordValid) {
+      throw new UnauthorizedException('Credenciais inválidas');
     }
 
     const payload = { email: user.email, sub: user.id, role: user.role };
@@ -76,5 +78,26 @@ export class AuthService {
     user.role = 'ADMIN';
     await this.usersRepository.save(user);
     return { message: 'User promoted to ADMIN successfully', user: { id: user.id, name: user.name, role: user.role } };
+  }
+
+  async createAdminUser(registerDto: any) {
+    const existingUser = await this.usersRepository.findOne({
+      where: [{ email: registerDto.email }, { cpf: registerDto.cpf }]
+    });
+
+    if (existingUser) {
+      throw new BadRequestException('User with this email or CPF already exists');
+    }
+
+    const hashedPassword = await bcrypt.hash(registerDto.password || 'change_me_immediately', 10);
+
+    const user = this.usersRepository.create({
+      ...registerDto,
+      password: hashedPassword,
+      role: registerDto.role || 'CUSTOMER',
+    }) as any;
+
+    await this.usersRepository.save(user);
+    return { message: 'Usuário criado', user: { id: user.id, name: user.name, email: user.email, role: user.role } };
   }
 }

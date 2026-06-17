@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { X, Copy, Check, CheckCircle, Loader2, AlertCircle, Timer } from 'lucide-react';
+import { X, Copy, Check, CheckCircle, Loader2, Timer } from 'lucide-react';
 import { API_URL } from '../config';
 import { useAuth } from '../contexts/AuthContext';
 import { createPortal } from 'react-dom';
@@ -19,7 +19,6 @@ interface PixModalProps {
 export default function PixModal({ isOpen, onClose, amount, pixData }: PixModalProps) {
   const [copied, setCopied] = useState(false);
   const [status, setStatus] = useState<'PENDING' | 'PAID' | 'CANCELLED'>('PENDING');
-  const [pollingTimeout, setPollingTimeout] = useState(false);
   const [timeLeft, setTimeLeft] = useState(15 * 60);
   const { token } = useAuth();
 
@@ -47,8 +46,7 @@ export default function PixModal({ isOpen, onClose, amount, pixData }: PixModalP
     }, 5000);
 
     const timeout = setTimeout(() => {
-      clearInterval(interval);
-      setPollingTimeout(true);
+     clearInterval(interval);
     }, 900000);
 
     return () => {
@@ -95,6 +93,13 @@ export default function PixModal({ isOpen, onClose, amount, pixData }: PixModalP
             <CheckCircle size={64} className="mb-4" />
             <h4 className="text-xl font-bold mb-2">PAGAMENTO APROVADO</h4>
             <p className="font-mono text-sm text-gray-600">Seu pedido foi confirmado!</p>
+          </div>
+        ) : timeLeft <= 0 && status === 'PENDING' ? (
+          <div className="py-8 text-center text-red-600 flex flex-col items-center">
+            <Timer size={64} className="mb-4" />
+            <h4 className="text-xl font-bold mb-2">PIX EXPIRADO</h4>
+            <p className="font-mono text-sm text-gray-600">O tempo para pagamento esgotou. Faça um novo pedido.</p>
+            <button onClick={onClose} className="mt-4 bg-black text-white px-6 py-2 font-bold">FECHAR</button>
           </div>
         ) : (
           <>

@@ -13,6 +13,26 @@ export class OrderItemDto {
   @IsNumber()
   @Min(1)
   quantity: number;
+
+  @IsString()
+  @IsOptional()
+  customName?: string;
+
+  @IsString()
+  @IsOptional()
+  customNumber?: string;
+
+  @IsString()
+  @IsOptional()
+  playerType?: string;
+
+  @IsString()
+  @IsOptional()
+  productName?: string;
+
+  @IsNumber()
+  @IsOptional()
+  price?: number;
 }
 
 export class CreateOrderDto {

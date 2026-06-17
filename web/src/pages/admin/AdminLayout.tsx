@@ -1,6 +1,6 @@
 import { Outlet, Navigate, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
-import { LayoutDashboard, ShoppingBag, Users, Settings, LogOut, Package } from 'lucide-react';
+import { LayoutDashboard, ShoppingBag, Users, LogOut, Package, Image, MessageSquare } from 'lucide-react';
 
 export default function AdminLayout() {
   const { user, logout } = useAuth();
@@ -14,6 +14,8 @@ export default function AdminLayout() {
     { path: '/admin', icon: <LayoutDashboard size={20} />, label: 'Dashboard' },
     { path: '/admin/products', icon: <Package size={20} />, label: 'Produtos' },
     { path: '/admin/orders', icon: <ShoppingBag size={20} />, label: 'Pedidos' },
+    { path: '/admin/team', icon: <Image size={20} />, label: 'Diretoria' },
+    { path: '/admin/news', icon: <MessageSquare size={20} />, label: 'Fórum' },
     { path: '/admin/users', icon: <Users size={20} />, label: 'Usuários' },
   ];
 

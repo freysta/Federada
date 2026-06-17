@@ -61,20 +61,28 @@ export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
         login(data.access_token, data.user);
       }
 
-      // Cria o Pedido com array de itens do carrinho
-      const orderItems = items.map(item => ({
-        productId: item.productId,
-        size: item.size,
-        quantity: item.quantity
-      }));
-
+      // Cria o Pedido com array
+      const payload = {
+        totalAmount: totalPrice,
+        items: items.map(item => ({
+          productId: item.productId,
+          productName: item.name,
+          productSize: item.size || null,
+          customName: item.customName || null,
+          customNumber: item.customNumber || null,
+          playerType: item.playerType || null,
+          price: item.price,
+          quantity: item.quantity
+        }))
+      }; 
+      
       const orderRes = await fetch(`${API_URL}/orders`, {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${currentToken}`
         },
-        body: JSON.stringify({ items: orderItems })
+        body: JSON.stringify(payload)
       });
 
       if (!orderRes.ok) {
@@ -135,9 +143,24 @@ export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
                   <div className="space-y-3 max-h-40 overflow-y-auto custom-scrollbar pr-2">
                     {items.map((item, idx) => (
                       <div key={idx} className="flex justify-between items-center text-sm border-b border-gray-200 pb-2 last:border-0 last:pb-0">
-                        <div className="flex flex-col">
-                          <span className="font-bold uppercase line-clamp-1 max-w-[220px] leading-tight">{item.quantity}x {item.name}</span>
-                          {item.size && <span className="font-mono text-[10px] text-gray-500 mt-0.5">TAM: {item.size}</span>}
+                        <div>
+                          <p className="font-bold text-gray-900 leading-tight truncate max-w-[120px] sm:max-w-[180px] text-sm">
+                            {item.name}
+                          </p>
+                          <div className="flex items-center gap-2 mt-1">
+                            <span className="font-mono text-xs text-gray-500">QTD: {item.quantity}</span>
+                            {item.size && (
+                              <span className="font-mono text-xs bg-gray-100 px-1.5 py-0.5 rounded text-gray-700">
+                                {item.size}
+                              </span>
+                            )}
+                          </div>
+                          {item.customName && (
+                            <div className="mt-1 text-xs text-gray-500 font-mono">
+                              <div>Nome: {item.customName}</div>
+                              <div>Nº: {item.customNumber} ({item.playerType})</div>
+                            </div>
+                          )}
                         </div>
                         <span className="font-mono font-bold">R$ {(item.price * item.quantity).toFixed(2).replace('.', ',')}</span>
                       </div>

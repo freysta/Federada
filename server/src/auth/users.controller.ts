@@ -1,4 +1,4 @@
-import { Controller, Get, Put, Param, UseGuards } from '@nestjs/common';
+import { Controller, Get, Param, Put, Post, Body, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { JwtAuthGuard } from './jwt-auth.guard';
 import { RolesGuard } from './roles.guard';
@@ -20,5 +20,12 @@ export class UsersController {
   @Put(':id/promote')
   promoteToAdmin(@Param('id') id: string) {
     return this.authService.promoteToAdmin(id);
+  }
+
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ADMIN')
+  @Post('admin-create')
+  createAdmin(@Body() registerDto: any) {
+    return this.authService.createAdminUser(registerDto);
   }
 }

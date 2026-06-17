@@ -1,8 +1,35 @@
 import { Calendar, ArrowUpRight } from 'lucide-react';
-import { newsData } from '../data/news';
+import { useState, useEffect } from 'react';
+import { API_URL } from '../config';
 import FadeIn from './FadeIn';
 
 export default function NewsSection() {
+  const [news, setNews] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch(`${API_URL}/cms/news`)
+      .then(res => res.json())
+      .then(data => {
+        setNews(data);
+        setLoading(false);
+      })
+      .catch(err => {
+        console.error("Erro ao buscar notícias:", err);
+        setLoading(false);
+      });
+  }, []);
+
+  if (loading) {
+    return (
+      <section className="py-20 px-6 bg-[#f5f5f5] text-black">
+        <div className="max-w-6xl mx-auto flex justify-center items-center h-48">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-black"></div>
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section className="py-24 bg-neutral-50 border-t border-black" id="news">
       <div className="max-w-7xl mx-auto px-6">
@@ -18,7 +45,7 @@ export default function NewsSection() {
         </FadeIn>
 
         <div className="grid gap-6">
-            {newsData.map((item, i) => (
+            {news.map((item, i) => (
                 <FadeIn key={item.id} delay={i * 100}>
                     <div className="group relative bg-white border border-gray-200 p-6 hover:border-black transition-all duration-300 shadow-sm hover:shadow-md cursor-pointer">
                         <div className="absolute top-0 left-0 w-1 h-full bg-gray-200 group-hover:bg-black transition-colors"></div>
@@ -26,18 +53,18 @@ export default function NewsSection() {
                         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                             <div className="space-y-2">
                                 <div className="flex items-center gap-3 font-sans text-xs font-bold tracking-wide">
-                                    <span className={`px-2 py-1 ${item.type === 'IMPORTANTE' ? 'bg-red-100 text-red-600' : 'bg-gray-100 text-gray-600'}`}>
-                                        {item.type}
+                                    <span className="bg-gray-100 text-gray-600 px-2 py-1">
+                                        AVISO
                                     </span>
                                     <span className="text-gray-400 flex items-center gap-1 font-medium">
-                                        <Calendar size={12} /> {item.date}
+                                        <Calendar size={12} /> {item.dateLabel || 'Recente'}
                                     </span>
                                 </div>
                                 <h3 className="text-2xl font-bold group-hover:text-gray-600 transition-colors duration-300">
                                     {item.title}
                                 </h3>
                                 <p className="text-gray-600 max-w-2xl font-sans text-lg">
-                                    {item.excerpt}
+                                    {item.content}
                                 </p>
                             </div>
 
@@ -49,10 +76,7 @@ export default function NewsSection() {
                 </FadeIn>
             ))}
         </div>
-
       </div>
     </section>
   );
 }
-
-

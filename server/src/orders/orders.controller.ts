@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req, Logger, BadRequestException } from '@nestjs/common';
 import { OrdersService } from './orders.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
@@ -24,6 +24,14 @@ export class OrdersController {
 
   @Post('webhook')
   handleWebhook(@Body() data: any) {
+    const logger = new Logger('WebhookController');
+    logger.log(`Webhook received: type=${data?.type}, data.id=${data?.data?.id}`);
+
+    if (!data || data.type !== 'payment' || !data.data?.id) {
+      logger.warn(`Invalid webhook payload rejected: ${JSON.stringify(data).substring(0, 200)}`);
+      return { received: true, processed: false, reason: 'Invalid payload' };
+    }
+
     return this.ordersService.handleWebhook(data);
   }
 
@@ -41,16 +49,21 @@ export class OrdersController {
     return this.ordersService.findAll();
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.ordersService.findOne(id);
   }
 
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ADMIN')
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateOrderDto: UpdateOrderDto) {
     return this.ordersService.update(id, updateOrderDto);
   }
 
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ADMIN')
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.ordersService.remove(id);

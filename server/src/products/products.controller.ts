@@ -3,6 +3,7 @@ import { ProductsService } from './products.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
+import { CreateProductDto } from './dto/create-product.dto';
 
 @Controller('products')
 export class ProductsController {
@@ -21,14 +22,14 @@ export class ProductsController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('ADMIN')
   @Post()
-  create(@Body() productData: any) {
+  create(@Body() productData: CreateProductDto) {
     return this.productsService.create(productData);
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('ADMIN')
   @Put(':id')
-  update(@Param('id') id: string, @Body() productData: any) {
+  update(@Param('id') id: string, @Body() productData: CreateProductDto) {
     return this.productsService.update(id, productData);
   }
 

@@ -8,6 +8,9 @@ import AdminOverview from "./pages/admin/AdminOverview";
 import AdminProducts from "./pages/admin/AdminProducts";
 import AdminOrders from "./pages/admin/AdminOrders";
 import AdminUsers from "./pages/admin/AdminUsers";
+import AdminTeam from "./pages/admin/AdminTeam";
+import AdminNews from "./pages/admin/AdminNews";
+import NotFound from "./components/NotFound";
 
 function App() {
   return (
@@ -25,7 +28,12 @@ function App() {
             <Route path="products" element={<AdminProducts />} />
             <Route path="orders" element={<AdminOrders />} />
             <Route path="users" element={<AdminUsers />} />
+            <Route path="team" element={<AdminTeam />} />
+            <Route path="news" element={<AdminNews />} />
           </Route>
+
+          {/* Fallback 404 Route */}
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </div>
     </CartProvider>
