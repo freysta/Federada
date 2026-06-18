@@ -46,7 +46,7 @@ import { MailerModule } from '@nestjs-modules/mailer';
           },
         },
         defaults: {
-          from: `"Federada" <${configService.get('SMTP_USER')}>`,
+          from: `"Federada" <${configService.get('SMTP_FROM') || configService.get('SMTP_USER')}>`,
         },
       }),
     }),
