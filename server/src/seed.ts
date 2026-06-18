@@ -2,13 +2,28 @@ import { DataSource } from 'typeorm';
 import { Product } from './products/entities/product.entity';
 import { User } from './orders/entities/user.entity';
 import { Order } from './orders/entities/order.entity';
+import { OrderItem } from './orders/entities/order-item.entity';
+import { TeamMember } from './cms/entities/team-member.entity';
+import { News } from './cms/entities/news.entity';
 
-const dataSource = new DataSource({
-  type: 'sqlite',
-  database: 'data/database.sqlite',
-  entities: [Product, User, Order],
-  synchronize: true,
-});
+const dbUrl = process.env.DATABASE_URL;
+
+const dataSource = new DataSource(
+  dbUrl
+    ? {
+        type: 'postgres',
+        url: dbUrl,
+        entities: [Product, User, Order, OrderItem, TeamMember, News],
+        synchronize: true,
+        ssl: { rejectUnauthorized: false },
+      }
+    : {
+        type: 'sqlite',
+        database: 'data/database.sqlite',
+        entities: [Product, User, Order, OrderItem, TeamMember, News],
+        synchronize: true,
+      }
+);
 
 async function run() {
   await dataSource.initialize();
