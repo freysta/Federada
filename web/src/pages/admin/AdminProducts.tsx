@@ -55,7 +55,13 @@ export default function AdminProducts() {
   const uploadImage = async (file: File): Promise<string> => {
     const fd = new FormData();
     fd.append('file', file);
-    const res = await fetch(`${API_URL}/upload`, { method: 'POST', body: fd });
+    const res = await fetch(`${API_URL}/upload`, { 
+      method: 'POST', 
+      body: fd,
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
     if (!res.ok) throw new Error('Falha no upload da imagem');
     const data = await res.json();
     return data.url;
