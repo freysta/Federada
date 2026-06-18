@@ -23,28 +23,28 @@ async function run() {
         name: 'CAMISA DRY-FIT FEDERADA',
         description: 'Tecido Dry-Fit Tecnológico, Cor: Azul Oficial',
         price: 69.90,
-        imageUrl: '/src/assets/merchs/camisas/camiseta-federada-v2.jpg',
+        imageUrl: '/uploads/merchs/camisas/camiseta-federada-v2.jpg',
         sizes: ['P', 'M', 'G', 'GG'],
       },
       {
         name: 'CAMISA DRY-FIT ADS',
         description: 'Malha Esportiva Premium, Cor: Preta',
         price: 69.90,
-        imageUrl: '/src/assets/merchs/camisas/camiseta-ads-v1.jpg',
+        imageUrl: '/uploads/merchs/camisas/camiseta-ads-v1.jpg',
         sizes: ['P', 'M', 'G', 'GG'],
       },
       {
         name: 'CAMISA OFICIAL ATLÉTICA',
         description: 'Tecido Leve e Respirável, Design Minimalista',
         price: 59.90,
-        imageUrl: '/src/assets/merchs/camisas/camiseta-atletica-v1-front.jpg',
+        imageUrl: '/uploads/merchs/camisas/camiseta-atletica-v1-front.jpg',
         sizes: ['P', 'M', 'G', 'GG'],
       },
       {
         name: 'CANECA TÉRMICA FEDERADA',
         description: 'Cerâmica de Alta Qualidade, 350ml',
         price: 45.90,
-        imageUrl: '/src/assets/merchs/canecas/caneca-federada-v1.jpeg',
+        imageUrl: '/uploads/merchs/canecas/caneca-federada-v1.jpeg',
         sizes: [],
       }
     ]);
