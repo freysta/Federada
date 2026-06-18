@@ -3,6 +3,8 @@ import { useAuth } from '../../contexts/AuthContext';
 import { API_URL } from '../../config';
 import { Loader2, Plus, Edit, Trash2 } from 'lucide-react';
 import toast from 'react-hot-toast';
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
 
 export default function AdminNews() {
   const { token } = useAuth();
@@ -40,7 +42,11 @@ export default function AdminNews() {
   const uploadImage = async (file: File): Promise<string> => {
     const formData = new FormData();
     formData.append('file', file);
-    const res = await fetch(`${API_URL}/upload`, { method: 'POST', body: formData });
+    const res = await fetch(`${API_URL}/upload`, { 
+      method: 'POST', 
+      body: formData,
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
     if (!res.ok) throw new Error('Falha no upload');
     const data = await res.json();
     return data.url;
@@ -127,7 +133,7 @@ export default function AdminNews() {
                   </div>
                   <div>
                     <div className="font-bold">{n.title}</div>
-                    <div className="text-xs text-gray-500 truncate max-w-xs">{n.content}</div>
+                    <div className="text-xs text-gray-500 truncate max-w-xs" dangerouslySetInnerHTML={{ __html: n.content }} />
                   </div>
                 </td>
                 <td className="p-3 font-mono">{n.dateLabel}</td>
@@ -151,12 +157,12 @@ export default function AdminNews() {
                 <input required type="text" value={formData.title} onChange={e => setFormData({...formData, title: e.target.value})} className="mt-1 block w-full border p-2" />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700">Data (ex: 15/Out)</label>
-                <input type="text" value={formData.dateLabel} onChange={e => setFormData({...formData, dateLabel: e.target.value})} className="mt-1 block w-full border p-2" />
+                <label className="block text-sm font-medium text-gray-700">Data e Hora de Publicação</label>
+                <input required type="datetime-local" value={formData.dateLabel} onChange={e => setFormData({...formData, dateLabel: e.target.value})} className="mt-1 block w-full border p-2" />
               </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Conteúdo</label>
-                <textarea required rows={5} value={formData.content} onChange={e => setFormData({...formData, content: e.target.value})} className="mt-1 block w-full border p-2" />
+              <div className="mb-12">
+                <label className="block text-sm font-medium text-gray-700 mb-1">Conteúdo</label>
+                <ReactQuill theme="snow" value={formData.content} onChange={(val) => setFormData({...formData, content: val})} className="bg-white h-48" />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700">Imagem da Capa</label>

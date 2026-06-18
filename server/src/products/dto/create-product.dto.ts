@@ -18,6 +18,11 @@ export class CreateProductDto {
   imageUrl?: string;
 
   @IsArray()
+  @IsString({ each: true })
+  @IsOptional()
+  extraImages?: string[];
+
+  @IsArray()
   @IsOptional()
   sizes?: string[];
 

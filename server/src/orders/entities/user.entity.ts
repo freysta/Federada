@@ -9,8 +9,8 @@ export class User {
   @Column({ unique: true })
   email: string;
 
-  @Column({ unique: true })
-  cpf: string;
+  @Column({ unique: true, nullable: true })
+  cpf?: string;
 
   @Column()
   name: string;
@@ -23,6 +23,15 @@ export class User {
 
   @Column({ default: 'CUSTOMER' })
   role: string;
+
+  @Column({ nullable: true })
+  userType?: string; // ALUNO, PROFESSOR, FAMILIAR
+
+  @Column({ nullable: true })
+  period?: string; // Periodo se for aluno
+
+  @Column({ default: true })
+  isActive: boolean;
 
   @CreateDateColumn()
   createdAt: Date;

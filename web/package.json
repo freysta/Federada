@@ -11,10 +11,13 @@
   },
   "dependencies": {
     "clsx": "^2.1.1",
+    "embla-carousel-autoplay": "^8.6.0",
+    "embla-carousel-react": "^8.6.0",
     "lucide-react": "^0.563.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-hot-toast": "^2.6.0",
+    "react-quill": "^2.0.0",
     "react-router-dom": "^7.18.0",
     "tailwind-merge": "^3.4.0"
   },

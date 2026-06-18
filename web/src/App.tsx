@@ -3,6 +3,7 @@ import { Toaster } from "react-hot-toast";
 import { CartProvider } from "./contexts/CartContext";
 
 import StoreFront from "./pages/StoreFront";
+import Store from "./pages/Store";
 import Forum from "./pages/Forum";
 import GalleryPage from "./pages/GalleryPage";
 import AdminLayout from "./pages/admin/AdminLayout";
@@ -24,6 +25,7 @@ function App() {
         <Routes>
           {/* Rota Principal da Loja */}
           <Route path="/" element={<StoreFront />} />
+          <Route path="/loja" element={<Store />} />
           <Route path="/forum" element={<Forum />} />
           <Route path="/gallery" element={<GalleryPage />} />
 

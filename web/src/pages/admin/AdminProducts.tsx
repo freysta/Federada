@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { API_URL } from '../../config';
-import { Loader2, Plus, Edit, Trash2 } from 'lucide-react';
+import { Loader2, Plus, Edit, Trash2, X } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 interface Product {
@@ -10,6 +10,7 @@ interface Product {
   description: string;
   price: number;
   imageUrl: string;
+  extraImages: string[];
   sizes: string[];
   category: string;
   isCustomizable: boolean;
@@ -32,7 +33,9 @@ export default function AdminProducts() {
     category: 'GERAL',
     isCustomizable: false
   });
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  
+  const [existingImages, setExistingImages] = useState<string[]>([]);
+  const [newFiles, setNewFiles] = useState<File[]>([]);
 
   const fetchProducts = async () => {
     setLoading(true);
@@ -70,10 +73,18 @@ export default function AdminProducts() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      let imageUrl = editingProduct?.imageUrl || '';
-      if (selectedFile) {
-        imageUrl = await uploadImage(selectedFile);
+      const loadingToast = toast.loading('Salvando produto...');
+      
+      let finalUrls = [...existingImages];
+
+      if (newFiles.length > 0) {
+        const uploadPromises = newFiles.map(file => uploadImage(file));
+        const uploadedUrls = await Promise.all(uploadPromises);
+        finalUrls.push(...uploadedUrls);
       }
+
+      const imageUrl = finalUrls[0] || '';
+      const extraImages = finalUrls.slice(1);
 
       const payload = {
         name: formData.name,
@@ -82,7 +93,8 @@ export default function AdminProducts() {
         category: formData.category,
         isCustomizable: formData.isCustomizable,
         sizes: formData.sizes.split(',').map(s => s.trim()).filter(Boolean),
-        imageUrl
+        imageUrl,
+        extraImages
       };
 
       const url = editingProduct ? `${API_URL}/products/${editingProduct.id}` : `${API_URL}/products`;
@@ -97,11 +109,14 @@ export default function AdminProducts() {
         body: JSON.stringify(payload)
       });
 
+      toast.dismiss(loadingToast);
+
       if (!res.ok) throw new Error('Erro ao salvar produto');
 
       toast.success(editingProduct ? 'Produto atualizado!' : 'Produto criado!');
       setIsModalOpen(false);
-      setSelectedFile(null);
+      setNewFiles([]);
+      setExistingImages([]);
       fetchProducts();
     } catch (err: any) {
       toast.error(err.message);
@@ -117,6 +132,11 @@ export default function AdminProducts() {
       isCustomizable: prod.isCustomizable || false,
       sizes: prod.sizes ? prod.sizes.join(', ') : ''
     });
+    const imgs = [];
+    if (prod.imageUrl) imgs.push(prod.imageUrl);
+    if (prod.extraImages?.length) imgs.push(...prod.extraImages);
+    setExistingImages(imgs);
+    setNewFiles([]);
     setEditingProduct(prod);
     setIsModalOpen(true);
   };
@@ -138,8 +158,26 @@ export default function AdminProducts() {
 
   const openNewModal = () => {
     setFormData({ name: '', description: '', price: '', sizes: '', category: 'GERAL', isCustomizable: false });
+    setExistingImages([]);
+    setNewFiles([]);
     setEditingProduct(null);
     setIsModalOpen(true);
+  };
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      setNewFiles([...newFiles, ...Array.from(e.target.files)]);
+    }
+    // reset the input so same files can be selected again if removed
+    e.target.value = '';
+  };
+
+  const removeExistingImage = (idx: number) => {
+    setExistingImages(existingImages.filter((_, i) => i !== idx));
+  };
+
+  const removeNewFile = (idx: number) => {
+    setNewFiles(newFiles.filter((_, i) => i !== idx));
   };
 
   if (loading) {
@@ -197,12 +235,12 @@ export default function AdminProducts() {
 
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-          <div className="bg-white w-full max-w-lg border border-black shadow-2xl">
-            <div className="bg-black text-white p-3 font-mono text-xs tracking-widest flex justify-between">
+          <div className="bg-white w-full max-w-lg border border-black shadow-2xl flex flex-col max-h-[90vh]">
+            <div className="bg-black text-white p-3 font-mono text-xs tracking-widest flex justify-between shrink-0">
               {editingProduct ? 'EDITAR PRODUTO' : 'NOVO PRODUTO'}
               <button onClick={() => setIsModalOpen(false)}>FECHAR</button>
             </div>
-            <form onSubmit={handleSubmit} className="p-6 space-y-4">
+            <form onSubmit={handleSubmit} className="p-6 space-y-4 overflow-y-auto custom-scrollbar">
               <input required placeholder="NOME DO PRODUTO" className="w-full border border-gray-300 p-2 font-mono text-sm" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} />
               <input required type="number" step="0.01" placeholder="PREÇO (EX: 50.00)" className="w-full border border-gray-300 p-2 font-mono text-sm" value={formData.price} onChange={e => setFormData({...formData, price: e.target.value})} />
               <textarea placeholder="DESCRIÇÃO" className="w-full border border-gray-300 p-2 font-mono text-sm" value={formData.description} onChange={e => setFormData({...formData, description: e.target.value})} />
@@ -218,11 +256,34 @@ export default function AdminProducts() {
               </div>
 
               <div>
-                <label className="block font-mono text-xs mb-1">IMAGEM DO PRODUTO</label>
-                <input type="file" accept="image/*" onChange={e => setSelectedFile(e.target.files?.[0] || null)} className="w-full border border-gray-300 p-2 font-mono text-sm" />
-                {editingProduct?.imageUrl && !selectedFile && (
-                  <p className="text-xs text-gray-500 mt-1">Imagem atual preservada. Envie outra para substituir.</p>
+                <label className="block font-mono text-xs mb-2">IMAGENS DO PRODUTO</label>
+                
+                {/* Image Gallery Preview */}
+                {(existingImages.length > 0 || newFiles.length > 0) && (
+                  <div className="grid grid-cols-4 gap-2 mb-3">
+                    {existingImages.map((imgUrl, idx) => (
+                      <div key={`existing-${idx}`} className="relative border border-gray-300 aspect-square group">
+                        <img src={imgUrl.startsWith('http') ? imgUrl : `${API_URL}${imgUrl}`} className="w-full h-full object-cover" />
+                        <button type="button" onClick={() => removeExistingImage(idx)} className="absolute top-1 right-1 bg-red-600 text-white p-0.5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
+                          <X size={12} />
+                        </button>
+                        {idx === 0 && <span className="absolute bottom-0 left-0 right-0 bg-black/70 text-white text-[8px] text-center py-0.5">CAPA</span>}
+                      </div>
+                    ))}
+                    {newFiles.map((file, idx) => (
+                      <div key={`new-${idx}`} className="relative border border-gray-300 aspect-square group">
+                        <img src={URL.createObjectURL(file)} className="w-full h-full object-cover opacity-70" />
+                        <button type="button" onClick={() => removeNewFile(idx)} className="absolute top-1 right-1 bg-red-600 text-white p-0.5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
+                          <X size={12} />
+                        </button>
+                        {(idx === 0 && existingImages.length === 0) && <span className="absolute bottom-0 left-0 right-0 bg-black/70 text-white text-[8px] text-center py-0.5">CAPA</span>}
+                      </div>
+                    ))}
+                  </div>
                 )}
+
+                <input type="file" multiple accept="image/*" onChange={handleFileSelect} className="w-full border border-gray-300 p-2 font-mono text-sm" />
+                <p className="text-[10px] text-gray-500 mt-1">A primeira imagem será usada como capa. Você pode selecionar múltiplas imagens.</p>
               </div>
 
               <label className="flex items-center gap-2 mt-4 cursor-pointer">
@@ -230,7 +291,7 @@ export default function AdminProducts() {
                 <span className="font-mono text-sm">Permitir Customização (Nome/Número)</span>
               </label>
               
-              <button type="submit" className="w-full bg-[#00f0ff] text-black font-bold font-mono py-3 border border-black shadow-[2px_2px_0_0_#000] hover:shadow-[4px_4px_0_0_#000] transition-all">
+              <button type="submit" className="w-full bg-[#00f0ff] text-black font-bold font-mono py-3 border border-black shadow-[2px_2px_0_0_#000] hover:shadow-[4px_4px_0_0_#000] transition-all mt-4">
                 SALVAR PRODUTO
               </button>
             </form>

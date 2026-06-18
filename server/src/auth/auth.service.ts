@@ -17,8 +17,13 @@ export class AuthService {
   ) {}
 
   async register(registerDto: RegisterDto) {
+    const whereConditions: any[] = [{ email: registerDto.email }];
+    if (registerDto.cpf) {
+      whereConditions.push({ cpf: registerDto.cpf });
+    }
+
     const existingUser = await this.usersRepository.findOne({
-      where: [{ email: registerDto.email }, { cpf: registerDto.cpf }]
+      where: whereConditions
     });
 
     if (existingUser) {
@@ -50,6 +55,10 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
 
+    if (!user.isActive) {
+      throw new UnauthorizedException('Esta conta foi desativada pelo administrador.');
+    }
+
     if (!user.password) {
       throw new UnauthorizedException('Credenciais inválidas');
     }
@@ -73,7 +82,7 @@ export class AuthService {
 
   async findAllUsers() {
     return this.usersRepository.find({
-      select: ['id', 'name', 'email', 'cpf', 'phone', 'role', 'createdAt'],
+      select: ['id', 'name', 'email', 'cpf', 'phone', 'role', 'userType', 'period', 'isActive', 'createdAt'],
       order: { createdAt: 'DESC' }
     });
   }
@@ -89,8 +98,13 @@ export class AuthService {
   }
 
   async createAdminUser(registerDto: any) {
+    const whereConditions: any[] = [{ email: registerDto.email }];
+    if (registerDto.cpf) {
+      whereConditions.push({ cpf: registerDto.cpf });
+    }
+
     const existingUser = await this.usersRepository.findOne({
-      where: [{ email: registerDto.email }, { cpf: registerDto.cpf }]
+      where: whereConditions
     });
 
     if (existingUser) {
@@ -127,5 +141,49 @@ export class AuthService {
     await this.usersRepository.save(user);
 
     return { message: 'Senha alterada com sucesso' };
+  }
+
+  async updateProfile(userId: string, updateDto: any) {
+    const user = await this.usersRepository.findOne({ where: { id: userId } });
+    if (!user) throw new BadRequestException('User not found');
+
+    if (updateDto.name) user.name = updateDto.name;
+    if (updateDto.phone !== undefined) user.phone = updateDto.phone;
+    if (updateDto.userType) user.userType = updateDto.userType;
+    if (updateDto.period !== undefined) user.period = updateDto.period;
+
+    await this.usersRepository.save(user);
+    return { message: 'Perfil atualizado', user: { id: user.id, name: user.name, role: user.role } };
+  }
+
+  async updateUserByAdmin(id: string, updateDto: any) {
+    const user = await this.usersRepository.findOne({ where: { id } });
+    if (!user) throw new BadRequestException('User not found');
+
+    if (updateDto.email && updateDto.email !== user.email) {
+      const existingEmail = await this.usersRepository.findOne({ where: { email: updateDto.email } });
+      if (existingEmail) throw new BadRequestException('E-mail já está em uso');
+      user.email = updateDto.email;
+    }
+
+    if (updateDto.cpf && updateDto.cpf !== user.cpf) {
+      const existingCpf = await this.usersRepository.findOne({ where: { cpf: updateDto.cpf } });
+      if (existingCpf) throw new BadRequestException('CPF já está em uso');
+      user.cpf = updateDto.cpf;
+    }
+
+    if (updateDto.name) user.name = updateDto.name;
+    if (updateDto.phone !== undefined) user.phone = updateDto.phone;
+    if (updateDto.role) user.role = updateDto.role;
+    if (updateDto.userType) user.userType = updateDto.userType;
+    if (updateDto.period !== undefined) user.period = updateDto.period;
+    if (updateDto.isActive !== undefined) user.isActive = updateDto.isActive;
+
+    if (updateDto.password) {
+      user.password = await bcrypt.hash(updateDto.password, 10);
+    }
+
+    await this.usersRepository.save(user);
+    return { message: 'Usuário atualizado com sucesso' };
   }
 }

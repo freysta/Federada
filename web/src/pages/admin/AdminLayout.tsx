@@ -1,6 +1,6 @@
 import { Outlet, Navigate, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
-import { LayoutDashboard, ShoppingBag, Users, LogOut, Package, Image, MessageSquare, KeyRound } from 'lucide-react';
+import { LayoutDashboard, ShoppingBag, Users, LogOut, Package, Image, MessageSquare, KeyRound, Store } from 'lucide-react';
 
 export default function AdminLayout() {
   const { user, logout } = useAuth();
@@ -56,6 +56,13 @@ export default function AdminLayout() {
               <span className="text-sm font-bold truncate max-w-[150px]">{user.name}</span>
             </div>
           </div>
+          <Link 
+            to="/"
+            className="w-full flex items-center justify-center gap-2 bg-neutral-800 hover:bg-neutral-700 text-white font-mono text-sm py-2 transition-colors mb-2"
+          >
+            <Store size={16} />
+            IR PARA A LOJA
+          </Link>
           <button 
             onClick={logout}
             className="w-full flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700 text-white font-mono text-sm py-2 transition-colors"

@@ -1,4 +1,5 @@
 import Navbar from "../components/Navbar";
+import { Link } from "react-router-dom";
 import Hero from "../components/Hero";
 import SectionSeparator from "../components/SectionSeparator";
 import NewsSection from "../components/NewsSection";
@@ -18,7 +19,12 @@ export default function StoreFront() {
       <main>
         <Hero />
         <SectionSeparator />
-        <ProductGrid />
+        <ProductGrid limit={3} />
+        <div className="bg-white flex justify-center pb-16">
+          <Link to="/loja" className="bg-black text-white px-12 py-4 font-bold font-mono tracking-widest hover:bg-neutral-800 transition-colors shadow-[6px_6px_0_0_#00f0ff] hover:shadow-[2px_2px_0_0_#00f0ff] active:shadow-none translate-y-0 hover:translate-y-1 active:translate-y-2">
+            VER TODOS OS PRODUTOS
+          </Link>
+        </div>
         <Gallery />
         <NewsSection />
         <CAADS />

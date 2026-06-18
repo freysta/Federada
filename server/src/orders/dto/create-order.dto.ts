@@ -29,10 +29,6 @@ export class OrderItemDto {
   @IsString()
   @IsOptional()
   productName?: string;
-
-  @IsNumber()
-  @IsOptional()
-  price?: number;
 }
 
 export class CreateOrderDto {

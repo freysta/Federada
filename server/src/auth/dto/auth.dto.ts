@@ -1,4 +1,4 @@
-import { IsEmail, IsNotEmpty, IsString, MinLength } from 'class-validator';
+import { IsEmail, IsNotEmpty, IsString, MinLength, IsOptional, IsBoolean } from 'class-validator';
 
 export class RegisterDto {
   @IsString()
@@ -9,8 +9,8 @@ export class RegisterDto {
   email: string;
 
   @IsString()
-  @IsNotEmpty()
-  cpf: string;
+  @IsOptional()
+  cpf?: string;
 
   @IsString()
   @IsNotEmpty()
@@ -20,6 +20,14 @@ export class RegisterDto {
   @IsNotEmpty()
   @MinLength(6)
   password: string;
+
+  @IsString()
+  @IsNotEmpty()
+  userType: string;
+
+  @IsString()
+  @IsOptional()
+  period?: string;
 }
 
 export class LoginDto {
@@ -40,4 +48,43 @@ export class ChangePasswordDto {
   @IsNotEmpty()
   @MinLength(6)
   newPassword: string;
+}
+
+export class UpdateUserDto {
+  @IsString()
+  @IsOptional()
+  name?: string;
+
+  @IsEmail()
+  @IsOptional()
+  email?: string;
+
+  @IsString()
+  @IsOptional()
+  cpf?: string;
+
+  @IsString()
+  @IsOptional()
+  phone?: string;
+
+  @IsString()
+  @IsOptional()
+  role?: string;
+
+  @IsString()
+  @IsOptional()
+  userType?: string;
+
+  @IsString()
+  @IsOptional()
+  period?: string;
+
+  @IsString()
+  @IsOptional()
+  @MinLength(6)
+  password?: string;
+
+  @IsBoolean()
+  @IsOptional()
+  isActive?: boolean;
 }

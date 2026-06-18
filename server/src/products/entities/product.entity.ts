@@ -18,6 +18,9 @@ export class Product {
   imageUrl: string;
 
   @Column('simple-json', { nullable: true })
+  extraImages: string[];
+
+  @Column('simple-json', { nullable: true })
   sizes: string[];
 
   @Column({ default: 'GERAL' })

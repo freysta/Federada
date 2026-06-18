@@ -1,5 +1,6 @@
-import { ShoppingBag, Loader2 } from "lucide-react";
+import { ShoppingBag, Loader2, ChevronLeft, ChevronRight } from "lucide-react";
 import { useState, useEffect } from "react";
+import useEmblaCarousel from "embla-carousel-react";
 import FadeIn from "./FadeIn";
 import { API_URL } from "../config";
 import { useCart } from "../contexts/CartContext";
@@ -10,12 +11,57 @@ interface Product {
   description: string;
   price: number;
   imageUrl: string;
+  extraImages?: string[];
   sizes: string[];
   category?: string;
   isCustomizable?: boolean;
 }
 
-export default function ProductGrid() {
+function ProductImageCarousel({ product }: { product: Product }) {
+  const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true });
+  const images = [product.imageUrl];
+  if (product.extraImages && product.extraImages.length > 0) {
+    images.push(...product.extraImages);
+  }
+
+  const scrollPrev = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (emblaApi) emblaApi.scrollPrev();
+  };
+  
+  const scrollNext = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (emblaApi) emblaApi.scrollNext();
+  };
+
+  return (
+    <div className="absolute inset-0 w-full h-full overflow-hidden" ref={emblaRef}>
+      <div className="flex w-full h-full">
+        {images.map((src, index) => (
+          <div className="flex-[0_0_100%] min-w-0 relative" key={index}>
+            <img
+              src={src?.startsWith('http') ? src : `${API_URL}${src}`}
+              alt={`${product.name} - ${index + 1}`}
+              className="absolute inset-0 w-full h-full object-cover mix-blend-multiply opacity-95 group-hover:scale-105 transition-transform duration-700"
+            />
+          </div>
+        ))}
+      </div>
+      {images.length > 1 && (
+        <div className="absolute inset-0 flex justify-between items-center px-2 opacity-0 group-hover:opacity-100 transition-opacity z-10">
+          <button onClick={scrollPrev} className="bg-white/80 p-1 border border-black hover:bg-white text-black">
+            <ChevronLeft size={16} />
+          </button>
+          <button onClick={scrollNext} className="bg-white/80 p-1 border border-black hover:bg-white text-black">
+            <ChevronRight size={16} />
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+export default function ProductGrid({ limit }: { limit?: number }) {
 	const [products, setProducts] = useState<Product[]>([]);
 	const [loading, setLoading] = useState(true);
 	const [activeCategory, setActiveCategory] = useState<string>('TODOS');
@@ -81,7 +127,10 @@ export default function ProductGrid() {
 					</div>
 				) : (
 					<div className="grid md:grid-cols-3 gap-12">
-						{products.filter(p => activeCategory === 'TODOS' || p.category === activeCategory).map((product, index) => (
+						{products
+              .filter(p => activeCategory === 'TODOS' || p.category === activeCategory)
+              .slice(0, limit || products.length)
+              .map((product, index) => (
 							<FadeIn key={product.id} delay={index * 100}>
 							<div className="group cursor-pointer">
 								{/* Image Container */}
@@ -91,18 +140,14 @@ export default function ProductGrid() {
 									</div>
 
 									{/* Inventory - Clear Language */}
-									<div className="absolute bottom-4 left-4 font-sans text-xs bg-white/90 backdrop-blur px-3 py-1 border border-black/10 shadow-sm z-10 text-gray-800 font-bold">
+									<div className="absolute bottom-4 left-4 font-sans text-xs bg-white/90 backdrop-blur px-3 py-1 border border-black/10 shadow-sm z-20 text-gray-800 font-bold pointer-events-none">
 										Venda sob demanda
 									</div>
 
-									{/* Product Image */}
-									<img
-										src={product.imageUrl?.startsWith('http') ? product.imageUrl : `${API_URL}${product.imageUrl}`}
-										alt={product.name}
-										className="absolute inset-0 w-full h-full object-cover mix-blend-multiply opacity-95 group-hover:scale-105 transition-transform duration-700"
-									/>
+									{/* Product Image Carousel */}
+									<ProductImageCarousel product={product} />
 
-									<div className="absolute inset-0 flex flex-col items-center justify-center gap-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-white/95 z-20 p-6">
+									<div className="absolute inset-0 flex flex-col items-center justify-center gap-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-white/95 z-30 p-6">
 										{product.sizes && product.sizes.length > 0 ? (
 											<div className="w-full flex flex-col items-center gap-3">
 												<span className="font-mono text-xs font-bold tracking-widest text-gray-500">// ESCOLHA O TAMANHO</span>

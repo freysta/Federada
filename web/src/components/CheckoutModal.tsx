@@ -22,7 +22,9 @@ export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
     email: user?.email || '',
     cpf: '',
     phone: '',
-    password: ''
+    password: '',
+    userType: 'ALUNO',
+    period: ''
   });
 
   if (!isOpen || items.length === 0) return null;
@@ -43,9 +45,11 @@ export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
           body: JSON.stringify({
             name: formData.name,
             email: formData.email,
-            cpf: formData.cpf,
+            cpf: formData.cpf || undefined,
             phone: formData.phone,
-            password: formData.password || '123456'
+            password: formData.password || '123456',
+            userType: formData.userType,
+            period: formData.userType === 'ALUNO' ? formData.period : undefined
           })
         });
 
@@ -64,7 +68,6 @@ export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
         const payloadItem: any = {
           productId: item.productId,
           productName: item.name,
-          price: Number(item.price),
           quantity: Number(item.quantity)
         };
         if (item.size) payloadItem.size = item.size;
@@ -192,9 +195,24 @@ export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
                     <input required type="email" className="w-full bg-white border border-gray-300 p-3 text-sm font-mono focus:border-black focus:ring-0 outline-none" placeholder="SEU@EMAIL.COM" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} />
                   </div>
                   <div className="grid grid-cols-2 gap-4">
-                    <input required type="text" inputMode="numeric" placeholder="CPF" className="w-full bg-white border border-gray-300 p-3 text-sm font-mono focus:border-black focus:ring-0 outline-none" value={formData.cpf} onChange={(e) => setFormData({ ...formData, cpf: e.target.value })} />
+                    <input type="text" inputMode="numeric" placeholder="CPF (Opcional)" className="w-full bg-white border border-gray-300 p-3 text-sm font-mono focus:border-black focus:ring-0 outline-none" value={formData.cpf} onChange={(e) => setFormData({ ...formData, cpf: e.target.value })} />
                     <input required type="tel" inputMode="numeric" placeholder="WHATSAPP" className="w-full bg-white border border-gray-300 p-3 text-sm font-mono focus:border-black focus:ring-0 outline-none" value={formData.phone} onChange={(e) => setFormData({ ...formData, phone: e.target.value })} />
                   </div>
+                  
+                  <div className="group">
+                    <select className="w-full bg-white border border-gray-300 p-3 text-sm font-mono focus:border-black focus:ring-0 outline-none" value={formData.userType} onChange={(e) => setFormData({ ...formData, userType: e.target.value })}>
+                      <option value="ALUNO">Sou Aluno</option>
+                      <option value="PROFESSOR">Sou Professor</option>
+                      <option value="FAMILIAR">Sou Familiar / Apoiador</option>
+                    </select>
+                  </div>
+
+                  {formData.userType === 'ALUNO' && (
+                    <div className="group">
+                      <input required type="text" placeholder="PERÍODO (Ex: 1º Período)" className="w-full bg-white border border-gray-300 p-3 text-sm font-mono focus:border-black focus:ring-0 outline-none" value={formData.period} onChange={(e) => setFormData({ ...formData, period: e.target.value })} />
+                    </div>
+                  )}
+
                   <div className="group">
                     <input required type="password" minLength={6} className="w-full bg-white border border-gray-300 p-3 text-sm font-mono focus:border-black focus:ring-0 outline-none" placeholder="CRIE UMA SENHA" value={formData.password} onChange={(e) => setFormData({ ...formData, password: e.target.value })} />
                   </div>

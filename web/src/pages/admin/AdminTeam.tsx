@@ -40,7 +40,11 @@ export default function AdminTeam() {
   const uploadImage = async (file: File): Promise<string> => {
     const formData = new FormData();
     formData.append('file', file);
-    const res = await fetch(`${API_URL}/upload`, { method: 'POST', body: formData });
+    const res = await fetch(`${API_URL}/upload`, { 
+      method: 'POST', 
+      body: formData,
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
     if (!res.ok) throw new Error('Falha no upload');
     const data = await res.json();
     return data.url;
@@ -148,8 +152,19 @@ export default function AdminTeam() {
                 <input required type="text" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} className="mt-1 block w-full border p-2" />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700">Cargo (ex: Presidente)</label>
-                <input required type="text" value={formData.role} onChange={e => setFormData({...formData, role: e.target.value})} className="mt-1 block w-full border p-2" />
+                <label className="block text-sm font-medium text-gray-700">Cargo</label>
+                <select required value={formData.role} onChange={e => setFormData({...formData, role: e.target.value})} className="mt-1 block w-full border p-2 bg-white">
+                  <option value="" disabled>Selecione um Cargo</option>
+                  <option value="Presidente">Presidente</option>
+                  <option value="Vice-Presidente">Vice-Presidente</option>
+                  <option value="Diretor(a) Financeiro">Diretor(a) Financeiro</option>
+                  <option value="Diretor(a) de Esportes">Diretor(a) de Esportes</option>
+                  <option value="Diretor(a) de Marketing">Diretor(a) de Marketing</option>
+                  <option value="Diretor(a) de Eventos">Diretor(a) de Eventos</option>
+                  <option value="Secretário(a)">Secretário(a)</option>
+                  <option value="Assessor(a)">Assessor(a)</option>
+                  <option value="Conselheiro(a)">Conselheiro(a)</option>
+                </select>
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700">Instagram URL</label>
