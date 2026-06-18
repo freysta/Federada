@@ -5,6 +5,7 @@ import { Order } from './orders/entities/order.entity';
 import { OrderItem } from './orders/entities/order-item.entity';
 import { TeamMember } from './cms/entities/team-member.entity';
 import { News } from './cms/entities/news.entity';
+import * as bcrypt from 'bcrypt';
 
 const dbUrl = process.env.DATABASE_URL;
 
@@ -66,6 +67,26 @@ async function run() {
     console.log('Products seeded successfully.');
   } else {
     console.log('Products already exist.');
+  }
+
+  const userRepo = dataSource.getRepository(User);
+  const adminExists = await userRepo.findOne({ where: { email: 'admin@federada.com.br' } });
+  
+  if (!adminExists) {
+    console.log('Seeding initial admin user...');
+    const hashedPassword = await bcrypt.hash('admin123', 10);
+    const admin = userRepo.create({
+      name: 'Administrador',
+      email: 'admin@federada.com.br',
+      password: hashedPassword,
+      cpf: '00000000000',
+      phone: '00000000000',
+      role: 'ADMIN',
+    });
+    await userRepo.save(admin);
+    console.log('Admin user seeded (email: admin@federada.com.br | password: admin123).');
+  } else {
+    console.log('Admin user already exists.');
   }
 
   await dataSource.destroy();
