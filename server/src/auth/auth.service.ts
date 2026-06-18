@@ -17,17 +17,20 @@ export class AuthService {
   ) {}
 
   async register(registerDto: RegisterDto) {
-    const whereConditions: any[] = [{ email: registerDto.email }];
-    if (registerDto.cpf) {
-      whereConditions.push({ cpf: registerDto.cpf });
+    if (!registerDto.cpf || registerDto.cpf.trim() === '') {
+      registerDto.cpf = null as any;
     }
 
-    const existingUser = await this.usersRepository.findOne({
-      where: whereConditions
-    });
+    const emailExists = await this.usersRepository.findOne({ where: { email: registerDto.email } });
+    if (emailExists) {
+      throw new BadRequestException('Este e-mail já está cadastrado. Por favor, faça login.');
+    }
 
-    if (existingUser) {
-      throw new BadRequestException('User with this email or CPF already exists');
+    if (registerDto.cpf) {
+      const cpfExists = await this.usersRepository.findOne({ where: { cpf: registerDto.cpf } });
+      if (cpfExists) {
+        throw new BadRequestException('Este CPF já está cadastrado.');
+      }
     }
 
     const hashedPassword = await bcrypt.hash(registerDto.password, 10);
@@ -98,17 +101,20 @@ export class AuthService {
   }
 
   async createAdminUser(registerDto: any) {
-    const whereConditions: any[] = [{ email: registerDto.email }];
-    if (registerDto.cpf) {
-      whereConditions.push({ cpf: registerDto.cpf });
+    if (!registerDto.cpf || registerDto.cpf.trim() === '') {
+      registerDto.cpf = null;
     }
 
-    const existingUser = await this.usersRepository.findOne({
-      where: whereConditions
-    });
+    const emailExists = await this.usersRepository.findOne({ where: { email: registerDto.email } });
+    if (emailExists) {
+      throw new BadRequestException('Este e-mail já está cadastrado.');
+    }
 
-    if (existingUser) {
-      throw new BadRequestException('User with this email or CPF already exists');
+    if (registerDto.cpf) {
+      const cpfExists = await this.usersRepository.findOne({ where: { cpf: registerDto.cpf } });
+      if (cpfExists) {
+        throw new BadRequestException('Este CPF já está cadastrado.');
+      }
     }
 
     const hashedPassword = await bcrypt.hash(registerDto.password || 'change_me_immediately', 10);
@@ -166,10 +172,12 @@ export class AuthService {
       user.email = updateDto.email;
     }
 
-    if (updateDto.cpf && updateDto.cpf !== user.cpf) {
+    if (updateDto.cpf && updateDto.cpf.trim() !== '' && updateDto.cpf !== user.cpf) {
       const existingCpf = await this.usersRepository.findOne({ where: { cpf: updateDto.cpf } });
       if (existingCpf) throw new BadRequestException('CPF já está em uso');
       user.cpf = updateDto.cpf;
+    } else if (updateDto.cpf !== undefined && updateDto.cpf.trim() === '') {
+      user.cpf = null as any;
     }
 
     if (updateDto.name) user.name = updateDto.name;
