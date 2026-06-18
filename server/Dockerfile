@@ -18,8 +18,8 @@ COPY --from=builder /app/package*.json ./
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/dist ./dist
 
-# Garante permissões para o SQLite se for usar
-RUN mkdir -p /app/data && chown -R node:node /app/data
+# Garante permissões
+RUN mkdir -p /app/data /app/uploads && chown -R node:node /app/data /app/uploads
 
 EXPOSE 3000
 

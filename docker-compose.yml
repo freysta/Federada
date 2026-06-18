@@ -1,6 +1,20 @@
 version: '3.8'
 
 services:
+  # Banco de Dados (PostgreSQL)
+  db:
+    image: postgres:15-alpine
+    container_name: federada-db
+    restart: always
+    environment:
+      POSTGRES_USER: federada
+      POSTGRES_PASSWORD: super_secret_db_password_123
+      POSTGRES_DB: federada_db
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - federada-network
+
   # Backend (NestJS)
   api:
     build:
@@ -12,9 +26,15 @@ services:
       - "3000"
     environment:
       - PORT=3000
+      - DATABASE_URL=postgresql://federada:super_secret_db_password_123@db:5432/federada_db
       - MERCADO_PAGO_ACCESS_TOKEN=${MERCADO_PAGO_ACCESS_TOKEN}
+      - JWT_SECRET=${JWT_SECRET}
+      - WEBHOOK_URL=https://federada.com.br
+    depends_on:
+      - db
     volumes:
       - ./server/data:/app/data
+      - ./server/uploads:/app/uploads
     networks:
       - federada-network
 
@@ -52,6 +72,7 @@ services:
       - federada-network
 
 volumes:
+  pgdata:
   caddy_data:
   caddy_config:
 
