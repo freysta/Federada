@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import { User } from '../orders/entities/user.entity';
 import { JwtService } from '@nestjs/jwt';
 import { RegisterDto, LoginDto } from './dto/auth.dto';
+import { MailerService } from '@nestjs-modules/mailer';
 import * as bcrypt from 'bcrypt';
 
 @Injectable()
@@ -12,6 +13,7 @@ export class AuthService {
     @InjectRepository(User)
     private usersRepository: Repository<User>,
     private jwtService: JwtService,
+    private mailerService: MailerService,
   ) {}
 
   async register(registerDto: RegisterDto) {
@@ -31,6 +33,12 @@ export class AuthService {
     });
 
     await this.usersRepository.save(user);
+
+    this.mailerService.sendMail({
+      to: user.email,
+      subject: 'Bem-vindo(a) à Federada!',
+      text: `Olá ${user.name},\n\nSua conta na Federada foi criada com sucesso!\n\nAcesse nossa loja: https://federada.com.br\n\nAbraços,\nEquipe Federada`,
+    }).catch(e => console.error('Erro ao enviar email:', e));
 
     return this.login({ email: user.email, password: registerDto.password! });
   }
@@ -98,6 +106,26 @@ export class AuthService {
     }) as any;
 
     await this.usersRepository.save(user);
+    
+    this.mailerService.sendMail({
+      to: user.email,
+      subject: 'Sua conta de acesso foi criada!',
+      text: `Olá ${user.name},\n\nSua conta com cargo ${user.role} foi criada na plataforma Federada.\nAcesse: https://federada.com.br\n\nAbraços,\nEquipe Federada`,
+    }).catch(e => console.error('Erro ao enviar email:', e));
+    
     return { message: 'Usuário criado', user: { id: user.id, name: user.name, email: user.email, role: user.role } };
+  }
+
+  async changePassword(userId: string, currentPassword: string, newPassword: string) {
+    const user = await this.usersRepository.findOne({ where: { id: userId } });
+    if (!user) throw new BadRequestException('User not found');
+
+    const isPasswordValid = await bcrypt.compare(currentPassword, user.password || '');
+    if (!isPasswordValid) throw new BadRequestException('Senha atual incorreta');
+
+    user.password = await bcrypt.hash(newPassword, 10);
+    await this.usersRepository.save(user);
+
+    return { message: 'Senha alterada com sucesso' };
   }
 }

@@ -12,6 +12,7 @@ import AdminOrders from "./pages/admin/AdminOrders";
 import AdminUsers from "./pages/admin/AdminUsers";
 import AdminTeam from "./pages/admin/AdminTeam";
 import AdminNews from "./pages/admin/AdminNews";
+import AdminProfile from "./pages/admin/AdminProfile";
 import NotFound from "./components/NotFound";
 
 function App() {
@@ -34,6 +35,7 @@ function App() {
             <Route path="users" element={<AdminUsers />} />
             <Route path="team" element={<AdminTeam />} />
             <Route path="news" element={<AdminNews />} />
+            <Route path="profile" element={<AdminProfile />} />
           </Route>
 
           {/* Fallback 404 Route */}

@@ -3,6 +3,8 @@ import { AuthService } from './auth.service';
 import { JwtAuthGuard } from './jwt-auth.guard';
 import { RolesGuard } from './roles.guard';
 import { Roles } from './roles.decorator';
+import { ChangePasswordDto } from './dto/auth.dto';
+import { Request } from '@nestjs/common';
 
 @Controller('users')
 export class UsersController {
@@ -27,5 +29,11 @@ export class UsersController {
   @Post('admin-create')
   createAdmin(@Body() registerDto: any) {
     return this.authService.createAdminUser(registerDto);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Put('me/password')
+  changePassword(@Request() req: any, @Body() changePasswordDto: ChangePasswordDto) {
+    return this.authService.changePassword(req.user.id, changePasswordDto.currentPassword, changePasswordDto.newPassword);
   }
 }

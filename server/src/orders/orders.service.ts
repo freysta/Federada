@@ -9,6 +9,7 @@ import { OrderItem } from './entities/order-item.entity';
 import { User } from './entities/user.entity';
 import { MercadoPagoConfig, Payment, Preference } from 'mercadopago';
 import { ProductsService } from '../products/products.service';
+import { MailerService } from '@nestjs-modules/mailer';
 
 @Injectable()
 export class OrdersService {
@@ -22,6 +23,7 @@ export class OrdersService {
     private usersRepository: Repository<User>,
     private configService: ConfigService,
     private productsService: ProductsService,
+    private mailerService: MailerService,
   ) {
     this.initializeMP();
   }
@@ -113,6 +115,12 @@ export class OrdersService {
       order.paymentId = prefResponse.id || null; 
       await this.ordersRepository.save(order);
 
+      this.mailerService.sendMail({
+        to: user.email,
+        subject: `Seu pedido foi recebido! #${order.id}`,
+        text: `Olá ${user.name},\n\nRecebemos o seu pedido de R$ ${Number(order.amount).toFixed(2).replace('.', ',')} e ele está aguardando pagamento.\n\nPara pagar, acesse o link:\n${prefResponse.init_point}\n\nAbraços,\nEquipe Federada`,
+      }).catch(e => console.error('Erro ao enviar email de pedido:', e));
+
       return {
         orderId: order.id,
         customer: user.name,
@@ -151,13 +159,23 @@ export class OrdersService {
         
         const order = await this.ordersRepository.findOne({
           where: { id: paymentData.external_reference },
+          relations: ['user']
         });
 
         if (order) {
           if (paymentData.status === 'approved') {
+            const wasPaid = order.status === 'PAID';
             order.status = 'PAID';
             order.paymentId = paymentId.toString(); // Guarda o ID final do pagamento
             console.log(`Order ${order.id} marked as PAID`);
+
+            if (!wasPaid && order.user?.email) {
+              this.mailerService.sendMail({
+                to: order.user.email,
+                subject: `Pagamento Aprovado! Pedido #${order.id}`,
+                text: `Olá ${order.user.name},\n\nSeu pagamento de R$ ${Number(order.amount).toFixed(2).replace('.', ',')} foi aprovado com sucesso!\n\nEm breve entraremos em contato sobre a entrega.\n\nAbraços,\nEquipe Federada`,
+              }).catch(e => console.error('Erro ao enviar email de pagamento:', e));
+            }
           } else if (paymentData.status === 'rejected' || paymentData.status === 'cancelled') {
             order.status = 'CANCELLED';
             console.log(`Order ${order.id} marked as CANCELLED`);

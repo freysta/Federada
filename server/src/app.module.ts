@@ -17,6 +17,7 @@ import { join } from 'path';
 import { CmsModule } from './cms/cms.module';
 import { TeamMember } from './cms/entities/team-member.entity';
 import { News } from './cms/entities/news.entity';
+import { MailerModule } from '@nestjs-modules/mailer';
 
 @Module({
   imports: [
@@ -31,6 +32,24 @@ import { News } from './cms/entities/news.entity';
       ttl: 60000,
       limit: 100, // 100 requests per minute per IP
     }]),
+    MailerModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => ({
+        transport: {
+          host: configService.get('SMTP_HOST') || 'smtp.gmail.com',
+          port: Number(configService.get('SMTP_PORT')) || 587,
+          secure: configService.get('SMTP_SECURE') === 'true',
+          auth: {
+            user: configService.get('SMTP_USER'),
+            pass: configService.get('SMTP_PASS'),
+          },
+        },
+        defaults: {
+          from: `"Federada" <${configService.get('SMTP_USER')}>`,
+        },
+      }),
+    }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
