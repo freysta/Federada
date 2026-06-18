@@ -99,6 +99,16 @@ export class OrdersService {
         payer: {
           name: user.name,
           email: user.email,
+          ...(user.cpf ? {
+            identification: {
+              type: 'CPF',
+              number: user.cpf,
+            }
+          } : {})
+        },
+        payment_methods: {
+          excluded_payment_methods: [],
+          excluded_payment_types: [],
         },
         back_urls: {
           success: 'http://localhost:5174/orders',
