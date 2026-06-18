@@ -99,11 +99,10 @@ export class OrdersService {
           email: user.email,
         },
         back_urls: {
-          success: 'http://localhost:5174/',
-          pending: 'http://localhost:5174/',
+          success: 'http://localhost:5174/orders',
+          pending: 'http://localhost:5174/orders',
           failure: 'http://localhost:5174/',
         },
-        auto_return: 'approved',
         external_reference: order.id,
         notification_url: webhookUrl ? `${webhookUrl}/orders/webhook` : undefined,
       };

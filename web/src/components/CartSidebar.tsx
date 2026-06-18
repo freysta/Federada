@@ -9,7 +9,7 @@ export default function CartSidebar() {
   const { isCartOpen, setIsCartOpen, items, updateQuantity, removeFromCart, totalPrice } = useCart();
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
 
-  if (!isCartOpen) return null;
+  if (!isCartOpen && !isCheckoutOpen) return null;
 
   const handleCheckout = () => {
     setIsCartOpen(false);
@@ -105,7 +105,7 @@ export default function CartSidebar() {
 
   return (
     <>
-      {createPortal(cartContent, document.body)}
+      {isCartOpen && createPortal(cartContent, document.body)}
       <CheckoutModal isOpen={isCheckoutOpen} onClose={() => setIsCheckoutOpen(false)} />
     </>
   );

@@ -60,18 +60,22 @@ export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
       }
 
       // Cria o Pedido com array
-      const payload = {
-        totalAmount: totalPrice,
-        items: items.map(item => ({
+      const payloadItems = items.map(item => {
+        const payloadItem: any = {
           productId: item.productId,
           productName: item.name,
-          productSize: item.size || null,
-          customName: item.customName || null,
-          customNumber: item.customNumber || null,
-          playerType: item.playerType || null,
           price: item.price,
           quantity: item.quantity
-        }))
+        };
+        if (item.size) payloadItem.size = item.size;
+        if (item.customName) payloadItem.customName = item.customName;
+        if (item.customNumber) payloadItem.customNumber = item.customNumber;
+        if (item.playerType) payloadItem.playerType = item.playerType;
+        return payloadItem;
+      });
+
+      const payload = {
+        items: payloadItems
       }; 
       
       const orderRes = await fetch(`${API_URL}/orders`, {
@@ -84,7 +88,8 @@ export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
       });
 
       if (!orderRes.ok) {
-        throw new Error('Erro ao gerar pagamento com Mercado Pago.');
+        const errorText = await orderRes.text();
+        throw new Error(`Erro API: ${errorText}`);
       }
 
       const orderData = await orderRes.json();
