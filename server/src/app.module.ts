@@ -43,7 +43,7 @@ import { News } from './cms/entities/news.entity';
             url: dbUrl,
             entities: [Order, OrderItem, User, Product, TeamMember, News],
             synchronize: process.env.NODE_ENV !== 'production',
-            ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
+            ssl: process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : false,
           };
         }
         // Fallback para SQLite em ambiente de dev local (sem URL de banco)

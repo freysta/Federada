@@ -15,7 +15,7 @@ const dataSource = new DataSource(
         url: dbUrl,
         entities: [Product, User, Order, OrderItem, TeamMember, News],
         synchronize: true,
-        ssl: { rejectUnauthorized: false },
+        ssl: process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : false,
       }
     : {
         type: 'sqlite',
