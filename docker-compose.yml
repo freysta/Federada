@@ -7,9 +7,9 @@ services:
     container_name: federada-db
     restart: always
     environment:
-      POSTGRES_USER: federada
-      POSTGRES_PASSWORD: super_secret_db_password_123
-      POSTGRES_DB: federada_db
+      POSTGRES_USER: ${POSTGRES_USER:-federada}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-federada_db}
     volumes:
       - pgdata:/var/lib/postgresql/data
     networks:
@@ -26,10 +26,10 @@ services:
       - "3000"
     environment:
       - PORT=3000
-      - DATABASE_URL=postgresql://federada:super_secret_db_password_123@db:5432/federada_db
-      - MERCADO_PAGO_ACCESS_TOKEN=${MERCADO_PAGO_ACCESS_TOKEN}
-      - JWT_SECRET=${JWT_SECRET}
-      - WEBHOOK_URL=https://federada.com.br
+      - DATABASE_URL=${DATABASE_URL:-postgresql://federada:postgres@db:5432/federada_db}
+      - WEBHOOK_URL=${WEBHOOK_URL:-https://federada.com.br}
+    env_file:
+      - .env
     depends_on:
       - db
     volumes:
