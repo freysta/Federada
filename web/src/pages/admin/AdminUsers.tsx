@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { API_URL } from '../../config';
-import { Loader2, ShieldAlert, Edit, Ban, CheckCircle, Package, MessageCircle } from 'lucide-react';
+import { Loader2, Edit, Ban, CheckCircle, Package, MessageCircle } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 export default function AdminUsers() {
