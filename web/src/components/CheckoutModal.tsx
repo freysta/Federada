@@ -64,8 +64,8 @@ export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
         const payloadItem: any = {
           productId: item.productId,
           productName: item.name,
-          price: item.price,
-          quantity: item.quantity
+          price: Number(item.price),
+          quantity: Number(item.quantity)
         };
         if (item.size) payloadItem.size = item.size;
         if (item.customName) payloadItem.customName = item.customName;
