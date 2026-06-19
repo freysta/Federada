@@ -96,7 +96,17 @@ export class AuthService {
     user.verificationToken = undefined;
     await this.usersRepository.save(user);
 
-    return { message: 'E-mail verificado com sucesso! Você já pode fazer login.' };
+    const payload = { email: user.email, sub: user.id, role: user.role };
+    return { 
+      message: 'E-mail verificado com sucesso! Você já pode fazer login.',
+      access_token: this.jwtService.sign(payload),
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role
+      }
+    };
   }
 
   async fixUsers() {
