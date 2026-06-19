@@ -111,6 +111,7 @@ export default function AdminOrders() {
     if (status === 'PENDING') return 'PENDENTE';
     if (status === 'CANCELLED') return 'CANCELADO';
     if (status === 'SHIPPED') return 'ENVIADO';
+    if (status === 'REFUNDED') return 'ESTORNADO';
     return status;
   };
 
@@ -148,6 +149,7 @@ export default function AdminOrders() {
           <option value="PAID">Pago</option>
           <option value="PENDING">Pendente</option>
           <option value="SHIPPED">Enviado</option>
+          <option value="REFUNDED">Estornado</option>
           <option value="CANCELLED">Cancelado</option>
         </select>
       </div>
@@ -180,7 +182,7 @@ export default function AdminOrders() {
                 <td className="p-3">
                   <span className={`text-[10px] font-mono px-2 py-1 font-bold ${
                     o.status === 'PAID' ? 'bg-green-100 text-green-800' :
-                    o.status === 'CANCELLED' ? 'bg-red-100 text-red-800' : 
+                    (o.status === 'CANCELLED' || o.status === 'REFUNDED') ? 'bg-red-100 text-red-800' : 
                     o.status === 'SHIPPED' ? 'bg-blue-100 text-blue-800' : 'bg-yellow-100 text-yellow-800'
                   }`}>
                     {translateStatus(o.status)}
@@ -239,7 +241,7 @@ export default function AdminOrders() {
                       <strong>Status:</strong>{' '}
                       <span className={`text-xs font-mono px-2 py-0.5 font-bold ${
                         selectedOrder.status === 'PAID' ? 'bg-green-100 text-green-800' :
-                        selectedOrder.status === 'CANCELLED' ? 'bg-red-100 text-red-800' : 
+                        (selectedOrder.status === 'CANCELLED' || selectedOrder.status === 'REFUNDED') ? 'bg-red-100 text-red-800' : 
                         selectedOrder.status === 'SHIPPED' ? 'bg-blue-100 text-blue-800' : 'bg-yellow-100 text-yellow-800'
                       }`}>
                         {translateStatus(selectedOrder.status)}
@@ -304,6 +306,32 @@ export default function AdminOrders() {
                     >
                       {updating ? <Loader2 className="animate-spin" size={20} /> : <Truck size={20} />}
                       MARCAR COMO ENVIADO
+                    </button>
+                    
+                    <button 
+                      onClick={async () => {
+                        if (!window.confirm('ATENÇÃO: O estorno pelo Mercado Pago é irreversível. Deseja devolver o dinheiro para o cliente e cancelar este pedido?')) return;
+                        setUpdating(true);
+                        try {
+                          const res = await fetch(`${API_URL}/orders/${selectedOrder.id}/refund`, {
+                            method: 'POST',
+                            headers: { Authorization: `Bearer ${token}` }
+                          });
+                          if (!res.ok) throw new Error();
+                          toast.success('Pedido estornado com sucesso!');
+                          setSelectedOrder(null);
+                          fetchOrders();
+                        } catch {
+                          toast.error('Erro ao estornar pedido (verifique o Mercado Pago)');
+                        } finally {
+                          setUpdating(false);
+                        }
+                      }}
+                      disabled={updating}
+                      className="w-full flex justify-center items-center gap-2 bg-red-600 hover:bg-red-700 text-white font-bold font-mono py-3 border-2 border-black shadow-[4px_4px_0_0_#000] active:translate-x-1 active:translate-y-1 active:shadow-none transition-all disabled:opacity-50 mt-4"
+                    >
+                      {updating ? <Loader2 className="animate-spin" size={20} /> : <X size={20} />}
+                      ESTORNAR VALOR
                     </button>
                   </div>
                 )}

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { API_URL } from '../../config';
-import { Loader2, Edit, Ban, CheckCircle, Package, MessageCircle } from 'lucide-react';
+import { Loader2, Edit, Ban, CheckCircle, Package, MessageCircle, Trash2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 export default function AdminUsers() {
@@ -113,6 +113,22 @@ export default function AdminUsers() {
     }
   };
 
+  const handleDeleteUser = async (u: any) => {
+    if (!window.confirm(`ATENÇÃO: Tem certeza que deseja EXCLUIR DEFINITIVAMENTE o usuário ${u.name}? Esta ação não pode ser desfeita e excluirá todos os pedidos relacionados.`)) return;
+    try {
+      const res = await fetch(`${API_URL}/users/${u.id}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (!res.ok) throw new Error('Erro ao excluir usuário');
+      toast.success('Usuário excluído com sucesso!');
+      setIsDetailsOpen(false);
+      fetchData();
+    } catch (err: any) {
+      toast.error(err.message);
+    }
+  };
+
   if (loading) return <div className="flex justify-center p-10"><Loader2 className="animate-spin text-black" size={32} /></div>;
 
   return (
@@ -194,9 +210,15 @@ export default function AdminUsers() {
                   </button>
                   <button 
                     onClick={() => handleToggleActive(selectedUser)} 
-                    className={`flex items-center gap-1 px-3 py-1 text-xs font-bold border ${selectedUser.isActive !== false ? 'bg-red-50 text-red-600 border-red-200 hover:bg-red-100' : 'bg-green-50 text-green-600 border-green-200 hover:bg-green-100'}`}
+                    className={`flex items-center gap-1 px-3 py-1 text-xs font-bold border ${selectedUser.isActive !== false ? 'bg-orange-50 text-orange-600 border-orange-200 hover:bg-orange-100' : 'bg-green-50 text-green-600 border-green-200 hover:bg-green-100'}`}
                   >
                     {selectedUser.isActive !== false ? <><Ban size={14} /> DESATIVAR</> : <><CheckCircle size={14} /> ATIVAR</>}
+                  </button>
+                  <button 
+                    onClick={() => handleDeleteUser(selectedUser)} 
+                    className="flex items-center gap-1 bg-red-50 text-red-600 border border-red-200 px-3 py-1 text-xs font-bold hover:bg-red-100 transition-colors"
+                  >
+                    <Trash2 size={14} /> EXCLUIR
                   </button>
                 </div>
               </div>

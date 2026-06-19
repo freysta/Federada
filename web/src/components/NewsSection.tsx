@@ -6,6 +6,7 @@ import FadeIn from './FadeIn';
 export default function NewsSection() {
   const [news, setNews] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [expandedNews, setExpandedNews] = useState<string | null>(null);
 
   useEffect(() => {
     fetch(`${API_URL}/cms/news`)
@@ -67,13 +68,15 @@ export default function NewsSection() {
                                 <h3 className="text-2xl font-bold group-hover:text-gray-600 transition-colors duration-300">
                                     {item.title}
                                 </h3>
-                                <p className="text-gray-600 max-w-2xl font-sans text-lg">
+                                <p className={`text-gray-600 max-w-2xl font-sans text-lg ${expandedNews === item.id ? '' : 'line-clamp-3'}`}>
                                     {item.content}
                                 </p>
                             </div>
 
-                            <button className="flex items-center gap-2 font-bold text-sm border border-black px-6 py-3 hover:bg-black hover:text-white transition-all whitespace-nowrap">
-                                LER MAIS <ArrowUpRight size={16} />
+                            <button 
+                                onClick={() => setExpandedNews(expandedNews === item.id ? null : item.id)}
+                                className="flex items-center gap-2 font-bold text-sm border border-black px-6 py-3 hover:bg-black hover:text-white transition-all whitespace-nowrap">
+                                {expandedNews === item.id ? 'LER MENOS' : 'LER MAIS'} <ArrowUpRight size={16} />
                             </button>
                         </div>
                     </div>
