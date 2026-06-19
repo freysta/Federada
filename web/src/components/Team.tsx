@@ -92,7 +92,7 @@ export default function Team() {
                             <img 
                                 src={member.imageUrl ? (member.imageUrl.startsWith('http') ? member.imageUrl : `${API_URL}${member.imageUrl}`) : 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80'} 
                                 alt={member.name} 
-                                className="w-full h-full object-cover grayscale contrast-125 brightness-90 group-hover:grayscale-0 transition-all duration-700"
+                                className="w-full h-full object-cover grayscale contrast-125 brightness-90 group-hover:grayscale-0 group-active:grayscale-0 transition-all duration-700"
                             />
                             
                             {/* Hover Tech Overlay */}
@@ -104,12 +104,12 @@ export default function Team() {
                              {/* Decorative Corner */}
                              <div className="absolute top-0 right-0 w-4 h-4 border-t border-r border-black/30"></div>
 
-                             <div className="flex items-center gap-2 mb-3 text-neon-cyan/80 group-hover:text-black transition-colors">
+                             <div className="flex items-center gap-2 mb-3 text-neon-cyan/80 group-hover:text-black group-active:text-black transition-colors">
                                 <Shield size={14} />
-                                <span className="font-mono text-[10px] tracking-widest text-gray-500 group-hover:text-black">LEADERSHIP</span>
+                                <span className="font-mono text-[10px] tracking-widest text-gray-500 group-hover:text-black group-active:text-black">LEADERSHIP</span>
                              </div>
 
-                            <h4 className="font-sans font-bold text-4xl mb-3 tracking-wide uppercase group-hover:text-[#00f0ff] transition-colors">{member.name}</h4>
+                            <h4 className="font-sans font-bold text-4xl mb-3 tracking-wide uppercase group-hover:text-[#00f0ff] group-active:text-[#00f0ff] transition-colors">{member.name}</h4>
                             
                             <div className="space-y-1">
                                 <div className="flex items-center gap-2">

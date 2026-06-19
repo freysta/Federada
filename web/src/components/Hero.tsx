@@ -58,7 +58,7 @@ export default function Hero() {
                   <span className="font-mono text-sm tracking-widest uppercase text-gray-600">Desde 2024</span>
                 </div>
                 
-                <h1 className="text-6xl md:text-[7rem] leading-[0.9] mb-6 font-bold tracking-normal">
+                <h1 className="text-5xl sm:text-6xl md:text-[7rem] leading-[0.9] mb-6 font-bold tracking-normal">
                   <span className="glitch" data-text="FEDERADA:">FEDERADA:</span><br/>
                   ESTILO &<br/>
                   PERFORMANCE
@@ -143,21 +143,21 @@ export default function Hero() {
                 SYSTEM_UPDATE_PENDING // V_3.0
               </div>
 
-              <h2 className="text-5xl md:text-7xl font-bold font-sans uppercase leading-none mb-12 text-center">
+              <h2 className="text-4xl sm:text-5xl md:text-7xl font-bold font-sans uppercase leading-none mb-8 md:mb-12 text-center">
                 PRÓXIMO <span className="text-transparent stroke-text" style={{ WebkitTextStroke: '1px #00f0ff' }}>DROP</span>
               </h2>
               
               {/* Terminal Countdown */}
-              <div className="grid grid-cols-4 gap-4 md:gap-8 w-full max-w-3xl mb-12">
+              <div className="grid grid-cols-4 gap-2 sm:gap-4 md:gap-8 w-full max-w-3xl mb-8 md:mb-12">
                 {[
                   { label: 'DIAS', value: countdown.days },
                   { label: 'HORAS', value: countdown.hours },
                   { label: 'MINUTOS', value: countdown.minutes },
                   { label: 'SEGUNDOS', value: countdown.seconds }
                 ].map((item, i) => (
-                  <div key={i} className="flex flex-col items-center bg-black/50 border border-[#00f0ff]/30 p-4 md:p-6 backdrop-blur group hover:border-[#00f0ff] hover:bg-[#00f0ff]/10 transition-colors">
-                    <span className="font-sans text-4xl md:text-6xl font-bold text-white group-hover:text-[#00f0ff] transition-colors">{String(item.value).padStart(2, '0')}</span>
-                    <span className="font-mono text-[10px] md:text-xs text-[#00f0ff]/70 mt-2 tracking-widest">{item.label}</span>
+                  <div key={i} className="flex flex-col items-center bg-black/50 border border-[#00f0ff]/30 p-2 sm:p-4 md:p-6 backdrop-blur group hover:border-[#00f0ff] hover:bg-[#00f0ff]/10 active:border-[#00f0ff] active:bg-[#00f0ff]/10 transition-colors">
+                    <span className="font-sans text-2xl sm:text-4xl md:text-6xl font-bold text-white group-hover:text-[#00f0ff] active:text-[#00f0ff] transition-colors">{String(item.value).padStart(2, '0')}</span>
+                    <span className="font-mono text-[8px] sm:text-[10px] md:text-xs text-[#00f0ff]/70 mt-1 md:mt-2 tracking-widest">{item.label}</span>
                   </div>
                 ))}
               </div>

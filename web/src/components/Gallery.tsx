@@ -63,9 +63,9 @@ export default function Gallery() {
                                 <img 
                                     src={post.url} 
                                     alt={post.title}
-                                    className="w-full h-full object-cover grayscale-[30%] group-hover:grayscale-0 group-hover:scale-105 transition-all duration-500"
+                                    className="w-full h-full object-cover grayscale-[30%] group-hover:grayscale-0 group-hover:scale-105 group-active:grayscale-0 group-active:scale-105 transition-all duration-500"
                                 />
-                                <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-all duration-300">
+                                <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 group-active:opacity-100 flex items-center justify-center transition-all duration-300">
                                     <span className="text-white font-bold tracking-widest border border-white px-4 py-2">VER NO INSTAGRAM</span>
                                 </div>
                             </div>

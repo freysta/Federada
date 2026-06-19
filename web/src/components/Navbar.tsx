@@ -113,23 +113,23 @@ export default function Navbar() {
 
 			{/* Mobile Menu */}
 			{isOpen && (
-				<div className="md:hidden bg-white border-b border-black/10 p-6 flex flex-col gap-4 font-mono text-sm">
-					<Link to="/" onClick={() => setIsOpen(false)}>
+				<div className="md:hidden bg-white border-b border-black/10 p-6 flex flex-col gap-2 font-mono text-sm">
+					<Link to="/" onClick={() => setIsOpen(false)} className="py-3 w-full border-b border-gray-50 active:bg-gray-50 transition-colors">
 						INÍCIO
 					</Link>
-					<Link to="/forum" onClick={() => setIsOpen(false)}>
+					<Link to="/forum" onClick={() => setIsOpen(false)} className="py-3 w-full border-b border-gray-50 active:bg-gray-50 transition-colors">
 						FÓRUM
 					</Link>
-					<Link to="/gallery" onClick={() => setIsOpen(false)}>
+					<Link to="/gallery" onClick={() => setIsOpen(false)} className="py-3 w-full border-b border-gray-50 active:bg-gray-50 transition-colors">
 						GALERIA
 					</Link>
-					<button onClick={() => handleScrollTo('caads')} className="text-left">
+					<button onClick={() => handleScrollTo('caads')} className="py-3 w-full text-left border-b border-gray-50 active:bg-gray-50 transition-colors">
 						CAADS
 					</button>
-					<Link to="/loja" onClick={() => setIsOpen(false)}>
+					<Link to="/loja" onClick={() => setIsOpen(false)} className="py-3 w-full border-b border-gray-50 active:bg-gray-50 transition-colors">
 						LOJA
 					</Link>
-					<button onClick={() => handleScrollTo('about')} className="text-left">
+					<button onClick={() => handleScrollTo('about')} className="py-3 w-full text-left border-b border-gray-50 active:bg-gray-50 transition-colors">
 						SOBRE
 					</button>
 					<div className="pt-4 border-t border-gray-100 flex justify-between items-center">

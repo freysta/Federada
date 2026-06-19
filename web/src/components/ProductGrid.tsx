@@ -88,20 +88,20 @@ export default function ProductGrid({ limit }: { limit?: number }) {
 							<FadeIn key={product.id} delay={index * 100}>
 							<div className="group cursor-pointer" onClick={() => setSelectedProduct(product)}>
 								{/* Image Container */}
-								<div className="relative aspect-[3/4] bg-neutral-100 mb-4 overflow-hidden border border-transparent hover:border-black transition-colors">
+								<div className="relative aspect-[3/4] bg-neutral-100 mb-4 overflow-hidden border border-transparent hover:border-black active:border-black transition-colors">
 									
-									<div className="absolute top-4 left-4 font-bold text-xs bg-black text-white px-3 py-1 z-10 group-hover:bg-white group-hover:text-black transition-colors">
+									<div className="absolute top-4 left-4 font-bold text-xs bg-black text-white px-3 py-1 z-10 group-hover:bg-white group-hover:text-black group-active:bg-white group-active:text-black transition-colors">
 										NOVO
 									</div>
 
 									<img
 									  src={product.imageUrl?.startsWith('http') ? product.imageUrl : `${API_URL}${product.imageUrl}`}
 									  alt={product.name}
-									  className="absolute inset-0 w-full h-full object-cover mix-blend-multiply opacity-95 group-hover:scale-105 transition-transform duration-700"
+									  className="absolute inset-0 w-full h-full object-cover mix-blend-multiply opacity-95 group-hover:scale-105 group-active:scale-105 transition-transform duration-700"
 									/>
 
 									{/* Hover overlay text */}
-									<div className="absolute inset-0 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-white/40 backdrop-blur-sm z-30">
+									<div className="absolute inset-0 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 group-active:opacity-100 transition-opacity duration-300 bg-white/40 backdrop-blur-sm z-30">
 										<span className="bg-black text-white px-6 py-3 font-bold text-sm tracking-widest">
 											VER DETALHES
 										</span>
@@ -112,7 +112,7 @@ export default function ProductGrid({ limit }: { limit?: number }) {
 								<div className="pt-2">
 									{/* Header: Name & Price */}
 									<div className="flex justify-between items-start mb-1">
-										<h3 className="text-lg font-bold leading-tight uppercase max-w-[80%] group-hover:text-gray-500 transition-colors">
+										<h3 className="text-lg font-bold leading-tight uppercase max-w-[80%] group-hover:text-gray-500 group-active:text-gray-500 transition-colors">
 											{product.name}
 										</h3>
 										<span className="font-mono font-bold text-sm text-black px-2 py-1">

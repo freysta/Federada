@@ -96,7 +96,7 @@ export default function ProductModal({ product, onClose }: ProductModalProps) {
           
           {/* Main Image */}
           <div 
-            className="relative w-full aspect-[4/5] md:aspect-auto md:h-[95vh] max-h-[800px] overflow-hidden cursor-crosshair group"
+            className="relative w-full aspect-[4/5] md:aspect-auto md:h-[95vh] max-h-[50vh] md:max-h-[800px] overflow-hidden cursor-crosshair group"
             onMouseEnter={() => setIsZoomed(true)}
             onMouseLeave={() => setIsZoomed(false)}
             onMouseMove={handleMouseMove}
@@ -214,7 +214,7 @@ export default function ProductModal({ product, onClose }: ProductModalProps) {
             </div>
           )}
 
-          <div className="mb-8">
+          <div className="sticky bottom-0 -mx-6 -mb-6 p-6 mt-4 md:static md:m-0 md:p-0 md:mb-8 bg-white border-t border-gray-100 md:border-0 z-50">
             <button 
               onClick={handleAddToCart}
               className="w-full bg-black text-white font-semibold text-sm uppercase tracking-widest py-4 flex items-center justify-center gap-2 hover:bg-neutral-800 transition-all active:scale-[0.98]"
