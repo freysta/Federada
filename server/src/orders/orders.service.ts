@@ -125,10 +125,29 @@ export class OrdersService {
       order.paymentId = prefResponse.id || null; 
       await this.ordersRepository.save(order);
 
+      const storeUrl = this.configService.get('STORE_URL') || 'https://federada.com.br';
       this.mailerService.sendMail({
         to: user.email,
-        subject: `Seu pedido foi recebido! #${order.id}`,
-        text: `Olá ${user.name},\n\nRecebemos o seu pedido de R$ ${Number(order.amount).toFixed(2).replace('.', ',')} e ele está aguardando pagamento.\n\nPara pagar, acesse o link:\n${prefResponse.init_point}\n\nAbraços,\nEquipe Federada`,
+        subject: `Seu pedido foi recebido! #${order.id.slice(0,8)}`,
+        html: `
+        <div style="font-family: monospace; max-width: 600px; margin: 0 auto; border: 1px solid #eaeaea; overflow: hidden;">
+          <div style="background-color: #000; padding: 30px; text-align: center;">
+            <img src="${storeUrl}/urso-polar-andando.gif" alt="Urso" style="width: 80px; height: 80px; object-fit: cover; border-radius: 50%; border: 2px solid white; margin-bottom: 10px;" />
+            <h1 style="color: #fff; letter-spacing: 4px; margin: 0; font-size: 24px; text-transform: uppercase;">FEDERADA</h1>
+          </div>
+          <div style="padding: 40px 30px; background-color: #fff; color: #000;">
+            <h2 style="margin-top: 0;">Olá, ${user.name}</h2>
+            <p>Recebemos o seu pedido <strong>#${order.id.slice(0,8)}</strong> no valor de <strong>R$ ${Number(order.amount).toFixed(2).replace('.', ',')}</strong> e ele está aguardando pagamento.</p>
+            <div style="text-align: center; margin: 30px 0;">
+              <a href="${prefResponse.init_point}" style="background-color: #000; color: #fff; padding: 15px 30px; text-decoration: none; font-weight: bold; letter-spacing: 2px; text-transform: uppercase; display: inline-block;">Realizar Pagamento</a>
+            </div>
+            <p>Após a confirmação do pagamento, você receberá um novo e-mail.</p>
+          </div>
+          <div style="background-color: #f9f9f9; padding: 20px; text-align: center; color: #888; font-size: 10px; letter-spacing: 1px;">
+            © 2026 FEDERADA. TODOS OS DIREITOS RESERVADOS.
+          </div>
+        </div>
+        `,
       }).catch(e => console.error('Erro ao enviar email de pedido:', e));
 
       return {
@@ -180,24 +199,47 @@ export class OrdersService {
             console.log(`Order ${order.id} marked as PAID`);
 
             if (!wasPaid && order.user?.email) {
+              const storeUrl = this.configService.get('STORE_URL') || 'https://federada.com.br';
+              const itemsHtml = order.items.map(i => `
+                <div style="border-bottom: 1px solid #eee; padding: 10px 0; display: flex; justify-content: space-between;">
+                  <div>
+                    <strong>${i.productName}</strong><br/>
+                    <span style="color: #666; font-size: 12px;">Qtd: ${i.quantity} ${i.productSize ? '| Tam: ' + i.productSize : ''}</span>
+                  </div>
+                  <strong>R$ ${Number(i.price).toFixed(2).replace('.', ',')}</strong>
+                </div>
+              `).join('');
+
               this.mailerService.sendMail({
                 to: order.user.email,
                 subject: `Pagamento Aprovado! Pedido #${order.id.slice(0,8)}`,
-                template: 'payment-approved',
-                context: {
-                  customerName: order.user.name,
-                  orderId: order.id.slice(0,8),
-                  items: order.items.map(i => ({
-                    name: i.productName,
-                    size: i.productSize,
-                    customName: i.customName,
-                    customNumber: i.customNumber,
-                    quantity: i.quantity,
-                    price: Number(i.price).toFixed(2).replace('.', ',')
-                  })),
-                  totalAmount: Number(order.amount).toFixed(2).replace('.', ','),
-                  storeUrl: this.configService.get('STORE_URL') || 'http://localhost:5173'
-                }
+                html: `
+                <div style="font-family: monospace; max-width: 600px; margin: 0 auto; border: 1px solid #eaeaea; overflow: hidden;">
+                  <div style="background-color: #000; padding: 30px; text-align: center;">
+                    <img src="${storeUrl}/urso-polar-andando.gif" alt="Urso" style="width: 80px; height: 80px; object-fit: cover; border-radius: 50%; border: 2px solid white; margin-bottom: 10px;" />
+                    <h1 style="color: #fff; letter-spacing: 4px; margin: 0; font-size: 24px; text-transform: uppercase;">FEDERADA</h1>
+                  </div>
+                  <div style="padding: 40px 30px; background-color: #fff; color: #000;">
+                    <h2 style="margin-top: 0; color: #16a34a;">Pagamento Aprovado!</h2>
+                    <p>Olá, <strong>${order.user.name}</strong>!</p>
+                    <p>O pagamento do seu pedido <strong>#${order.id.slice(0,8)}</strong> foi confirmado com sucesso.</p>
+                    <div style="margin: 30px 0; border: 1px solid #eaeaea; padding: 20px;">
+                      <h3 style="margin-top: 0;">Resumo do Pedido</h3>
+                      ${itemsHtml}
+                      <div style="margin-top: 20px; text-align: right; font-size: 18px;">
+                        Total: <strong>R$ ${Number(order.amount).toFixed(2).replace('.', ',')}</strong>
+                      </div>
+                    </div>
+                    <p>Acompanhe o status da entrega acessando a aba "Meus Pedidos" no site.</p>
+                    <div style="text-align: center; margin: 30px 0;">
+                      <a href="${storeUrl}/orders" style="background-color: #000; color: #fff; padding: 15px 30px; text-decoration: none; font-weight: bold; letter-spacing: 2px; text-transform: uppercase; display: inline-block;">Ver Meus Pedidos</a>
+                    </div>
+                  </div>
+                  <div style="background-color: #f9f9f9; padding: 20px; text-align: center; color: #888; font-size: 10px; letter-spacing: 1px;">
+                    © 2026 FEDERADA. TODOS OS DIREITOS RESERVADOS.
+                  </div>
+                </div>
+                `,
               }).catch(e => console.error('Erro ao enviar email de pagamento:', e));
             }
           } else if (paymentData.status === 'rejected' || paymentData.status === 'cancelled') {

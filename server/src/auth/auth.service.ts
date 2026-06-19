@@ -54,7 +54,26 @@ export class AuthService {
     this.mailerService.sendMail({
       to: user.email,
       subject: 'Bem-vindo(a) à Federada! Confirme seu e-mail',
-      text: `Olá ${user.name},\n\nSua conta na Federada foi criada com sucesso!\n\nPara ativar sua conta e fazer login, por favor confirme seu e-mail clicando no link abaixo:\n\n${verificationLink}\n\nAbraços,\nEquipe Federada`,
+      html: `
+        <div style="font-family: monospace; max-width: 600px; margin: 0 auto; border: 1px solid #eaeaea; overflow: hidden;">
+          <div style="background-color: #000; padding: 30px; text-align: center;">
+            <img src="${storeUrl}/urso-polar-andando.gif" alt="Urso" style="width: 80px; height: 80px; object-fit: cover; border-radius: 50%; border: 2px solid white; margin-bottom: 10px;" />
+            <h1 style="color: #fff; letter-spacing: 4px; margin: 0; font-size: 24px; text-transform: uppercase;">FEDERADA</h1>
+          </div>
+          <div style="padding: 40px 30px; background-color: #fff; color: #000;">
+            <h2 style="margin-top: 0;">Bem-vindo(a), ${user.name}!</h2>
+            <p>Sua conta na Federada foi criada com sucesso.</p>
+            <p>Para ativar sua conta e fazer login, por favor confirme seu e-mail clicando no botão abaixo:</p>
+            <div style="text-align: center; margin: 30px 0;">
+              <a href="${verificationLink}" style="background-color: #000; color: #fff; padding: 15px 30px; text-decoration: none; font-weight: bold; letter-spacing: 2px; text-transform: uppercase; display: inline-block;">Confirmar E-mail</a>
+            </div>
+            <p style="font-size: 12px; color: #666;">Se o botão não funcionar, copie e cole este link no navegador:<br/>${verificationLink}</p>
+          </div>
+          <div style="background-color: #f9f9f9; padding: 20px; text-align: center; color: #888; font-size: 10px; letter-spacing: 1px;">
+            © 2026 FEDERADA. TODOS OS DIREITOS RESERVADOS.
+          </div>
+        </div>
+      `,
     }).catch(e => console.error('Erro ao enviar email (configure o SMTP no .env):', e.message));
 
     // DEV MODE: Exibe o link no terminal do servidor para testes fáceis
@@ -218,10 +237,29 @@ export class AuthService {
 
     await this.usersRepository.save(user);
     
+    const storeUrl = process.env.STORE_URL || 'https://federada.com.br';
+    
     this.mailerService.sendMail({
       to: user.email,
       subject: 'Sua conta de acesso foi criada!',
-      text: `Olá ${user.name},\n\nSua conta com cargo ${user.role} foi criada na plataforma Federada.\nAcesse: https://federada.com.br\n\nAbraços,\nEquipe Federada`,
+      html: `
+        <div style="font-family: monospace; max-width: 600px; margin: 0 auto; border: 1px solid #eaeaea; overflow: hidden;">
+          <div style="background-color: #000; padding: 30px; text-align: center;">
+            <img src="${storeUrl}/urso-polar-andando.gif" alt="Urso" style="width: 80px; height: 80px; object-fit: cover; border-radius: 50%; border: 2px solid white; margin-bottom: 10px;" />
+            <h1 style="color: #fff; letter-spacing: 4px; margin: 0; font-size: 24px; text-transform: uppercase;">FEDERADA</h1>
+          </div>
+          <div style="padding: 40px 30px; background-color: #fff; color: #000;">
+            <h2 style="margin-top: 0;">Olá, ${user.name}</h2>
+            <p>Sua conta administrativa com cargo <strong>${user.role}</strong> foi criada com sucesso.</p>
+            <div style="text-align: center; margin: 30px 0;">
+              <a href="${storeUrl}" style="background-color: #000; color: #fff; padding: 15px 30px; text-decoration: none; font-weight: bold; letter-spacing: 2px; text-transform: uppercase; display: inline-block;">Acessar Plataforma</a>
+            </div>
+          </div>
+          <div style="background-color: #f9f9f9; padding: 20px; text-align: center; color: #888; font-size: 10px; letter-spacing: 1px;">
+            © 2026 FEDERADA. TODOS OS DIREITOS RESERVADOS.
+          </div>
+        </div>
+      `,
     }).catch(e => console.error('Erro ao enviar email:', e));
     
     return { message: 'Usuário criado', user: { id: user.id, name: user.name, email: user.email, role: user.role } };
