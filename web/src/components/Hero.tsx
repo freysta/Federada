@@ -44,7 +44,7 @@ export default function Hero() {
 
   return (
     <div className="overflow-hidden" ref={emblaRef}>
-      <div className="flex">
+      <div className="flex items-stretch">
         
         {/* SLIDE 1: Original Hero */}
         <div className="flex-[0_0_100%] min-w-0 h-full flex flex-col">
