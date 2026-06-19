@@ -42,7 +42,7 @@ export default function ProductGrid({ limit }: { limit?: number }) {
 	}, []);
 
 	return (
-		<section className="py-24 bg-white" id="merch">
+		<section className="py-12 md:py-24 bg-white" id="merch">
 			<div className="max-w-7xl mx-auto px-6">
 				<FadeIn>
 					<div className="flex items-end justify-between mb-16 border-b border-black pb-4">
@@ -62,12 +62,12 @@ export default function ProductGrid({ limit }: { limit?: number }) {
 					</div>
 					
 					{/* Categories */}
-					<div className="flex gap-4 mb-8 overflow-x-auto pb-2 custom-scrollbar">
+					<div className="flex flex-wrap gap-2 md:gap-4 mb-8">
 						{['TODOS', 'CAMISAS', 'CANECAS', 'ACESSORIOS', 'GERAL'].map(cat => (
 							<button 
 								key={cat}
 								onClick={() => setActiveCategory(cat)}
-								className={`px-4 py-2 font-mono text-sm font-bold whitespace-nowrap transition-colors ${activeCategory === cat ? 'bg-black text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
+								className={`px-3 md:px-4 py-2 font-mono text-xs md:text-sm font-bold whitespace-nowrap transition-colors ${activeCategory === cat ? 'bg-black text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
 							>
 								{cat}
 							</button>
