@@ -4,6 +4,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { API_URL } from '../config';
 import { createPortal } from 'react-dom';
 import toast from 'react-hot-toast';
+import { GoogleLogin } from '@react-oauth/google';
 
 export default function LoginModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
   const { login } = useAuth();
@@ -23,6 +24,31 @@ export default function LoginModal({ isOpen, onClose }: { isOpen: boolean; onClo
   const [error, setError] = useState('');
 
   if (!isOpen) return null;
+
+  const handleGoogleSuccess = async (credentialResponse: any) => {
+    setLoading(true);
+    setError('');
+    try {
+      const res = await fetch(`${API_URL}/auth/google`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token: credentialResponse.credential })
+      });
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.message || 'Erro no login com Google');
+      }
+      const data = await res.json();
+      login(data.access_token, data.user);
+      toast.success('Login efetuado!');
+      onClose();
+    } catch (err: any) {
+      setError(err.message);
+      toast.error(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -81,10 +107,27 @@ export default function LoginModal({ isOpen, onClose }: { isOpen: boolean; onClo
           <form onSubmit={handleSubmit} className="space-y-0">
             <div className="overflow-y-auto max-h-[60vh] custom-scrollbar space-y-4 px-1 pb-2">
               {error && (
-                <div className="bg-red-50 text-red-600 p-2 text-xs font-mono border border-red-200">
+                <div className="bg-red-50 text-red-600 p-2 text-xs font-mono border border-red-200 mb-4">
                   {error}
                 </div>
               )}
+
+              <div className="mb-4">
+                <GoogleLogin
+                  onSuccess={handleGoogleSuccess}
+                  onError={() => toast.error('Falha ao conectar com o Google')}
+                  useOneTap
+                  theme="outline"
+                  text="continue_with"
+                  width="100%"
+                />
+              </div>
+
+              <div className="flex items-center gap-2 mb-4">
+                <div className="h-px bg-gray-200 flex-1"></div>
+                <span className="text-xs font-mono text-gray-400">OU</span>
+                <div className="h-px bg-gray-200 flex-1"></div>
+              </div>
 
               {mode === 'register' && (
                 <>

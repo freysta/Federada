@@ -7,6 +7,9 @@ import { RegisterDto, LoginDto } from './dto/auth.dto';
 import { MailerService } from '@nestjs-modules/mailer';
 import * as bcrypt from 'bcrypt';
 import * as crypto from 'crypto';
+import { OAuth2Client } from 'google-auth-library';
+
+const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 @Injectable()
 export class AuthService {
@@ -116,6 +119,58 @@ export class AuthService {
         role: user.role
       }
     };
+  }
+
+  async googleLogin(token: string) {
+    try {
+      const ticket = await googleClient.verifyIdToken({
+        idToken: token,
+        audience: process.env.GOOGLE_CLIENT_ID,
+      });
+      const payload = ticket.getPayload();
+      
+      if (!payload || !payload.email) {
+        throw new UnauthorizedException('Invalid Google token');
+      }
+
+      let user = await this.usersRepository.findOne({ where: { email: payload.email } });
+
+      if (!user) {
+        // Create user
+        user = this.usersRepository.create({
+          email: payload.email,
+          name: payload.name || 'User',
+          role: 'CUSTOMER',
+          emailVerified: true,
+          isActive: true
+        });
+        await this.usersRepository.save(user);
+      } else {
+        // If user exists but email is not verified, verify it since they logged in via Google
+        if (!user.emailVerified) {
+          user.emailVerified = true;
+          await this.usersRepository.save(user);
+        }
+        
+        if (!user.isActive) {
+          throw new UnauthorizedException('Esta conta foi desativada pelo administrador.');
+        }
+      }
+
+      const jwtPayload = { email: user.email, sub: user.id, role: user.role };
+      return {
+        access_token: this.jwtService.sign(jwtPayload),
+        user: {
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          role: user.role
+        }
+      };
+    } catch (error) {
+      console.error('Google login error:', error);
+      throw new UnauthorizedException('Falha na autenticação com o Google');
+    }
   }
 
   async findAllUsers() {
