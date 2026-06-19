@@ -40,9 +40,9 @@ export default function Navbar() {
 		<nav className="fixed w-full z-50 bg-white/90 backdrop-blur border-b border-black/5">
 			<div className="max-w-7xl mx-auto px-6 h-20 flex justify-between items-center">
 				{/* Brand */}
-				<div className="flex items-center gap-2">
-					<img src={federadaIcon} alt="Federada" className="h-12" />
-				</div>
+				<Link to="/" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="flex items-center gap-2 cursor-pointer">
+					<img src={federadaIcon} alt="Federada" className="h-12 hover:scale-105 transition-transform" />
+				</Link>
 
 				{/* Desktop Menu */}
 				<div className="hidden md:flex items-center gap-8 font-mono text-sm">
