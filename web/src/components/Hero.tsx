@@ -48,8 +48,8 @@ export default function Hero() {
         
         {/* SLIDE 1: Original Hero */}
         <div className="flex-[0_0_100%] min-w-0 h-full flex flex-col">
-          <section className="relative flex-1 min-h-screen flex flex-col justify-center pb-12 md:pb-0 pt-24 md:pt-20 overflow-hidden bg-white text-black">
-            <div className="max-w-7xl mx-auto px-6 w-full grid md:grid-cols-2 gap-8 md:gap-12 items-center">
+          <section className="relative flex-1 min-h-screen flex flex-col justify-center pb-12 pt-24 md:pt-20 overflow-hidden bg-white text-black">
+            <div className="max-w-7xl mx-auto px-6 w-full grid md:grid-cols-2 gap-8 items-center">
               
               {/* Text Content */}
               <div className="z-10 order-2 md:order-1">
@@ -82,7 +82,7 @@ export default function Hero() {
               {/* Visual / Mascot - Actual Image */}
               <div className="relative order-1 md:order-2 flex justify-center items-center">
                   {/* Main Visual Container */}
-                  <div className="relative w-full aspect-[4/5] bg-neutral-100 border border-neutral-200 overflow-hidden group shadow-2xl">
+                  <div className="relative w-full aspect-[4/5] max-h-[40vh] md:max-h-none mx-auto max-w-[70%] md:max-w-full bg-neutral-100 border border-neutral-200 overflow-hidden group shadow-2xl">
                       {/* Grid Background */}
                       <div className="absolute inset-0 z-0" style={{ backgroundImage: 'radial-gradient(#ccc 1px, transparent 1px)', backgroundSize: '20px 20px' }}></div>
                       

@@ -80,7 +80,7 @@ export default function ProductGrid({ limit }: { limit?: number }) {
 						<Loader2 className="animate-spin" size={48} />
 					</div>
 				) : (
-					<div className="grid md:grid-cols-3 gap-12">
+					<div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-12">
 						{products
               .filter(p => activeCategory === 'TODOS' || p.category === activeCategory)
               .slice(0, limit || products.length)
@@ -111,15 +111,15 @@ export default function ProductGrid({ limit }: { limit?: number }) {
 								{/* Info */}
 								<div className="pt-2">
 									{/* Header: Name & Price */}
-									<div className="flex justify-between items-start mb-1">
-										<h3 className="text-lg font-bold leading-tight uppercase max-w-[80%] group-hover:text-gray-500 group-active:text-gray-500 transition-colors">
+									<div className="flex flex-col md:flex-row justify-between md:items-start mb-1">
+										<h3 className="text-sm md:text-lg font-bold leading-tight uppercase group-hover:text-gray-500 group-active:text-gray-500 transition-colors">
 											{product.name}
 										</h3>
-										<span className="font-mono font-bold text-sm text-black px-2 py-1">
+										<span className="font-mono font-bold text-xs md:text-sm text-black mt-1 md:mt-0">
 											R$ {Number(product.price).toFixed(2).replace('.', ',')}
 										</span>
 									</div>
-									<div className="text-sm text-gray-500">
+									<div className="text-[10px] md:text-sm text-gray-500">
 										{product.category}
 									</div>
 								</div>
