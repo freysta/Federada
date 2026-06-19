@@ -88,4 +88,9 @@ export class CmsController {
   deleteEvent(@Param('id') id: string) {
     return this.cmsService.deleteEvent(id);
   }
+
+  @Get('instagram')
+  getInstagramFeed() {
+    return this.cmsService.getInstagramFeed();
+  }
 }

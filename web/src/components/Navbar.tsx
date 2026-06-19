@@ -1,6 +1,6 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Menu, X, ShoppingBag, User as UserIcon } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import ifroLogo from "../assets/logos/logo-ifro-branca-white-branco.png.webp";
 import federadaIcon from "../assets/logos/logo-sem-nome.png";
 import { useAuth } from "../contexts/AuthContext";
@@ -14,6 +14,27 @@ export default function Navbar() {
 	const { totalItems, setIsCartOpen } = useCart();
 	const [isLoginOpen, setIsLoginOpen] = useState(false);
 	const [isDashboardOpen, setIsDashboardOpen] = useState(false);
+	const navigate = useNavigate();
+	const location = useLocation();
+
+	// Scroll to hash on load if present
+	useEffect(() => {
+		if (location.hash) {
+			const id = location.hash.replace('#', '');
+			setTimeout(() => {
+				document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
+			}, 100);
+		}
+	}, [location]);
+
+	const handleScrollTo = (id: string) => {
+		if (location.pathname !== '/') {
+			navigate(`/#${id}`);
+		} else {
+			document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
+		}
+		setIsOpen(false);
+	};
 
 	return (
 		<nav className="fixed w-full z-50 bg-white/90 backdrop-blur border-b border-black/5">
@@ -34,16 +55,15 @@ export default function Navbar() {
 					<Link to="/gallery" className="hover:underline underline-offset-4">
 						GALERIA
 					</Link>
-					<a href="/#caads" className="hover:underline underline-offset-4">
+					<button onClick={() => handleScrollTo('caads')} className="hover:underline underline-offset-4 cursor-pointer">
 						CAADS
-					</a>
+					</button>
 					<Link to="/loja" className="hover:underline underline-offset-4">
 						LOJA
 					</Link>
-
-					<a href="/#about" className="hover:underline underline-offset-4">
+					<button onClick={() => handleScrollTo('about')} className="hover:underline underline-offset-4 cursor-pointer">
 						SOBRE
-					</a>
+					</button>
 
 					<div className="h-4 w-[1px] bg-gray-300 mx-2"></div>
 
@@ -103,15 +123,15 @@ export default function Navbar() {
 					<Link to="/gallery" onClick={() => setIsOpen(false)}>
 						GALERIA
 					</Link>
-					<a href="/#caads" onClick={() => setIsOpen(false)}>
+					<button onClick={() => handleScrollTo('caads')} className="text-left">
 						CAADS
-					</a>
+					</button>
 					<Link to="/loja" onClick={() => setIsOpen(false)}>
 						LOJA
 					</Link>
-					<a href="/#about" onClick={() => setIsOpen(false)}>
+					<button onClick={() => handleScrollTo('about')} className="text-left">
 						SOBRE
-					</a>
+					</button>
 					<div className="pt-4 border-t border-gray-100 flex justify-between items-center">
 						<img
 							src={ifroLogo}

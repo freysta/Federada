@@ -46,12 +46,20 @@ export class AuthService {
     await this.usersRepository.save(user);
 
     const storeUrl = process.env.STORE_URL || 'http://localhost:5174';
+    const verificationLink = `${storeUrl}/verify-email?token=${verificationToken}`;
 
     this.mailerService.sendMail({
       to: user.email,
       subject: 'Bem-vindo(a) à Federada! Confirme seu e-mail',
-      text: `Olá ${user.name},\n\nSua conta na Federada foi criada com sucesso!\n\nPara ativar sua conta e fazer login, por favor confirme seu e-mail clicando no link abaixo:\n\n${storeUrl}/verify-email?token=${verificationToken}\n\nAbraços,\nEquipe Federada`,
-    }).catch(e => console.error('Erro ao enviar email:', e));
+      text: `Olá ${user.name},\n\nSua conta na Federada foi criada com sucesso!\n\nPara ativar sua conta e fazer login, por favor confirme seu e-mail clicando no link abaixo:\n\n${verificationLink}\n\nAbraços,\nEquipe Federada`,
+    }).catch(e => console.error('Erro ao enviar email (configure o SMTP no .env):', e.message));
+
+    // DEV MODE: Exibe o link no terminal do servidor para testes fáceis
+    console.log('\n\n======================================================');
+    console.log('🚨 MENSAGEM DO SISTEMA: VERIFICAÇÃO DE E-MAIL 🚨');
+    console.log(`Para verificar a conta de ${user.email}, acesse o link:`);
+    console.log(verificationLink);
+    console.log('======================================================\n\n');
 
     return { message: 'Conta criada com sucesso! Verifique seu e-mail para acessar.' };
   }

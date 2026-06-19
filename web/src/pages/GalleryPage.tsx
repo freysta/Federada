@@ -3,22 +3,41 @@ import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import FadeIn from "../components/FadeIn";
 import { X, ZoomIn, Instagram, Share2, Camera } from "lucide-react";
-
-// Mock data for the interactive gallery
-const galleryItems = [
-  { id: 1, type: "image", url: "https://picsum.photos/seed/1/800/800", span: "col-span-2 row-span-2", title: "JOGOS UNIVERSITÁRIOS", likes: 342 },
-  { id: 2, type: "image", url: "https://picsum.photos/seed/2/800/400", span: "col-span-1 row-span-1", title: "TREINO DA EQUIPE", likes: 128 },
-  { id: 3, type: "image", url: "https://picsum.photos/seed/3/400/800", span: "col-span-1 row-span-2", title: "BASTIDORES", likes: 89 },
-  { id: 4, type: "image", url: "https://picsum.photos/seed/4/800/600", span: "col-span-1 row-span-1", title: "FESTA DE ENCERRAMENTO", likes: 567 },
-  { id: 5, type: "image", url: "https://picsum.photos/seed/5/800/800", span: "col-span-1 row-span-1", title: "NOVO UNIFORME", likes: 892 },
-  { id: 6, type: "image", url: "https://picsum.photos/seed/6/1200/600", span: "col-span-2 row-span-1", title: "A TORCIDA", likes: 455 },
-];
+import { API_URL } from "../config";
 
 export default function GalleryPage() {
+  const [posts, setPosts] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
   const [selectedImage, setSelectedImage] = useState<any>(null);
 
   useEffect(() => {
     window.scrollTo(0, 0);
+
+    fetch(`${API_URL}/cms/instagram`)
+      .then(res => res.json())
+      .then(data => {
+        // Distribuir span styles aleatoriamente ou sequencialmente para o mosaico
+        const spans = [
+          "col-span-1 md:col-span-2 row-span-2",
+          "col-span-1 row-span-1",
+          "col-span-1 row-span-2",
+          "col-span-1 row-span-1",
+          "col-span-1 md:col-span-2 row-span-1",
+          "col-span-1 row-span-1"
+        ];
+        
+        const mappedData = data.map((item: any, i: number) => ({
+          ...item,
+          span: spans[i % spans.length]
+        }));
+        
+        setPosts(mappedData);
+        setLoading(false);
+      })
+      .catch(err => {
+        console.error('Failed to load instagram feed', err);
+        setLoading(false);
+      });
   }, []);
 
   // Prevent scrolling when lightbox is open
@@ -47,10 +66,10 @@ export default function GalleryPage() {
                   <span className="font-mono text-sm tracking-widest font-bold">// MEDIA_VAULT</span>
                 </div>
                 <h1 className="text-5xl md:text-7xl font-bold uppercase tracking-normal leading-none mb-4">
-                  Galeria <span className="text-transparent stroke-text">Fotos</span>
+                  Galeria <span className="text-transparent stroke-text">Instagram</span>
                 </h1>
                 <p className="text-xl text-gray-600 font-medium max-w-2xl">
-                  Nossos melhores momentos, jogos, eventos e produtos oficiais em alta resolução.
+                  Nossos melhores momentos, jogos, eventos e produtos oficiais direto do nosso feed oficial.
                 </p>
               </div>
               
@@ -68,45 +87,51 @@ export default function GalleryPage() {
 
           {/* Interactive Bento Grid */}
           <div className="grid grid-cols-1 md:grid-cols-4 auto-rows-[250px] gap-4">
-            {galleryItems.map((item, index) => (
-              <FadeIn 
-                key={item.id} 
-                delay={index * 100}
-                className={`relative group overflow-hidden border border-black bg-neutral-200 cursor-pointer ${item.span}`}
-              >
-                <img 
-                  src={item.url} 
-                  alt={item.title}
-                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 filter grayscale-[20%] group-hover:grayscale-0"
-                  onClick={() => setSelectedImage(item)}
-                />
-                
-                {/* Techy Hover Overlay */}
-                <div 
-                  className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-between p-6"
-                  onClick={() => setSelectedImage(item)}
-                >
-                  <div className="flex justify-between items-start">
-                    <span className="font-mono text-[10px] text-white tracking-widest border border-white/30 px-2 py-1 backdrop-blur-sm">
-                      FILE::{item.id.toString().padStart(3, '0')}
-                    </span>
-                    <button className="bg-white text-black p-2 hover:bg-blue-500 hover:text-white transition-colors">
-                      <ZoomIn size={18} />
-                    </button>
-                  </div>
-                  
-                  <div>
-                    <h3 className="text-white font-bold text-xl mb-2 translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
-                      {item.title}
-                    </h3>
-                    <div className="flex items-center gap-2 text-white/80 font-mono text-xs translate-y-4 group-hover:translate-y-0 transition-transform duration-300 delay-75">
-                      <Instagram size={12} />
-                      {item.likes} LIKES
+            {loading ? (
+                <div className="col-span-1 md:col-span-4 py-32 text-center font-mono text-gray-400">ESTABELECENDO CONEXÃO SECRETA...</div>
+            ) : posts.length === 0 ? (
+                <div className="col-span-1 md:col-span-4 py-32 text-center font-mono text-gray-400">NENHUM ARQUIVO LOCALIZADO. TENTE NOVAMENTE MAIS TARDE.</div>
+            ) : (
+                posts.map((item, index) => (
+                  <FadeIn 
+                    key={item.id} 
+                    delay={index * 50}
+                    className={`relative group overflow-hidden border border-black bg-neutral-200 cursor-pointer ${item.span}`}
+                  >
+                    <img 
+                      src={item.url} 
+                      alt={item.title}
+                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 filter grayscale-[20%] group-hover:grayscale-0"
+                      onClick={() => setSelectedImage(item)}
+                    />
+                    
+                    {/* Techy Hover Overlay */}
+                    <div 
+                      className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-between p-6"
+                      onClick={() => setSelectedImage(item)}
+                    >
+                      <div className="flex justify-between items-start">
+                        <span className="font-mono text-[10px] text-white tracking-widest border border-white/30 px-2 py-1 backdrop-blur-sm">
+                          FILE::{(index + 1).toString().padStart(3, '0')}
+                        </span>
+                        <button className="bg-white text-black p-2 hover:bg-blue-500 hover:text-white transition-colors">
+                          <ZoomIn size={18} />
+                        </button>
+                      </div>
+                      
+                      <div>
+                        <h3 className="text-white font-bold text-xl mb-2 translate-y-4 group-hover:translate-y-0 transition-transform duration-300 line-clamp-2">
+                          {item.title}
+                        </h3>
+                        <div className="flex items-center gap-2 text-white/80 font-mono text-xs translate-y-4 group-hover:translate-y-0 transition-transform duration-300 delay-75">
+                          <Instagram size={12} />
+                          MÍDIA OFICIAL
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                </div>
-              </FadeIn>
-            ))}
+                  </FadeIn>
+                ))
+            )}
           </div>
 
         </div>
@@ -126,15 +151,15 @@ export default function GalleryPage() {
             {/* Top Bar */}
             <div className="flex justify-between items-center text-white mb-4 pointer-events-auto">
               <span className="font-mono text-sm tracking-widest text-white/50">
-                VIEWER // {selectedImage.title}
+                VIEWER // FILE::{(posts.indexOf(selectedImage) + 1).toString().padStart(3, '0')}
               </span>
               <div className="flex items-center gap-4">
-                <button className="hover:text-blue-400 transition-colors">
+                <a href={selectedImage.permalink} target="_blank" rel="noopener noreferrer" className="hover:text-blue-400 transition-colors pointer-events-auto">
                   <Share2 size={24} />
-                </button>
+                </a>
                 <button 
                   onClick={() => setSelectedImage(null)}
-                  className="hover:text-red-500 transition-colors"
+                  className="hover:text-red-500 transition-colors pointer-events-auto"
                 >
                   <X size={32} />
                 </button>
@@ -161,15 +186,15 @@ export default function GalleryPage() {
             
             {/* Bottom Info */}
             <div className="mt-4 flex justify-between items-center text-white pointer-events-auto">
-              <div className="flex items-center gap-2">
-                <Instagram size={16} className="text-white/50" />
-                <span className="font-mono text-sm">{selectedImage.likes} CURTIDAS</span>
+              <div className="flex items-center gap-2 flex-1 mr-4 overflow-hidden">
+                <Instagram size={16} className="text-white/50 shrink-0" />
+                <span className="font-mono text-sm truncate">{selectedImage.title}</span>
               </div>
               <a 
-                href="https://instagram.com/federadaifro" 
+                href={selectedImage.permalink} 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="font-mono text-xs border border-white/30 px-3 py-1 hover:bg-white hover:text-black transition-colors"
+                className="font-mono text-xs border border-white/30 px-3 py-1 hover:bg-white hover:text-black transition-colors shrink-0"
               >
                 VER POST ORIGINAL
               </a>

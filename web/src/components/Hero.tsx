@@ -2,9 +2,11 @@ import { ShoppingBag } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import useEmblaCarousel from 'embla-carousel-react';
 import Autoplay from 'embla-carousel-autoplay';
+import { useNavigate } from 'react-router-dom';
 import ursoImg from '../assets/urso.jpg';
 
 export default function Hero() {
+  const navigate = useNavigate();
   const [emblaRef] = useEmblaCarousel({ loop: true }, [Autoplay({ delay: 6000, stopOnInteraction: true })]);
   const [text, setText] = useState('');
   const [countdown, setCountdown] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
@@ -68,7 +70,7 @@ export default function Hero() {
                 </div>
 
                 <button 
-                  onClick={() => document.getElementById('merch')?.scrollIntoView({ behavior: 'smooth' })}
+                  onClick={() => navigate('/loja')}
                   className="group flex items-center gap-4 bg-black text-white px-10 py-5 hover:bg-[#00f0ff] hover:text-black transition-all duration-300 shadow-xl hover:shadow-[6px_6px_0_0_#000] hover:-translate-y-1 relative overflow-hidden"
                 >
                   <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
