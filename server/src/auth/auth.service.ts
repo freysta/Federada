@@ -6,6 +6,7 @@ import { JwtService } from '@nestjs/jwt';
 import { RegisterDto, LoginDto } from './dto/auth.dto';
 import { MailerService } from '@nestjs-modules/mailer';
 import * as bcrypt from 'bcrypt';
+import * as crypto from 'crypto';
 
 @Injectable()
 export class AuthService {
@@ -34,28 +35,54 @@ export class AuthService {
     }
 
     const hashedPassword = await bcrypt.hash(registerDto.password, 10);
+    const verificationToken = crypto.randomUUID();
 
     const user = this.usersRepository.create({
       ...registerDto,
       password: hashedPassword,
+      verificationToken,
     });
 
     await this.usersRepository.save(user);
 
+    const storeUrl = process.env.STORE_URL || 'http://localhost:5174';
+
     this.mailerService.sendMail({
       to: user.email,
-      subject: 'Bem-vindo(a) à Federada!',
-      text: `Olá ${user.name},\n\nSua conta na Federada foi criada com sucesso!\n\nAcesse nossa loja: https://federada.com.br\n\nAbraços,\nEquipe Federada`,
+      subject: 'Bem-vindo(a) à Federada! Confirme seu e-mail',
+      text: `Olá ${user.name},\n\nSua conta na Federada foi criada com sucesso!\n\nPara ativar sua conta e fazer login, por favor confirme seu e-mail clicando no link abaixo:\n\n${storeUrl}/verify-email?token=${verificationToken}\n\nAbraços,\nEquipe Federada`,
     }).catch(e => console.error('Erro ao enviar email:', e));
 
-    return this.login({ email: user.email, password: registerDto.password! });
+    return { message: 'Conta criada com sucesso! Verifique seu e-mail para acessar.' };
+  }
+
+  async verifyEmail(token: string) {
+    const user = await this.usersRepository.findOne({ where: { verificationToken: token } });
+    if (!user) {
+      throw new BadRequestException('Token de verificação inválido ou expirado.');
+    }
+
+    user.emailVerified = true;
+    user.verificationToken = undefined;
+    await this.usersRepository.save(user);
+
+    return { message: 'E-mail verificado com sucesso! Você já pode fazer login.' };
+  }
+
+  async fixUsers() {
+    await this.usersRepository.update({}, { emailVerified: true });
+    return { message: 'Usuários antigos atualizados com sucesso.' };
   }
 
   async login(loginDto: LoginDto) {
     const user = await this.usersRepository.findOne({ where: { email: loginDto.email } });
 
     if (!user) {
-      throw new UnauthorizedException('Invalid credentials');
+      throw new UnauthorizedException('Credenciais inválidas');
+    }
+
+    if (!user.emailVerified) {
+      throw new UnauthorizedException('Por favor, verifique seu e-mail antes de fazer login. Cheque sua caixa de entrada ou spam.');
     }
 
     if (!user.isActive) {
@@ -123,6 +150,7 @@ export class AuthService {
       ...registerDto,
       password: hashedPassword,
       role: registerDto.role || 'CUSTOMER',
+      emailVerified: true,
     }) as any;
 
     await this.usersRepository.save(user);

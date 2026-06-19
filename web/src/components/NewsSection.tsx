@@ -14,7 +14,8 @@ export default function NewsSection() {
         return res.json();
       })
       .then(data => {
-        setNews(data);
+        if (Array.isArray(data)) setNews(data);
+        else setNews([]);
         setLoading(false);
       })
       .catch(err => {

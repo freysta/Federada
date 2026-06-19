@@ -13,4 +13,8 @@ export class UpdateOrderDto {
   @IsString()
   @IsEnum(OrderStatus)
   status?: string;
+
+  @IsOptional()
+  @IsString()
+  trackingCode?: string;
 }

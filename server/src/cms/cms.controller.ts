@@ -5,6 +5,7 @@ import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
 import { TeamMemberDto } from './dto/team-member.dto';
 import { NewsDto } from './dto/news.dto';
+import { EventDto } from './dto/event.dto';
 
 @Controller('cms')
 export class CmsController {
@@ -60,5 +61,31 @@ export class CmsController {
   @Delete('news/:id')
   deleteNews(@Param('id') id: string) {
     return this.cmsService.deleteNews(id);
+  }
+
+  @Get('events')
+  getEvents() {
+    return this.cmsService.getEvents();
+  }
+
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ADMIN')
+  @Post('events')
+  createEvent(@Body() data: EventDto) {
+    return this.cmsService.createEvent(data);
+  }
+
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ADMIN')
+  @Put('events/:id')
+  updateEvent(@Param('id') id: string, @Body() data: EventDto) {
+    return this.cmsService.updateEvent(id, data);
+  }
+
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ADMIN')
+  @Delete('events/:id')
+  deleteEvent(@Param('id') id: string) {
+    return this.cmsService.deleteEvent(id);
   }
 }

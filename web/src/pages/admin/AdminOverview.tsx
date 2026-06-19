@@ -4,6 +4,7 @@ import { API_URL } from '../../config';
 import { DollarSign, Package, ShoppingCart, XCircle, Clock, CheckCircle } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { Loader2 } from 'lucide-react';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 export default function AdminOverview() {
   const { token } = useAuth();
@@ -81,6 +82,26 @@ export default function AdminOverview() {
         </div>
       </div>
 
+      <div className="mt-8 bg-white border border-black p-6 shadow-[4px_4px_0_0_#000]">
+        <h2 className="text-lg font-bold font-mono tracking-widest uppercase mb-4">Vendas por Dia</h2>
+        <div className="h-64 w-full">
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={stats.chartData || []}>
+              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e5e7eb" />
+              <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{fontFamily: 'monospace', fontSize: 12}} />
+              <YAxis axisLine={false} tickLine={false} tick={{fontFamily: 'monospace', fontSize: 12}} tickFormatter={(value) => `R$${value}`} />
+              <Tooltip 
+                cursor={{fill: '#f3f4f6'}}
+                contentStyle={{backgroundColor: '#000', color: '#fff', border: 'none', fontFamily: 'monospace', fontSize: '12px'}}
+                itemStyle={{color: '#00f0ff'}}
+                formatter={(value: any) => [`R$ ${Number(value).toFixed(2).replace('.', ',')}`, 'Vendas']}
+              />
+              <Bar dataKey="vendas" fill="#000" radius={[4, 4, 0, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
+
       <div className="mt-8">
         <h2 className="text-lg font-bold font-mono tracking-widest uppercase mb-4">Últimos Pedidos</h2>
         <div className="bg-white border border-black overflow-hidden shadow-[4px_4px_0_0_#000]">
@@ -102,9 +123,10 @@ export default function AdminOverview() {
                   <td className="p-3">
                     <span className={`text-[10px] font-mono px-2 py-1 font-bold ${
                       order.status === 'PAID' ? 'bg-green-100 text-green-800' :
-                      order.status === 'CANCELLED' ? 'bg-red-100 text-red-800' : 'bg-yellow-100 text-yellow-800'
+                      order.status === 'CANCELLED' ? 'bg-red-100 text-red-800' : 
+                      order.status === 'SHIPPED' ? 'bg-blue-100 text-blue-800' : 'bg-yellow-100 text-yellow-800'
                     }`}>
-                      {order.status}
+                      {order.status === 'PAID' ? 'PAGO' : order.status === 'PENDING' ? 'PENDENTE' : order.status === 'SHIPPED' ? 'ENVIADO' : 'CANCELADO'}
                     </span>
                   </td>
                 </tr>

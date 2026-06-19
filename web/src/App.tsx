@@ -6,12 +6,14 @@ import StoreFront from "./pages/StoreFront";
 import Store from "./pages/Store";
 import Forum from "./pages/Forum";
 import GalleryPage from "./pages/GalleryPage";
+import VerifyEmail from "./pages/VerifyEmail";
 import AdminLayout from "./pages/admin/AdminLayout";
 import AdminOverview from "./pages/admin/AdminOverview";
 import AdminProducts from "./pages/admin/AdminProducts";
 import AdminOrders from "./pages/admin/AdminOrders";
 import AdminUsers from "./pages/admin/AdminUsers";
 import AdminTeam from "./pages/admin/AdminTeam";
+import AdminEvents from "./pages/admin/AdminEvents";
 import AdminNews from "./pages/admin/AdminNews";
 import AdminProfile from "./pages/admin/AdminProfile";
 import NotFound from "./components/NotFound";
@@ -28,6 +30,7 @@ function App() {
           <Route path="/loja" element={<Store />} />
           <Route path="/forum" element={<Forum />} />
           <Route path="/gallery" element={<GalleryPage />} />
+          <Route path="/verify-email" element={<VerifyEmail />} />
 
           {/* Rotas do Painel Administrativo */}
           <Route path="/admin" element={<AdminLayout />}>
@@ -36,6 +39,7 @@ function App() {
             <Route path="orders" element={<AdminOrders />} />
             <Route path="users" element={<AdminUsers />} />
             <Route path="team" element={<AdminTeam />} />
+            <Route path="events" element={<AdminEvents />} />
             <Route path="news" element={<AdminNews />} />
             <Route path="profile" element={<AdminProfile />} />
           </Route>

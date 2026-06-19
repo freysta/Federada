@@ -17,7 +17,9 @@ import { join } from 'path';
 import { CmsModule } from './cms/cms.module';
 import { TeamMember } from './cms/entities/team-member.entity';
 import { News } from './cms/entities/news.entity';
+import { Event } from './cms/entities/event.entity';
 import { MailerModule } from '@nestjs-modules/mailer';
+import { HandlebarsAdapter } from '@nestjs-modules/mailer/adapters/handlebars.adapter';
 
 @Module({
   imports: [
@@ -48,6 +50,13 @@ import { MailerModule } from '@nestjs-modules/mailer';
         defaults: {
           from: `"Federada" <${configService.get('SMTP_FROM') || configService.get('SMTP_USER')}>`,
         },
+        template: {
+          dir: join(__dirname, 'templates/emails'),
+          adapter: new HandlebarsAdapter(),
+          options: {
+            strict: true,
+          },
+        },
       }),
     }),
     TypeOrmModule.forRootAsync({
@@ -60,7 +69,7 @@ import { MailerModule } from '@nestjs-modules/mailer';
           return {
             type: 'postgres',
             url: dbUrl,
-            entities: [Order, OrderItem, User, Product, TeamMember, News],
+            entities: [Order, OrderItem, User, Product, TeamMember, News, Event],
             synchronize: process.env.NODE_ENV !== 'production',
             ssl: process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : false,
           };
@@ -69,7 +78,7 @@ import { MailerModule } from '@nestjs-modules/mailer';
         return {
           type: 'sqlite',
           database: 'data/database.sqlite',
-          entities: [Order, OrderItem, User, Product, TeamMember, News],
+          entities: [Order, OrderItem, User, Product, TeamMember, News, Event],
           synchronize: true,
         };
       },

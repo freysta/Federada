@@ -3,12 +3,14 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { TeamMember } from './entities/team-member.entity';
 import { News } from './entities/news.entity';
+import { Event } from './entities/event.entity';
 
 @Injectable()
 export class CmsService {
   constructor(
     @InjectRepository(TeamMember) private teamRepo: Repository<TeamMember>,
     @InjectRepository(News) private newsRepo: Repository<News>,
+    @InjectRepository(Event) private eventRepo: Repository<Event>,
   ) {}
 
   getTeam() {
@@ -45,5 +47,23 @@ export class CmsService {
 
   deleteNews(id: string) {
     return this.newsRepo.delete(id);
+  }
+
+  getEvents() {
+    return this.eventRepo.find({ order: { version: 'ASC' } });
+  }
+
+  createEvent(data: any) {
+    const event = this.eventRepo.create(data);
+    return this.eventRepo.save(event);
+  }
+
+  async updateEvent(id: string, data: any) {
+    await this.eventRepo.update(id, data);
+    return this.eventRepo.findOne({ where: { id } });
+  }
+
+  deleteEvent(id: string) {
+    return this.eventRepo.delete(id);
   }
 }

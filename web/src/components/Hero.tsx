@@ -7,6 +7,7 @@ import ursoImg from '../assets/urso.jpg';
 export default function Hero() {
   const [emblaRef] = useEmblaCarousel({ loop: true }, [Autoplay({ delay: 6000, stopOnInteraction: true })]);
   const [text, setText] = useState('');
+  const [countdown, setCountdown] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
   const fullText = "A marca oficial da Atlética de ADS. Vestuário premium para quem vive o código.";
 
   useEffect(() => {
@@ -16,7 +17,27 @@ export default function Hero() {
       index++;
       if (index > fullText.length) clearInterval(timer);
     }, 30);
-    return () => clearInterval(timer);
+    
+    // Setup countdown timer (30 days from now as example)
+    const target = new Date();
+    target.setDate(target.getDate() + 30);
+    
+    const countTimer = setInterval(() => {
+      const now = new Date().getTime();
+      const distance = target.getTime() - now;
+      
+      setCountdown({
+        days: Math.floor(distance / (1000 * 60 * 60 * 24)),
+        hours: Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
+        minutes: Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60)),
+        seconds: Math.floor((distance % (1000 * 60)) / 1000)
+      });
+    }, 1000);
+    
+    return () => {
+      clearInterval(timer);
+      clearInterval(countTimer);
+    };
   }, []);
 
   return (
@@ -48,10 +69,11 @@ export default function Hero() {
 
                 <button 
                   onClick={() => document.getElementById('merch')?.scrollIntoView({ behavior: 'smooth' })}
-                  className="group flex items-center gap-4 bg-black text-white px-10 py-5 hover:bg-neutral-800 transition-all duration-300 shadow-xl hover:shadow-2xl hover:-translate-y-1"
+                  className="group flex items-center gap-4 bg-black text-white px-10 py-5 hover:bg-[#00f0ff] hover:text-black transition-all duration-300 shadow-xl hover:shadow-[6px_6px_0_0_#000] hover:-translate-y-1 relative overflow-hidden"
                 >
-                  <ShoppingBag className="w-5 h-5" />
-                  <span className="font-sans text-xl tracking-wider font-bold">VER COLEÇÃO 2026</span>
+                  <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
+                  <ShoppingBag className="w-5 h-5 relative z-10" />
+                  <span className="font-sans text-xl tracking-wider font-bold relative z-10">VER COLEÇÃO 2026</span>
                 </button>
               </div>
 
@@ -94,11 +116,12 @@ export default function Hero() {
               onClick={() => window.scrollTo({ top: window.innerHeight, behavior: 'smooth' })}
               className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-3 z-20 group cursor-pointer"
             >
-              <div className="w-6 h-10 border-2 border-black/20 rounded-full flex justify-center p-1 group-hover:border-black/50 transition-colors">
-                  <div className="w-1 h-2 bg-black rounded-full animate-bounce"></div>
+              <div className="w-12 h-12 border border-black/20 rounded-full flex justify-center items-center relative overflow-hidden group-hover:border-black/50 transition-colors bg-white">
+                  <div className="absolute inset-0 bg-[conic-gradient(from_0deg,transparent_70%,rgba(0,240,255,0.4)_100%)] animate-spin" style={{ animationDuration: '3s' }}></div>
+                  <div className="w-1.5 h-1.5 bg-black rounded-full z-10 relative shadow-[0_0_8px_#00f0ff]"></div>
               </div>
               <span className="font-mono text-[10px] tracking-[0.2em] text-gray-400 group-hover:text-black transition-colors uppercase">
-                  Explorar Sistema
+                  Scanner de Sistema
               </span>
             </button>
           </section>
@@ -106,23 +129,39 @@ export default function Hero() {
 
         {/* SLIDE 2: Placeholder Drop */}
         <div className="flex-[0_0_100%] min-w-0">
-          <section className="relative min-h-screen flex flex-col justify-center pt-20 overflow-hidden bg-black text-white text-center">
+          <section className="relative min-h-screen flex flex-col justify-center pt-20 overflow-hidden bg-[#050505] text-white">
             
-            {/* Imagem de Fundo (Exemplo de Placeholder) */}
-            <div className="absolute inset-0 opacity-40">
-              <img src="https://images.unsplash.com/photo-1550684848-fac1c5b4e853?q=80&w=2070&auto=format&fit=crop" className="w-full h-full object-cover mix-blend-luminosity" alt="Background" />
-            </div>
+            {/* Grid Hacker Background */}
+            <div className="absolute inset-0 opacity-20 pointer-events-none" style={{ backgroundImage: 'linear-gradient(rgba(0, 240, 255, 0.2) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 240, 255, 0.2) 1px, transparent 1px)', backgroundSize: '30px 30px' }}></div>
 
-            <div className="relative z-10 max-w-4xl mx-auto px-6">
-              <h2 className="text-6xl md:text-[8rem] font-bold font-sans uppercase leading-none mb-6">
-                NOVO <span className="text-[#00f0ff]">DROP</span>
-              </h2>
-              <p className="font-mono text-xl text-gray-300 mb-10 border-l-4 border-[#00f0ff] pl-4 text-left max-w-xl mx-auto">
-                {"// INSIRA AQUI A PUBLICIDADE DO PRÓXIMO LANÇAMENTO. VOCÊ PODE MUDAR O TEXTO, O FUNDO E O BOTÃO NO CÓDIGO FONTE (Hero.tsx - Slide 2)."}
-              </p>
+            <div className="relative z-10 max-w-5xl mx-auto px-6 w-full flex flex-col items-center">
               
-              <button className="bg-[#00f0ff] text-black px-12 py-5 font-bold font-mono tracking-widest hover:bg-white transition-colors shadow-[6px_6px_0_0_#fff] hover:shadow-[2px_2px_0_0_#fff] active:shadow-none translate-y-0 hover:translate-y-1 active:translate-y-2">
-                ATIVAR NOTIFICAÇÕES
+              <div className="font-mono text-[#00f0ff] mb-8 flex items-center gap-2 bg-[#00f0ff]/10 px-4 py-2 border border-[#00f0ff]/30">
+                <span className="w-2 h-2 bg-[#00f0ff] rounded-full animate-pulse"></span>
+                SYSTEM_UPDATE_PENDING // V_3.0
+              </div>
+
+              <h2 className="text-5xl md:text-7xl font-bold font-sans uppercase leading-none mb-12 text-center">
+                PRÓXIMO <span className="text-transparent stroke-text" style={{ WebkitTextStroke: '1px #00f0ff' }}>DROP</span>
+              </h2>
+              
+              {/* Terminal Countdown */}
+              <div className="grid grid-cols-4 gap-4 md:gap-8 w-full max-w-3xl mb-12">
+                {[
+                  { label: 'DIAS', value: countdown.days },
+                  { label: 'HORAS', value: countdown.hours },
+                  { label: 'MINUTOS', value: countdown.minutes },
+                  { label: 'SEGUNDOS', value: countdown.seconds }
+                ].map((item, i) => (
+                  <div key={i} className="flex flex-col items-center bg-black/50 border border-[#00f0ff]/30 p-4 md:p-6 backdrop-blur group hover:border-[#00f0ff] hover:bg-[#00f0ff]/10 transition-colors">
+                    <span className="font-sans text-4xl md:text-6xl font-bold text-white group-hover:text-[#00f0ff] transition-colors">{String(item.value).padStart(2, '0')}</span>
+                    <span className="font-mono text-[10px] md:text-xs text-[#00f0ff]/70 mt-2 tracking-widest">{item.label}</span>
+                  </div>
+                ))}
+              </div>
+              
+              <button className="bg-[#00f0ff] text-black px-12 py-5 font-bold font-mono tracking-widest hover:bg-white transition-colors shadow-[0_0_20px_rgba(0,240,255,0.4)] hover:shadow-[0_0_30px_rgba(255,255,255,0.6)] translate-y-0 hover:-translate-y-1">
+                INICIAR PROTOCOLO DE ALERTA
               </button>
             </div>
             

@@ -169,7 +169,7 @@ export class OrdersService {
         
         const order = await this.ordersRepository.findOne({
           where: { id: paymentData.external_reference },
-          relations: ['user']
+          relations: ['user', 'items']
         });
 
         if (order) {
@@ -182,8 +182,22 @@ export class OrdersService {
             if (!wasPaid && order.user?.email) {
               this.mailerService.sendMail({
                 to: order.user.email,
-                subject: `Pagamento Aprovado! Pedido #${order.id}`,
-                text: `Olá ${order.user.name},\n\nSeu pagamento de R$ ${Number(order.amount).toFixed(2).replace('.', ',')} foi aprovado com sucesso!\n\nEm breve entraremos em contato sobre a entrega.\n\nAbraços,\nEquipe Federada`,
+                subject: `Pagamento Aprovado! Pedido #${order.id.slice(0,8)}`,
+                template: 'payment-approved',
+                context: {
+                  customerName: order.user.name,
+                  orderId: order.id.slice(0,8),
+                  items: order.items.map(i => ({
+                    name: i.productName,
+                    size: i.productSize,
+                    customName: i.customName,
+                    customNumber: i.customNumber,
+                    quantity: i.quantity,
+                    price: Number(i.price).toFixed(2).replace('.', ',')
+                  })),
+                  totalAmount: Number(order.amount).toFixed(2).replace('.', ','),
+                  storeUrl: this.configService.get('STORE_URL') || 'http://localhost:5173'
+                }
               }).catch(e => console.error('Erro ao enviar email de pagamento:', e));
             }
           } else if (paymentData.status === 'rejected' || paymentData.status === 'cancelled') {
@@ -227,6 +241,19 @@ export class OrdersService {
       }
     }
 
+    // Group revenue by date (last 7 days approx, or just all dates sorted)
+    const revenueByDate: Record<string, number> = {};
+    for (const order of orders) {
+      if (order.status === 'PAID') {
+        const dateStr = order.createdAt.toISOString().split('T')[0];
+        revenueByDate[dateStr] = (revenueByDate[dateStr] || 0) + Number(order.amount);
+      }
+    }
+    const chartData = Object.keys(revenueByDate).sort().map(date => ({
+      date: new Date(date).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }),
+      vendas: revenueByDate[date]
+    }));
+
     return {
       totalRevenue,
       totalItemsSold,
@@ -234,6 +261,7 @@ export class OrdersService {
       paidCount,
       pendingCount,
       cancelledCount,
+      chartData,
       recentOrders: orders.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime()).slice(0, 5)
     };
   }

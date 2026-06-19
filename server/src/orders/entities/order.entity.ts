@@ -22,6 +22,9 @@ export class Order {
   @Column({ type: 'text', nullable: true })
   pixCopyPaste: string | null;
 
+  @Column({ type: 'text', nullable: true })
+  trackingCode: string | null;
+
   @CreateDateColumn()
   createdAt: Date;
 

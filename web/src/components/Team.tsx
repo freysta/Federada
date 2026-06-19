@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import FadeIn from './FadeIn';
+import TiltCard from './TiltCard';
 import { Shield } from 'lucide-react';
 import { API_URL } from '../config';
 
@@ -14,7 +15,8 @@ export default function Team() {
         return res.json();
       })
       .then(data => {
-        setTeamMembers(data);
+        if (Array.isArray(data)) setTeamMembers(data);
+        else setTeamMembers([]);
         setLoading(false);
       })
       .catch(err => {
@@ -69,36 +71,36 @@ export default function Team() {
         <div className="grid md:grid-cols-3 gap-8">
             {teamMembers.map((member, i) => (
                 <FadeIn key={i} delay={i * 150}>
-                    <div className="group relative bg-neutral-50 border border-black/10 hover:border-black transition-all duration-300">
+                    <TiltCard className="group relative bg-neutral-50 border border-black/10 hover:border-black transition-all duration-300 w-full h-full block">
                         
                         {/* Status Bar */}
-                        <div className="absolute top-4 right-4 z-20 font-mono text-[10px] bg-black/80 text-white backdrop-blur px-2 py-1 flex items-center gap-2">
+                        <div className="absolute top-4 right-4 z-20 font-mono text-[10px] bg-black/80 text-white backdrop-blur px-2 py-1 flex items-center gap-2" style={{ transform: 'translateZ(20px)' }}>
                            <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span>
                            ONLINE
                         </div>
 
                         {/* ID Tag */}
-                        <div className="absolute top-4 left-4 z-20 font-mono text-xs font-bold text-white mix-blend-difference">
+                        <div className="absolute top-4 left-4 z-20 font-mono text-xs font-bold text-white mix-blend-difference" style={{ transform: 'translateZ(15px)' }}>
                            [{member.id.substring(0,8)}]
                         </div>
 
                         {/* Image Container */}
-                        <div className="aspect-[3/4] relative overflow-hidden bg-black">
+                        <div className="aspect-[3/4] relative overflow-hidden bg-black" style={{ transform: 'translateZ(5px)' }}>
                             {/* Scanline Overlay */}
-                            <div className="absolute inset-0 z-10 bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.25)_50%),linear-gradient(90deg,rgba(255,0,0,0.06),rgba(0,255,0,0.02),rgba(0,0,255,0.06))] z-[1] bg-[length:100%_2px,3px_100%] pointer-events-none opacity-50"></div>
+                            <div className="absolute inset-0 z-10 bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.25)_50%),linear-gradient(90deg,rgba(255,0,0,0.06),rgba(0,255,0,0.02),rgba(0,0,255,0.06))] bg-[length:100%_2px,3px_100%] pointer-events-none opacity-50"></div>
                             
                             <img 
                                 src={member.imageUrl ? (member.imageUrl.startsWith('http') ? member.imageUrl : `${API_URL}${member.imageUrl}`) : 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80'} 
                                 alt={member.name} 
-                                className="w-full h-full object-cover grayscale contrast-125 brightness-90 group-hover:grayscale-0 group-hover:scale-105 transition-all duration-700"
+                                className="w-full h-full object-cover grayscale contrast-125 brightness-90 group-hover:grayscale-0 transition-all duration-700"
                             />
                             
                             {/* Hover Tech Overlay */}
-                            <div className="absolute inset-0 bg-neon-cyan/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 mix-blend-overlay z-10"></div>
+                            <div className="absolute inset-0 bg-neon-cyan/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 mix-blend-overlay z-10 pointer-events-none"></div>
                         </div>
 
                         {/* Info Card */}
-                        <div className="p-6 border-t border-black/10 relative overflow-hidden">
+                        <div className="p-6 border-t border-black/10 relative overflow-hidden bg-white" style={{ transform: 'translateZ(25px)' }}>
                              {/* Decorative Corner */}
                              <div className="absolute top-0 right-0 w-4 h-4 border-t border-r border-black/30"></div>
 
@@ -107,18 +109,18 @@ export default function Team() {
                                 <span className="font-mono text-[10px] tracking-widest text-gray-500 group-hover:text-black">LEADERSHIP</span>
                              </div>
 
-                            <h4 className="font-sans font-bold text-4xl mb-3 tracking-wide uppercase">{member.name}</h4>
+                            <h4 className="font-sans font-bold text-4xl mb-3 tracking-wide uppercase group-hover:text-[#00f0ff] transition-colors">{member.name}</h4>
                             
                             <div className="space-y-1">
                                 <div className="flex items-center gap-2">
-                                    <span className="text-neon-cyan font-bold text-xs">{'>'}</span>
+                                    <span className="text-[#00f0ff] font-bold text-xs">{'>'}</span>
                                     <span className="font-mono text-xs text-gray-600 uppercase tracking-tight">
                                         {member.role}
                                     </span>
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </TiltCard>
                 </FadeIn>
             ))}
         </div>

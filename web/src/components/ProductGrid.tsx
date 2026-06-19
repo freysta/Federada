@@ -17,49 +17,7 @@ interface Product {
   isCustomizable?: boolean;
 }
 
-function ProductImageCarousel({ product }: { product: Product }) {
-  const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true });
-  const images = [product.imageUrl];
-  if (product.extraImages && product.extraImages.length > 0) {
-    images.push(...product.extraImages);
-  }
-
-  const scrollPrev = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (emblaApi) emblaApi.scrollPrev();
-  };
-  
-  const scrollNext = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (emblaApi) emblaApi.scrollNext();
-  };
-
-  return (
-    <div className="absolute inset-0 w-full h-full overflow-hidden" ref={emblaRef}>
-      <div className="flex w-full h-full">
-        {images.map((src, index) => (
-          <div className="flex-[0_0_100%] min-w-0 relative" key={index}>
-            <img
-              src={src?.startsWith('http') ? src : `${API_URL}${src}`}
-              alt={`${product.name} - ${index + 1}`}
-              className="absolute inset-0 w-full h-full object-cover mix-blend-multiply opacity-95 group-hover:scale-105 transition-transform duration-700"
-            />
-          </div>
-        ))}
-      </div>
-      {images.length > 1 && (
-        <div className="absolute inset-0 flex justify-between items-center px-2 opacity-0 group-hover:opacity-100 transition-opacity z-10">
-          <button onClick={scrollPrev} className="bg-white/80 p-1 border border-black hover:bg-white text-black">
-            <ChevronLeft size={16} />
-          </button>
-          <button onClick={scrollNext} className="bg-white/80 p-1 border border-black hover:bg-white text-black">
-            <ChevronRight size={16} />
-          </button>
-        </div>
-      )}
-    </div>
-  );
-}
+import ProductModal from "./ProductModal";
 
 export default function ProductGrid({ limit }: { limit?: number }) {
 	const [products, setProducts] = useState<Product[]>([]);
@@ -67,9 +25,7 @@ export default function ProductGrid({ limit }: { limit?: number }) {
 	const [activeCategory, setActiveCategory] = useState<string>('TODOS');
 	const { addToCart } = useCart();
 	
-	// Customization State
-	const [customizingProduct, setCustomizingProduct] = useState<{product: Product, size?: string} | null>(null);
-	const [customData, setCustomData] = useState({ name: '', number: '', type: 'TORCEDOR' });
+	const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
 	useEffect(() => {
 		fetch(`${API_URL}/products`)
@@ -78,7 +34,8 @@ export default function ProductGrid({ limit }: { limit?: number }) {
 				return res.json();
 			})
 			.then(data => {
-				setProducts(data);
+				if (Array.isArray(data)) setProducts(data);
+				else setProducts([]);
 				setLoading(false);
 			})
 			.catch(err => {
@@ -132,109 +89,41 @@ export default function ProductGrid({ limit }: { limit?: number }) {
               .slice(0, limit || products.length)
               .map((product, index) => (
 							<FadeIn key={product.id} delay={index * 100}>
-							<div className="group cursor-pointer">
+							<div className="group cursor-pointer" onClick={() => setSelectedProduct(product)}>
 								{/* Image Container */}
-								<div className="relative aspect-[3/4] bg-neutral-100 mb-6 overflow-hidden transition-all duration-500 border border-transparent group-hover:border-black/10 shadow-sm group-hover:shadow-lg">
-									<div className="absolute top-4 left-4 font-bold text-xs bg-black text-white px-3 py-1 z-10">
+								<div className="relative aspect-[3/4] bg-neutral-100 mb-4 overflow-hidden border border-transparent hover:border-black transition-colors">
+									
+									<div className="absolute top-4 left-4 font-bold text-xs bg-black text-white px-3 py-1 z-10 group-hover:bg-white group-hover:text-black transition-colors">
 										NOVO
 									</div>
 
-									{/* Inventory - Clear Language */}
-									<div className="absolute bottom-4 left-4 font-sans text-xs bg-white/90 backdrop-blur px-3 py-1 border border-black/10 shadow-sm z-20 text-gray-800 font-bold pointer-events-none">
-										Venda sob demanda
-									</div>
+									<img
+									  src={product.imageUrl?.startsWith('http') ? product.imageUrl : `${API_URL}${product.imageUrl}`}
+									  alt={product.name}
+									  className="absolute inset-0 w-full h-full object-cover mix-blend-multiply opacity-95 group-hover:scale-105 transition-transform duration-700"
+									/>
 
-									{/* Product Image Carousel */}
-									<ProductImageCarousel product={product} />
-
-									<div className="absolute inset-0 flex flex-col items-center justify-center gap-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-white/95 z-30 p-6">
-										{product.sizes && product.sizes.length > 0 ? (
-											<div className="w-full flex flex-col items-center gap-3">
-												<span className="font-mono text-xs font-bold tracking-widest text-gray-500">// ESCOLHA O TAMANHO</span>
-												<div className="grid grid-cols-3 gap-2 w-full">
-													{product.sizes.map((size) => (
-														<button
-															key={size}
-															onClick={(e) => {
-																e.stopPropagation();
-																if (product.isCustomizable) {
-																	setCustomizingProduct({ product, size });
-																} else {
-																	addToCart({
-																		productId: product.id,
-																		name: product.name,
-																		price: product.price,
-																		imageUrl: product.imageUrl,
-																		size: size
-																	});
-																}
-															}}
-															className="border border-black bg-white text-black py-2 font-mono text-sm font-bold hover:bg-black hover:text-white transition-colors"
-														>
-															{size}
-														</button>
-													))}
-												</div>
-											</div>
-										) : (
-											<button
-												onClick={(e) => {
-													e.stopPropagation();
-													if (product.isCustomizable) {
-														setCustomizingProduct({ product });
-													} else {
-														addToCart({
-															productId: product.id,
-															name: product.name,
-															price: product.price,
-															imageUrl: product.imageUrl,
-														});
-													}
-												}}
-												className="bg-black text-white w-full py-4 font-sans font-bold text-sm hover:bg-neutral-800 transition-colors flex items-center justify-center gap-2 shadow-lg"
-											>
-												<ShoppingBag size={18} />
-												COMPRAR AGORA
-											</button>
-										)}
+									{/* Hover overlay text */}
+									<div className="absolute inset-0 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-white/40 backdrop-blur-sm z-30">
+										<span className="bg-black text-white px-6 py-3 font-bold text-sm tracking-widest">
+											VER DETALHES
+										</span>
 									</div>
 								</div>
 
 								{/* Info */}
 								<div className="pt-2">
 									{/* Header: Name & Price */}
-									<div className="flex justify-between items-start mb-3">
-										<div>
-											<div className="font-mono text-[10px] text-gray-400 mb-1 flex items-center gap-2">
-												<span>[{product.id.slice(0, 8)}]</span>
-												<span className="w-px h-3 bg-gray-200"></span>
-												<span className="text-green-600">
-													DISPONÍVEL
-												</span>
-											</div>
-											<h3 className="text-lg font-bold leading-tight uppercase max-w-[80%]">
-												{product.name}
-											</h3>
-										</div>
-										<span className="font-mono font-bold text-sm text-black bg-gray-100 px-2 py-1 border border-gray-200 min-w-max">
+									<div className="flex justify-between items-start mb-1">
+										<h3 className="text-lg font-bold leading-tight uppercase max-w-[80%] group-hover:text-gray-500 transition-colors">
+											{product.name}
+										</h3>
+										<span className="font-mono font-bold text-sm text-black px-2 py-1">
 											R$ {Number(product.price).toFixed(2).replace('.', ',')}
 										</span>
 									</div>
-
-									{/* Technical Specs Box */}
-									<div className="border-t border-dashed border-gray-300 py-3 mt-2">
-										<ul className="space-y-1">
-											<li className="text-xs font-mono text-gray-600 flex items-start gap-2">
-												<span className="text-neon-cyan/50 font-bold">{">"}</span>
-												{product.description}
-											</li>
-											{product.sizes && product.sizes.length > 0 && (
-												<li className="text-xs font-mono text-gray-600 flex items-start gap-2">
-													<span className="text-neon-cyan/50 font-bold">{">"}</span>
-													Tamanhos: {product.sizes.join(', ')}
-												</li>
-											)}
-										</ul>
+									<div className="text-sm text-gray-500">
+										{product.category}
 									</div>
 								</div>
 							</div>
@@ -244,63 +133,11 @@ export default function ProductGrid({ limit }: { limit?: number }) {
 				)}
 			</div>
 
-			{/* Customization Modal */}
-			{customizingProduct && (
-				<div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-					<div className="bg-white p-6 max-w-md w-full">
-						<h3 className="text-xl font-bold font-mono uppercase mb-4 tracking-wider">Personalize seu Produto</h3>
-						<p className="text-gray-500 text-sm mb-6">Nome e número serão gravados no seu {customizingProduct.product.name}.</p>
-						
-						<div className="space-y-4">
-							<div>
-								<label className="block text-sm font-bold mb-1">Nome na Camisa</label>
-								<input type="text" maxLength={20} value={customData.name} onChange={e => setCustomData({...customData, name: e.target.value.toUpperCase()})} className="w-full border p-2 font-mono uppercase" placeholder="SEU NOME" />
-							</div>
-							<div>
-								<label className="block text-sm font-bold mb-1">Número</label>
-								<input type="text" maxLength={3} value={customData.number} onChange={e => setCustomData({...customData, number: e.target.value})} className="w-full border p-2 font-mono" placeholder="10" />
-							</div>
-							<div>
-								<label className="block text-sm font-bold mb-1">Você é?</label>
-								<div className="flex gap-4">
-									<label className="flex items-center gap-2 cursor-pointer">
-										<input type="radio" name="type" value="TORCEDOR" checked={customData.type === 'TORCEDOR'} onChange={() => setCustomData({...customData, type: 'TORCEDOR'})} />
-										<span>Torcedor</span>
-									</label>
-									<label className="flex items-center gap-2 cursor-pointer">
-										<input type="radio" name="type" value="ATLETA" checked={customData.type === 'ATLETA'} onChange={() => setCustomData({...customData, type: 'ATLETA'})} />
-										<span>Atleta da Atlética</span>
-									</label>
-								</div>
-							</div>
-						</div>
-
-						<div className="mt-8 flex gap-3">
-							<button onClick={() => setCustomizingProduct(null)} className="flex-1 py-3 border border-black font-bold hover:bg-gray-50">CANCELAR</button>
-							<button 
-								onClick={() => {
-									addToCart({
-										productId: customizingProduct.product.id,
-										name: customizingProduct.product.name,
-										price: customizingProduct.product.price,
-										imageUrl: customizingProduct.product.imageUrl,
-										size: customizingProduct.size,
-										isCustomizable: true,
-										customName: customData.name,
-										customNumber: customData.number,
-										playerType: customData.type
-									});
-									setCustomizingProduct(null);
-									setCustomData({ name: '', number: '', type: 'TORCEDOR' });
-								}} 
-								disabled={!customData.name || !customData.number}
-								className="flex-1 py-3 bg-black text-white font-bold hover:bg-neutral-800 disabled:opacity-50"
-							>
-								ADICIONAR
-							</button>
-						</div>
-					</div>
-				</div>
+			{selectedProduct && (
+				<ProductModal 
+					product={selectedProduct} 
+					onClose={() => setSelectedProduct(null)} 
+				/>
 			)}
 		</section>
 	);

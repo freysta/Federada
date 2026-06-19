@@ -47,9 +47,14 @@ export default function LoginModal({ isOpen, onClose }: { isOpen: boolean; onClo
       }
 
       const data = await res.json();
-      login(data.access_token, data.user);
-      toast.success(mode === 'login' ? 'Login efetuado!' : 'Conta criada com sucesso!');
-      onClose();
+      if (mode === 'register') {
+        toast.success(data.message || 'Conta criada com sucesso! Verifique seu e-mail.');
+        setMode('login');
+      } else {
+        login(data.access_token, data.user);
+        toast.success('Login efetuado!');
+        onClose();
+      }
     } catch (err: any) {
       setError(err.message);
       toast.error(err.message);

@@ -1,0 +1,75 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pagamento Aprovado</title>
+    <style>
+        body { font-family: 'Courier New', Courier, monospace; background-color: #f3f4f6; color: #000; margin: 0; padding: 0; }
+        .container { max-width: 600px; margin: 20px auto; background-color: #fff; border: 2px solid #000; box-shadow: 6px 6px 0px 0px #000; }
+        .header { background-color: #000; color: #00f0ff; padding: 20px; text-align: center; border-bottom: 2px solid #000; }
+        .header h1 { margin: 0; font-size: 24px; font-weight: bold; letter-spacing: 2px; }
+        .content { padding: 30px; }
+        .success-box { background-color: #d1fae5; border: 2px solid #065f46; padding: 15px; margin-bottom: 20px; text-align: center; color: #065f46; font-weight: bold; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; border: 2px solid #000; }
+        th { background-color: #000; color: #fff; padding: 10px; text-align: left; font-size: 14px; }
+        td { padding: 10px; border-bottom: 1px solid #000; font-size: 14px; }
+        .total-row { font-weight: bold; background-color: #f9fafb; }
+        .footer { padding: 20px; text-align: center; background-color: #000; color: #fff; font-size: 12px; }
+        .btn { display: inline-block; background-color: #00f0ff; color: #000; padding: 10px 20px; text-decoration: none; font-weight: bold; border: 2px solid #000; box-shadow: 2px 2px 0px 0px #000; margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>// FEDERADA</h1>
+        </div>
+        <div class="content">
+            <div class="success-box">
+                PAGAMENTO APROVADO COM SUCESSO!
+            </div>
+            <p>Olá, <strong>{{customerName}}</strong>!</p>
+            <p>Seu pagamento foi confirmado e o seu pedido já está sendo preparado pela nossa equipe.</p>
+            
+            <p style="margin-top: 30px; font-weight: bold;">RESUMO DO PEDIDO: #{{orderId}}</p>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>Produto</th>
+                        <th>Detalhes</th>
+                        <th>Qtd</th>
+                        <th>Preço</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{#each items}}
+                    <tr>
+                        <td>{{this.name}}</td>
+                        <td>
+                            Tam: {{this.size}}<br>
+                            {{#if this.customName}}Nome: {{this.customName}}<br>{{/if}}
+                            {{#if this.customNumber}}Nº: {{this.customNumber}}{{/if}}
+                        </td>
+                        <td>{{this.quantity}}</td>
+                        <td>R$ {{this.price}}</td>
+                    </tr>
+                    {{/each}}
+                    <tr class="total-row">
+                        <td colspan="3" style="text-align: right;">TOTAL:</td>
+                        <td>R$ {{totalAmount}}</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div style="text-align: center; margin-top: 30px;">
+                <p>Qualquer dúvida, responda este e-mail.</p>
+                <a href="{{storeUrl}}" class="btn">VOLTAR PARA A LOJA</a>
+            </div>
+        </div>
+        <div class="footer">
+            © 2026 FEDERADA - Todos os direitos reservados.
+        </div>
+    </div>
+</body>
+</html>

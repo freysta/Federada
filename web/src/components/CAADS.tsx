@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { Users, Zap, Trophy, Target, Instagram, User, ArrowUpRight } from 'lucide-react';
 import FadeIn from './FadeIn';
+import TiltCard from './TiltCard';
 
 // Imports de imagens do CAADS
 import hyagoImg from '../assets/membros-ca/hyago.png';
@@ -70,6 +71,11 @@ export default function CAADS() {
       
       {/* Background Decor */}
       <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-blue-500/5 blur-[120px] rounded-full pointer-events-none"></div>
+
+      {/* Background Marquee */}
+      <div className="absolute top-1/2 left-0 w-[300vw] pointer-events-none opacity-[0.03] flex gap-4 text-9xl font-bold font-sans whitespace-nowrap z-0 overflow-hidden animate-marquee">
+        // SISTEMA ACADÊMICO IFRO // NOTA 5 NO MEC // DESENVOLVIMENTO DE SISTEMAS // ALTA PERFORMANCE // SISTEMA ACADÊMICO IFRO // NOTA 5 NO MEC // DESENVOLVIMENTO DE SISTEMAS // ALTA PERFORMANCE // SISTEMA ACADÊMICO IFRO // NOTA 5 NO MEC // DESENVOLVIMENTO DE SISTEMAS // ALTA PERFORMANCE
+      </div>
 
       <div className="max-w-7xl mx-auto px-6 relative z-10">
         
@@ -186,12 +192,12 @@ export default function CAADS() {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {boardMembers.map((member, i) => (
-                  <div 
+                  <TiltCard 
                     key={i} 
-                    className={`flex items-center gap-4 border border-gray-200 p-3 hover:border-blue-600 hover:bg-blue-50/30 transition-all group relative overflow-hidden ${member.col || ''}`}
+                    className={`flex items-center gap-4 border border-gray-200 p-3 hover:border-blue-600 hover:bg-blue-50/30 transition-all group relative overflow-hidden bg-white/80 backdrop-blur block w-full h-full ${member.col || ''}`}
                   >
                     {/* Avatar Area */}
-                    <div className="w-12 h-12 md:w-14 md:h-14 shrink-0 bg-gray-100 border border-gray-300 overflow-hidden relative group-hover:border-blue-400 transition-colors">
+                    <div className="w-12 h-12 md:w-14 md:h-14 shrink-0 bg-gray-100 border border-gray-300 overflow-hidden relative group-hover:border-blue-400 transition-colors" style={{ transform: 'translateZ(10px)' }}>
                       {member.image ? (
                         <img 
                           src={member.image} 
@@ -206,11 +212,11 @@ export default function CAADS() {
                     </div>
 
                     {/* Info Area */}
-                    <div className="flex-1 min-w-0">
+                    <div className="flex-1 min-w-0" style={{ transform: 'translateZ(15px)' }}>
                       <p className="font-mono text-[9px] text-gray-400 uppercase mb-0.5 tracking-wider group-hover:text-blue-600 transition-colors truncate">
                         {member.role}
                       </p>
-                      <p className="font-bold text-sm md:text-base truncate">
+                      <p className="font-bold text-sm md:text-base truncate group-hover:text-blue-600 transition-colors">
                         {member.name}
                       </p>
                     </div>
@@ -220,14 +226,15 @@ export default function CAADS() {
                       href={member.instagram} 
                       target="_blank" 
                       rel="noopener noreferrer"
-                      className="p-2 text-gray-300 hover:text-blue-600 hover:bg-blue-100/50 rounded-full transition-all"
+                      className="p-2 text-gray-300 hover:text-blue-600 hover:bg-blue-100/50 rounded-full transition-all relative z-10"
+                      style={{ transform: 'translateZ(20px)' }}
                     >
                       <Instagram size={18} />
                     </a>
 
                     {/* Decorative Corner */}
                     <div className="absolute top-0 right-0 w-2 h-2 bg-blue-600 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                  </div>
+                  </TiltCard>
                 ))}
               </div>
             </FadeIn>

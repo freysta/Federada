@@ -1,0 +1,1 @@
+const sqlite3 = require('sqlite3'); const db = new sqlite3.Database('./data/federada.db'); db.run('UPDATE user SET emailVerified = 1', (err) => { if (err) console.error(err); else console.log('Migrated old users successfully!'); });

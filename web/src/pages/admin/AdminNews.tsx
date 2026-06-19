@@ -3,8 +3,6 @@ import { useAuth } from '../../contexts/AuthContext';
 import { API_URL } from '../../config';
 import { Loader2, Plus, Edit, Trash2 } from 'lucide-react';
 import toast from 'react-hot-toast';
-import ReactQuill from 'react-quill';
-import 'react-quill/dist/quill.snow.css';
 
 export default function AdminNews() {
   const { token } = useAuth();
@@ -27,7 +25,8 @@ export default function AdminNews() {
       const res = await fetch(`${API_URL}/cms/news`);
       if (!res.ok) throw new Error('Falha ao carregar noticias');
       const data = await res.json();
-      setNews(data);
+      if (Array.isArray(data)) setNews(data);
+      else setNews([]);
     } catch (err) {
       toast.error('Erro ao carregar fórum');
     } finally {
@@ -160,9 +159,9 @@ export default function AdminNews() {
                 <label className="block text-sm font-medium text-gray-700">Data e Hora de Publicação</label>
                 <input required type="datetime-local" value={formData.dateLabel} onChange={e => setFormData({...formData, dateLabel: e.target.value})} className="mt-1 block w-full border p-2" />
               </div>
-              <div className="mb-12">
+              <div className="mb-4">
                 <label className="block text-sm font-medium text-gray-700 mb-1">Conteúdo</label>
-                <ReactQuill theme="snow" value={formData.content} onChange={(val) => setFormData({...formData, content: val})} className="bg-white h-48" />
+                <textarea required rows={8} value={formData.content} onChange={(e) => setFormData({...formData, content: e.target.value})} className="mt-1 block w-full border p-2 bg-white font-mono text-sm" />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700">Imagem da Capa</label>

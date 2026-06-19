@@ -291,7 +291,7 @@ export default function AdminProducts() {
                 <span className="font-mono text-sm">Permitir Customização (Nome/Número)</span>
               </label>
               
-              <button type="submit" className="w-full bg-[#00f0ff] text-black font-bold font-mono py-3 border border-black shadow-[2px_2px_0_0_#000] hover:shadow-[4px_4px_0_0_#000] transition-all mt-4">
+              <button type="submit" className="w-full bg-black text-white font-bold font-mono py-3 border border-black shadow-[2px_2px_0_0_#000] hover:bg-neutral-800 transition-all mt-4">
                 SALVAR PRODUTO
               </button>
             </form>

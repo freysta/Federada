@@ -53,10 +53,15 @@ export default function AdminUsers() {
       const url = isEdit ? `${API_URL}/users/${editingId}` : `${API_URL}/users/admin-create`;
       const method = isEdit ? 'PUT' : 'POST';
 
+      const payload = { ...formData };
+      if (!payload.password) {
+        delete (payload as any).password;
+      }
+
       const res = await fetch(url, {
         method,
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-        body: JSON.stringify(formData)
+        body: JSON.stringify(payload)
       });
       if (!res.ok) {
         const errorData = await res.json();

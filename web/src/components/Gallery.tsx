@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import FadeIn from './FadeIn';
+import DecryptText from './DecryptText';
 
 export default function Gallery() {
   useEffect(() => {
@@ -35,9 +36,11 @@ export default function Gallery() {
         <FadeIn>
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl mb-4 uppercase">
-                <span className="glitch" data-text="INSTAGRAM FEED">INSTAGRAM FEED</span>
+                <DecryptText text="INSTAGRAM FEED" className="glitch font-bold text-black" />
             </h2>
-            <p className="text-gray-500 font-sans text-lg">Acompanhe as últimas novidades direto da fonte.</p>
+            <p className="text-gray-500 font-sans text-lg">
+                <DecryptText text="Acompanhe as últimas novidades direto da fonte." speed={10} />
+            </p>
           </div>
         </FadeIn>
 

@@ -34,14 +34,14 @@ export default function Navbar() {
 					<Link to="/gallery" className="hover:underline underline-offset-4">
 						GALERIA
 					</Link>
-					<a href="#caads" className="hover:underline underline-offset-4">
+					<a href="/#caads" className="hover:underline underline-offset-4">
 						CAADS
 					</a>
-					<a href="#merch" className="hover:underline underline-offset-4">
+					<Link to="/loja" className="hover:underline underline-offset-4">
 						LOJA
-					</a>
+					</Link>
 
-					<a href="#about" className="hover:underline underline-offset-4">
+					<a href="/#about" className="hover:underline underline-offset-4">
 						SOBRE
 					</a>
 
@@ -103,13 +103,13 @@ export default function Navbar() {
 					<Link to="/gallery" onClick={() => setIsOpen(false)}>
 						GALERIA
 					</Link>
-					<a href="#caads" onClick={() => setIsOpen(false)}>
+					<a href="/#caads" onClick={() => setIsOpen(false)}>
 						CAADS
 					</a>
-					<a href="#merch" onClick={() => setIsOpen(false)}>
+					<Link to="/loja" onClick={() => setIsOpen(false)}>
 						LOJA
-					</a>
-					<a href="#about" onClick={() => setIsOpen(false)}>
+					</Link>
+					<a href="/#about" onClick={() => setIsOpen(false)}>
 						SOBRE
 					</a>
 					<div className="pt-4 border-t border-gray-100 flex justify-between items-center">

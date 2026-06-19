@@ -1,6 +1,6 @@
 import { Outlet, Navigate, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
-import { LayoutDashboard, ShoppingBag, Users, LogOut, Package, Image, MessageSquare, KeyRound, Store } from 'lucide-react';
+import { LayoutDashboard, ShoppingBag, Users, LogOut, Package, Image, MessageSquare, KeyRound, Store, Calendar } from 'lucide-react';
 
 export default function AdminLayout() {
   const { user, logout } = useAuth();
@@ -11,10 +11,11 @@ export default function AdminLayout() {
   }
 
   const menuItems = [
-    { path: '/admin', icon: <LayoutDashboard size={20} />, label: 'Dashboard' },
+    { path: '/admin', icon: <LayoutDashboard size={20} />, label: 'Painel de Controle' },
     { path: '/admin/products', icon: <Package size={20} />, label: 'Produtos' },
     { path: '/admin/orders', icon: <ShoppingBag size={20} />, label: 'Pedidos' },
     { path: '/admin/team', icon: <Image size={20} />, label: 'Diretoria' },
+    { path: '/admin/events', icon: <Calendar size={20} />, label: 'Eventos' },
     { path: '/admin/news', icon: <MessageSquare size={20} />, label: 'Fórum' },
     { path: '/admin/users', icon: <Users size={20} />, label: 'Usuários' },
     { path: '/admin/profile', icon: <KeyRound size={20} />, label: 'Meu Perfil' },
@@ -52,7 +53,7 @@ export default function AdminLayout() {
         <div className="p-4 border-t border-white/20">
           <div className="flex items-center justify-between mb-4 px-2">
             <div className="flex flex-col">
-              <span className="text-xs font-mono text-gray-400">LOGGED AS</span>
+              <span className="text-xs font-mono text-gray-400">LOGADO COMO</span>
               <span className="text-sm font-bold truncate max-w-[150px]">{user.name}</span>
             </div>
           </div>
