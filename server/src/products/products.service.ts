@@ -11,7 +11,10 @@ export class ProductsService {
   ) {}
 
   findAll() {
-    return this.productsRepository.find({ where: { isActive: true } });
+    return this.productsRepository.find({ 
+      where: { isActive: true },
+      order: { createdAt: 'DESC' }
+    });
   }
 
   async findOne(id: string) {

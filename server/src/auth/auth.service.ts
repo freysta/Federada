@@ -333,4 +333,11 @@ export class AuthService {
     await this.usersRepository.save(user);
     return { message: 'Usuário atualizado com sucesso' };
   }
+
+  async deleteUser(id: string) {
+    const user = await this.usersRepository.findOne({ where: { id } });
+    if (!user) throw new BadRequestException('User not found');
+    await this.usersRepository.delete(id);
+    return { message: 'Usuário excluído com sucesso' };
+  }
 }

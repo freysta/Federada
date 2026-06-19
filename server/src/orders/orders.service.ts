@@ -7,7 +7,7 @@ import { UpdateOrderDto } from './dto/update-order.dto';
 import { Order } from './entities/order.entity';
 import { OrderItem } from './entities/order-item.entity';
 import { User } from './entities/user.entity';
-import { MercadoPagoConfig, Payment, Preference } from 'mercadopago';
+import { MercadoPagoConfig, Payment, Preference, PaymentRefund } from 'mercadopago';
 import { ProductsService } from '../products/products.service';
 import { MailerService } from '@nestjs-modules/mailer';
 
@@ -322,6 +322,53 @@ export class OrdersService {
   async update(id: string, updateOrderDto: UpdateOrderDto) {
     await this.ordersRepository.update(id, updateOrderDto as any);
     return this.findOne(id);
+  }
+
+  async refund(id: string) {
+    const order = await this.findOne(id);
+    if (!order) throw new InternalServerErrorException('Pedido não encontrado');
+    if (order.status !== 'PAID') throw new BadRequestException('Apenas pedidos pagos podem ser estornados');
+    if (!order.paymentId) throw new BadRequestException('ID de Pagamento não encontrado');
+
+    if (!this.mpClient) await this.initializeMP();
+    
+    try {
+      const refundClient = new PaymentRefund(this.mpClient);
+      await refundClient.create({ payment_id: order.paymentId, body: {} });
+      
+      order.status = 'REFUNDED';
+      await this.ordersRepository.save(order);
+
+      if (order.user && order.user.email) {
+        const storeUrl = this.configService.get('STORE_URL') || 'https://federada.com.br';
+        this.mailerService.sendMail({
+          to: order.user.email,
+          subject: \`Estorno Realizado! Pedido #\${order.id.slice(0,8)}\`,
+          html: \`
+          <div style="font-family: monospace; max-width: 600px; margin: 0 auto; border: 1px solid #eaeaea; overflow: hidden;">
+            <div style="background-color: #000; padding: 30px; text-align: center;">
+              <img src="\${storeUrl}/urso-polar-andando.gif" alt="Urso" style="width: 80px; height: 80px; object-fit: cover; border-radius: 50%; border: 2px solid white; margin-bottom: 10px;" />
+              <h1 style="color: #fff; letter-spacing: 4px; margin: 0; font-size: 24px; text-transform: uppercase;">FEDERADA</h1>
+            </div>
+            <div style="padding: 40px 30px; background-color: #fff; color: #000;">
+              <h2 style="margin-top: 0; color: #dc2626;">Pedido Estornado</h2>
+              <p>Olá, <strong>\${order.user.name}</strong>!</p>
+              <p>O seu pedido <strong>#\${order.id.slice(0,8)}</strong> foi cancelado e o valor de <strong>R$ \${Number(order.amount).toFixed(2).replace('.', ',')}</strong> foi estornado com sucesso.</p>
+              <p>O valor retornará para a sua conta ou fatura do cartão de crédito de acordo com os prazos do seu banco.</p>
+            </div>
+            <div style="background-color: #f9f9f9; padding: 20px; text-align: center; color: #888; font-size: 10px; letter-spacing: 1px;">
+              © 2026 FEDERADA. TODOS OS DIREITOS RESERVADOS.
+            </div>
+          </div>
+          \`,
+        }).catch(e => console.error('Erro ao enviar email de estorno:', e));
+      }
+
+      return { message: 'Pedido estornado com sucesso', order };
+    } catch (error: any) {
+      console.error('Error refunding via MP:', error);
+      throw new InternalServerErrorException('Erro ao solicitar estorno no Mercado Pago');
+    }
   }
 
   remove(id: string) {
