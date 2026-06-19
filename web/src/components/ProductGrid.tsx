@@ -1,9 +1,7 @@
-import { ShoppingBag, Loader2, ChevronLeft, ChevronRight } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { useState, useEffect } from "react";
-import useEmblaCarousel from "embla-carousel-react";
 import FadeIn from "./FadeIn";
 import { API_URL } from "../config";
-import { useCart } from "../contexts/CartContext";
 
 interface Product {
   id: string;
@@ -23,7 +21,6 @@ export default function ProductGrid({ limit }: { limit?: number }) {
 	const [products, setProducts] = useState<Product[]>([]);
 	const [loading, setLoading] = useState(true);
 	const [activeCategory, setActiveCategory] = useState<string>('TODOS');
-	const { addToCart } = useCart();
 	
 	const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
