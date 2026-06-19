@@ -61,6 +61,11 @@ export default function Navbar() {
 					<Link to="/loja" className="hover:underline underline-offset-4">
 						LOJA
 					</Link>
+					{user?.role === 'ADMIN' && (
+						<Link to="/admin" className="hover:underline underline-offset-4 text-blue-600 font-bold">
+							ADMIN
+						</Link>
+					)}
 					<button onClick={() => handleScrollTo('about')} className="hover:underline underline-offset-4 cursor-pointer">
 						SOBRE
 					</button>
@@ -129,6 +134,11 @@ export default function Navbar() {
 					<Link to="/loja" onClick={() => setIsOpen(false)} className="py-3 w-full border-b border-gray-50 active:bg-gray-50 transition-colors">
 						LOJA
 					</Link>
+					{user?.role === 'ADMIN' && (
+						<Link to="/admin" onClick={() => setIsOpen(false)} className="py-3 w-full border-b border-gray-50 active:bg-gray-50 transition-colors text-blue-600 font-bold">
+							PAINEL ADMIN
+						</Link>
+					)}
 					<button onClick={() => handleScrollTo('about')} className="py-3 w-full text-left border-b border-gray-50 active:bg-gray-50 transition-colors">
 						SOBRE
 					</button>

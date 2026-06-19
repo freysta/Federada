@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { API_URL } from '../config';
 import { useAuth } from '../contexts/AuthContext';
 import { createPortal } from 'react-dom';
+import { Link } from 'react-router-dom';
 
 interface OrderItem {
   productName: string;
@@ -122,7 +123,12 @@ export default function DashboardModal({ isOpen, onClose }: { isOpen: boolean; o
           )}
         </div>
 
-        <div className="p-4 bg-white border-t border-black shrink-0 flex justify-end">
+        <div className="p-4 bg-white border-t border-black shrink-0 flex justify-between items-center">
+          {user?.role === 'ADMIN' ? (
+            <Link to="/admin" onClick={onClose} className="text-xs font-mono font-bold text-blue-600 hover:underline">
+              [ PAINEL ADMIN ]
+            </Link>
+          ) : <div></div>}
           <button onClick={() => { logout(); onClose(); }} className="text-xs font-mono font-bold text-red-600 hover:underline">
             [ SAIR DA CONTA ]
           </button>
