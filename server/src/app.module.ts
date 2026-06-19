@@ -19,7 +19,6 @@ import { TeamMember } from './cms/entities/team-member.entity';
 import { News } from './cms/entities/news.entity';
 import { Event } from './cms/entities/event.entity';
 import { MailerModule } from '@nestjs-modules/mailer';
-import { HandlebarsAdapter } from '@nestjs-modules/mailer/adapters/handlebars.adapter';
 
 @Module({
   imports: [
@@ -49,13 +48,6 @@ import { HandlebarsAdapter } from '@nestjs-modules/mailer/adapters/handlebars.ad
         },
         defaults: {
           from: `"Federada" <${configService.get('SMTP_FROM') || configService.get('SMTP_USER')}>`,
-        },
-        template: {
-          dir: join(__dirname, 'templates/emails'),
-          adapter: new HandlebarsAdapter(),
-          options: {
-            strict: true,
-          },
         },
       }),
     }),

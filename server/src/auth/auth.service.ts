@@ -48,7 +48,7 @@ export class AuthService {
 
     await this.usersRepository.save(user);
 
-    const storeUrl = process.env.STORE_URL || 'http://localhost:5174';
+    const storeUrl = process.env.STORE_URL || 'https://federada.com.br';
     const verificationLink = `${storeUrl}/verify-email?token=${verificationToken}`;
 
     this.mailerService.sendMail({
