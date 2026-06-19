@@ -54,7 +54,7 @@ export default function CartSidebar() {
                     <div>
                       <div className="flex justify-between items-start">
                         <h3 className="font-bold text-sm leading-tight uppercase line-clamp-2">{item.name}</h3>
-                        <button onClick={() => removeFromCart(item.productId, item.size, item.customName, item.customNumber)} className="text-red-500 hover:text-red-700 ml-2">
+                        <button onClick={() => removeFromCart(item.productId, item.size, item.customName, item.customNumber)} className="text-red-500 hover:text-red-700 ml-2 p-2 -mr-2 -mt-2 active:bg-red-50 rounded-full transition-colors">
                           <X size={16} />
                         </button>
                       </div>
@@ -69,9 +69,9 @@ export default function CartSidebar() {
                     
                     <div className="flex justify-between items-end mt-2">
                       <div className="flex items-center border border-black bg-white">
-                        <button onClick={() => updateQuantity(item.productId, item.size, -1)} className="p-1 hover:bg-gray-100"><Minus size={14} /></button>
-                        <span className="w-8 text-center text-sm font-mono">{item.quantity}</span>
-                        <button onClick={() => updateQuantity(item.productId, item.size, 1)} className="p-1 hover:bg-gray-100"><Plus size={14} /></button>
+                        <button onClick={() => updateQuantity(item.productId, item.size, -1)} className="p-3 md:p-1.5 hover:bg-gray-100 active:bg-gray-200 transition-colors flex items-center justify-center"><Minus size={14} /></button>
+                        <span className="w-6 md:w-8 text-center text-sm font-mono">{item.quantity}</span>
+                        <button onClick={() => updateQuantity(item.productId, item.size, 1)} className="p-3 md:p-1.5 hover:bg-gray-100 active:bg-gray-200 transition-colors flex items-center justify-center"><Plus size={14} /></button>
                       </div>
                       <span className="font-mono font-bold text-sm">
                         R$ {(item.price * item.quantity).toFixed(2).replace('.', ',')}

@@ -53,11 +53,11 @@ export default function DashboardModal({ isOpen, onClose }: { isOpen: boolean; o
   if (!isOpen) return null;
 
   const modalContent = (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-[100] flex items-end md:items-center justify-center p-0 md:p-4">
       <div className="absolute inset-0 bg-black/90 backdrop-blur-md" onClick={onClose}></div>
 
-      <div className="relative bg-white w-full max-w-3xl shadow-2xl border border-black flex flex-col max-h-[90vh]">
-        <div className="bg-black text-white p-4 flex justify-between items-center shrink-0">
+      <div className="relative bg-white w-full max-w-3xl shadow-2xl border border-black flex flex-col max-h-[90vh] rounded-t-2xl md:rounded-none animate-in slide-in-from-bottom md:zoom-in-95 duration-300">
+        <div className="bg-black text-white p-4 flex justify-between items-center shrink-0 rounded-t-xl md:rounded-none">
           <div className="flex items-center gap-3">
             <Package size={20} />
             <h3 className="font-mono text-sm tracking-[0.2em] uppercase">

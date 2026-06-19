@@ -30,27 +30,32 @@ export default function AdminLayout() {
           <p className="text-xs text-gray-400 font-mono mt-2">ADMIN_PANEL v1.0</p>
         </div>
         
-        <nav className="flex-1 py-6 px-4 space-y-2">
+        <nav className="flex md:flex-col gap-2 md:gap-0 md:space-y-2 py-4 md:py-6 px-4 overflow-x-auto hide-scrollbar whitespace-nowrap border-b border-white/20 md:border-b-0">
           {menuItems.map((item) => {
             const isActive = location.pathname === item.path;
             return (
               <Link
                 key={item.path}
                 to={item.path}
-                className={`flex items-center gap-3 px-4 py-3 font-mono text-sm transition-colors ${
+                className={`flex shrink-0 items-center gap-3 px-4 py-3 font-mono text-sm transition-colors ${
                   isActive 
                     ? 'bg-white text-black font-bold border border-transparent' 
                     : 'text-gray-300 hover:bg-neutral-900 hover:text-white border border-transparent hover:border-white/10'
                 }`}
               >
                 {item.icon}
-                {item.label}
+                <span className="hidden sm:inline md:inline">{item.label}</span>
               </Link>
             );
           })}
         </nav>
 
-        <div className="p-4 border-t border-white/20">
+        <style>{`
+          .hide-scrollbar::-webkit-scrollbar { display: none; }
+          .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        `}</style>
+
+        <div className="p-4 border-t-0 md:border-t border-white/20 mt-auto md:mt-0 flex flex-col md:block hidden md:flex">
           <div className="flex items-center justify-between mb-4 px-2">
             <div className="flex flex-col">
               <span className="text-xs font-mono text-gray-400">LOGADO COMO</span>

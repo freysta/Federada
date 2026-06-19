@@ -115,11 +115,11 @@ export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
   };
 
   const modalContent = (
-    <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-[110] flex items-end md:items-center justify-center p-0 md:p-4">
       <div className="absolute inset-0 bg-black/90 backdrop-blur-md" onClick={handleClose}></div>
 
-      <div className="relative bg-white w-full max-w-md shadow-2xl border border-black flex flex-col max-h-[90vh]">
-        <div className="bg-black text-white p-3 flex justify-between items-center border-b border-white/20 shrink-0">
+      <div className="relative bg-white w-full max-w-md shadow-2xl border border-black flex flex-col max-h-[95vh] rounded-t-2xl md:rounded-none animate-in slide-in-from-bottom md:zoom-in-95 duration-300">
+        <div className="bg-black text-white p-4 flex justify-between items-center border-b border-white/20 shrink-0 rounded-t-xl md:rounded-none">
           <div className="flex items-center gap-2">
             <div className="w-2 h-2 bg-green-500 animate-pulse rounded-full"></div>
             <h3 className="font-mono text-xs tracking-[0.2em] uppercase text-gray-300">
@@ -137,7 +137,7 @@ export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
               <div className="bg-neutral-50 border border-black p-4 relative overflow-hidden flex flex-col gap-3">
                   <p className="font-mono text-[10px] text-gray-400 uppercase tracking-widest">RESUMO DO PEDIDO ({items.length} itens)</p>
                   
-                  <div className="space-y-3 max-h-40 overflow-y-auto custom-scrollbar pr-2">
+                  <div className="space-y-3 max-h-32 md:max-h-40 overflow-y-auto custom-scrollbar pr-2">
                     {items.map((item, idx) => (
                       <div key={idx} className="flex justify-between items-center text-sm border-b border-gray-200 pb-2 last:border-0 last:pb-0">
                         <div>
@@ -164,7 +164,7 @@ export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
                     ))}
                   </div>
 
-                  <div className="flex justify-between items-end border-t border-dashed border-gray-300 pt-3 mt-1">
+                  <div className="hidden md:flex justify-between items-end border-t border-dashed border-gray-300 pt-3 mt-1">
                      <div className="flex flex-col">
                        <span className="text-[10px] text-gray-500 font-mono">TOTAL A PAGAR</span>
                        <span className="font-mono text-xl font-bold leading-tight">R$ {totalPrice.toFixed(2).replace('.', ',')}</span>
@@ -189,14 +189,14 @@ export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
                 <div className="space-y-4">
                   <p className="text-xs font-mono text-gray-500">// DADOS_COMPRADOR (Criação de Conta)</p>
                   <div className="group">
-                    <input required type="text" className="w-full bg-white border border-gray-300 p-3 text-sm font-mono focus:border-black focus:ring-0 outline-none" placeholder="NOME COMPLETO" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} />
+                    <input required type="text" autoComplete="name" className="w-full bg-white border border-gray-300 p-4 md:p-3 text-sm font-mono focus:border-black focus:ring-0 outline-none" placeholder="NOME COMPLETO" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} />
                   </div>
                   <div className="group">
-                    <input required type="email" className="w-full bg-white border border-gray-300 p-3 text-sm font-mono focus:border-black focus:ring-0 outline-none" placeholder="SEU@EMAIL.COM" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} />
+                    <input required type="email" autoComplete="email" className="w-full bg-white border border-gray-300 p-4 md:p-3 text-sm font-mono focus:border-black focus:ring-0 outline-none" placeholder="SEU@EMAIL.COM" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} />
                   </div>
                   <div className="grid grid-cols-2 gap-4">
-                    <input type="text" inputMode="numeric" placeholder="CPF (Opcional)" className="w-full bg-white border border-gray-300 p-3 text-sm font-mono focus:border-black focus:ring-0 outline-none" value={formData.cpf} onChange={(e) => setFormData({ ...formData, cpf: e.target.value })} />
-                    <input required type="tel" inputMode="numeric" placeholder="WHATSAPP" className="w-full bg-white border border-gray-300 p-3 text-sm font-mono focus:border-black focus:ring-0 outline-none" value={formData.phone} onChange={(e) => setFormData({ ...formData, phone: e.target.value })} />
+                    <input type="tel" inputMode="numeric" placeholder="CPF (Opcional)" className="w-full bg-white border border-gray-300 p-4 md:p-3 text-sm font-mono focus:border-black focus:ring-0 outline-none" value={formData.cpf} onChange={(e) => setFormData({ ...formData, cpf: e.target.value })} />
+                    <input required type="tel" inputMode="numeric" autoComplete="tel" placeholder="WHATSAPP" className="w-full bg-white border border-gray-300 p-4 md:p-3 text-sm font-mono focus:border-black focus:ring-0 outline-none" value={formData.phone} onChange={(e) => setFormData({ ...formData, phone: e.target.value })} />
                   </div>
                   
                   <div className="group">
@@ -214,7 +214,7 @@ export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
                   )}
 
                   <div className="group">
-                    <input required type="password" minLength={6} className="w-full bg-white border border-gray-300 p-3 text-sm font-mono focus:border-black focus:ring-0 outline-none" placeholder="CRIE UMA SENHA" value={formData.password} onChange={(e) => setFormData({ ...formData, password: e.target.value })} />
+                    <input required type="password" minLength={6} autoComplete="new-password" className="w-full bg-white border border-gray-300 p-4 md:p-3 text-sm font-mono focus:border-black focus:ring-0 outline-none" placeholder="CRIE UMA SENHA" value={formData.password} onChange={(e) => setFormData({ ...formData, password: e.target.value })} />
                   </div>
                 </div>
               ) : (
@@ -223,10 +223,18 @@ export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
                 </div>
               )}
 
-              <button type="submit" className="w-full bg-[#009EE3] text-white font-bold py-4 hover:bg-[#0081BA] transition-all border border-[#009EE3] flex items-center justify-center gap-3">
-                <CreditCard size={20} />
-                <span className="tracking-widest uppercase">PAGAR COM MERCADO PAGO</span>
-              </button>
+              <div className="sticky bottom-0 -mx-6 -mb-6 p-6 mt-4 bg-white border-t border-gray-200 shadow-[0_-10px_20px_rgba(0,0,0,0.05)] z-50">
+                <div className="flex md:hidden justify-between items-end mb-4">
+                     <div className="flex flex-col">
+                       <span className="text-[10px] text-gray-500 font-mono">TOTAL A PAGAR</span>
+                       <span className="font-mono text-2xl font-bold leading-tight text-black">R$ {totalPrice.toFixed(2).replace('.', ',')}</span>
+                     </div>
+                </div>
+                <button type="submit" className="w-full bg-[#009EE3] text-white font-bold py-4 hover:bg-[#0081BA] active:scale-[0.98] transition-all flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed rounded-md md:rounded-none">
+                  <CreditCard size={20} />
+                  <span className="tracking-widest uppercase">PAGAR COM MERCADO PAGO</span>
+                </button>
+              </div>
             </form>
           )}
 
