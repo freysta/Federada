@@ -1,4 +1,4 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { Injectable, InternalServerErrorException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ConfigService } from '@nestjs/config';
@@ -343,24 +343,24 @@ export class OrdersService {
         const storeUrl = this.configService.get('STORE_URL') || 'https://federada.com.br';
         this.mailerService.sendMail({
           to: order.user.email,
-          subject: \`Estorno Realizado! Pedido #\${order.id.slice(0,8)}\`,
-          html: \`
+          subject: `Estorno Realizado! Pedido #${order.id.slice(0,8)}`,
+          html: `
           <div style="font-family: monospace; max-width: 600px; margin: 0 auto; border: 1px solid #eaeaea; overflow: hidden;">
             <div style="background-color: #000; padding: 30px; text-align: center;">
-              <img src="\${storeUrl}/urso-polar-andando.gif" alt="Urso" style="width: 80px; height: 80px; object-fit: cover; border-radius: 50%; border: 2px solid white; margin-bottom: 10px;" />
+              <img src="${storeUrl}/urso-polar-andando.gif" alt="Urso" style="width: 80px; height: 80px; object-fit: cover; border-radius: 50%; border: 2px solid white; margin-bottom: 10px;" />
               <h1 style="color: #fff; letter-spacing: 4px; margin: 0; font-size: 24px; text-transform: uppercase;">FEDERADA</h1>
             </div>
             <div style="padding: 40px 30px; background-color: #fff; color: #000;">
               <h2 style="margin-top: 0; color: #dc2626;">Pedido Estornado</h2>
-              <p>Olá, <strong>\${order.user.name}</strong>!</p>
-              <p>O seu pedido <strong>#\${order.id.slice(0,8)}</strong> foi cancelado e o valor de <strong>R$ \${Number(order.amount).toFixed(2).replace('.', ',')}</strong> foi estornado com sucesso.</p>
+              <p>Olá, <strong>${order.user.name}</strong>!</p>
+              <p>O seu pedido <strong>#${order.id.slice(0,8)}</strong> foi cancelado e o valor de <strong>R$ ${Number(order.amount).toFixed(2).replace('.', ',')}</strong> foi estornado com sucesso.</p>
               <p>O valor retornará para a sua conta ou fatura do cartão de crédito de acordo com os prazos do seu banco.</p>
             </div>
             <div style="background-color: #f9f9f9; padding: 20px; text-align: center; color: #888; font-size: 10px; letter-spacing: 1px;">
               © 2026 FEDERADA. TODOS OS DIREITOS RESERVADOS.
             </div>
           </div>
-          \`,
+          `,
         }).catch(e => console.error('Erro ao enviar email de estorno:', e));
       }
 
