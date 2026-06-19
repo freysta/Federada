@@ -9,6 +9,7 @@ interface Product {
   name: string;
   description: string;
   price: number;
+  originalPrice?: number;
   imageUrl: string;
   extraImages: string[];
   sizes: string[];
@@ -29,6 +30,7 @@ export default function AdminProducts() {
     name: '',
     description: '',
     price: '',
+    originalPrice: '',
     sizes: '',
     category: 'GERAL',
     isCustomizable: false
@@ -36,6 +38,23 @@ export default function AdminProducts() {
   
   const [existingImages, setExistingImages] = useState<string[]>([]);
   const [newFiles, setNewFiles] = useState<File[]>([]);
+
+  // Simulador
+  const [costPrice, setCostPrice] = useState<string>('');
+  const [margin, setMargin] = useState<number>(30);
+  const [simulatedPrice, setSimulatedPrice] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (costPrice && !isNaN(Number(costPrice))) {
+      // Preço final = (Custo × (1 + margem)) ÷ (1 - 0,04)
+      const cost = Number(costPrice);
+      const m = margin / 100;
+      const finalPrice = (cost * (1 + m)) / 0.96;
+      setSimulatedPrice(finalPrice);
+    } else {
+      setSimulatedPrice(null);
+    }
+  }, [costPrice, margin]);
 
   const fetchProducts = async () => {
     setLoading(true);
@@ -90,6 +109,7 @@ export default function AdminProducts() {
         name: formData.name,
         description: formData.description,
         price: parseFloat(formData.price),
+        originalPrice: formData.originalPrice ? parseFloat(formData.originalPrice) : null,
         category: formData.category,
         isCustomizable: formData.isCustomizable,
         sizes: formData.sizes.split(',').map(s => s.trim()).filter(Boolean),
@@ -128,6 +148,7 @@ export default function AdminProducts() {
       name: prod.name,
       description: prod.description || '',
       price: prod.price.toString(),
+      originalPrice: prod.originalPrice ? prod.originalPrice.toString() : '',
       category: prod.category || 'GERAL',
       isCustomizable: prod.isCustomizable || false,
       sizes: prod.sizes ? prod.sizes.join(', ') : ''
@@ -137,6 +158,8 @@ export default function AdminProducts() {
     if (prod.extraImages?.length) imgs.push(...prod.extraImages);
     setExistingImages(imgs);
     setNewFiles([]);
+    setCostPrice('');
+    setMargin(30);
     setEditingProduct(prod);
     setIsModalOpen(true);
   };
@@ -157,9 +180,11 @@ export default function AdminProducts() {
   };
 
   const openNewModal = () => {
-    setFormData({ name: '', description: '', price: '', sizes: '', category: 'GERAL', isCustomizable: false });
+    setFormData({ name: '', description: '', price: '', originalPrice: '', sizes: '', category: 'GERAL', isCustomizable: false });
     setExistingImages([]);
     setNewFiles([]);
+    setCostPrice('');
+    setMargin(30);
     setEditingProduct(null);
     setIsModalOpen(true);
   };
@@ -241,8 +266,47 @@ export default function AdminProducts() {
               <button onClick={() => setIsModalOpen(false)}>FECHAR</button>
             </div>
             <form onSubmit={handleSubmit} className="p-6 space-y-4 overflow-y-auto custom-scrollbar">
+              
+              <div className="bg-gray-50 border border-gray-300 p-4 mb-4">
+                <h3 className="font-mono text-sm font-bold mb-2 text-black flex items-center gap-2"><Loader2 size={16} className={costPrice ? "animate-spin" : "hidden"}/> SIMULADOR DE PREÇO (Calcula Taxa de 4%)</h3>
+                <div className="grid grid-cols-2 gap-4 mb-2">
+                  <div>
+                    <label className="block text-xs font-mono mb-1">CUSTO (R$)</label>
+                    <input type="number" step="0.01" className="w-full border border-gray-300 p-2 font-mono text-sm" placeholder="Ex: 50.00" value={costPrice} onChange={e => setCostPrice(e.target.value)} />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-mono mb-1">MARGEM DE LUCRO (%)</label>
+                    <select className="w-full border border-gray-300 p-2 font-mono text-sm" value={margin} onChange={e => setMargin(Number(e.target.value))}>
+                      <option value={20}>20%</option>
+                      <option value={30}>30%</option>
+                      <option value={40}>40%</option>
+                      <option value={50}>50%</option>
+                    </select>
+                  </div>
+                </div>
+                {simulatedPrice !== null && (
+                  <div className="flex justify-between items-center bg-black text-white p-3 mt-3">
+                    <span className="font-mono text-xs">Preço Sugerido:</span>
+                    <span className="font-mono font-bold">R$ {simulatedPrice.toFixed(2).replace('.', ',')}</span>
+                    <button type="button" onClick={() => setFormData({...formData, price: simulatedPrice.toFixed(2)})} className="bg-white text-black px-3 py-1 text-xs font-bold hover:bg-gray-200 transition-colors">USAR PREÇO</button>
+                  </div>
+                )}
+                <p className="text-[10px] text-gray-500 mt-2 font-sans leading-tight">Fórmula: (Custo × (1 + margem)) ÷ (1 - 0.04). Use esse preço base. Dê de 3% a 5% de desconto no PIX depois.</p>
+              </div>
+
               <input required placeholder="NOME DO PRODUTO" className="w-full border border-gray-300 p-2 font-mono text-sm" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} />
-              <input required type="number" step="0.01" placeholder="PREÇO (EX: 50.00)" className="w-full border border-gray-300 p-2 font-mono text-sm" value={formData.price} onChange={e => setFormData({...formData, price: e.target.value})} />
+              
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-mono mb-1">PREÇO VENDA (R$)*</label>
+                  <input required type="number" step="0.01" placeholder="EX: 139.90" className="w-full border border-gray-300 p-2 font-mono text-sm" value={formData.price} onChange={e => setFormData({...formData, price: e.target.value})} />
+                </div>
+                <div>
+                  <label className="block text-xs font-mono mb-1 text-red-600">PREÇO ANTIGO (RISCADO)</label>
+                  <input type="number" step="0.01" placeholder="EX: 159.90 (Opcional)" className="w-full border border-gray-300 p-2 font-mono text-sm text-red-600" value={formData.originalPrice} onChange={e => setFormData({...formData, originalPrice: e.target.value})} />
+                </div>
+              </div>
+
               <textarea placeholder="DESCRIÇÃO" className="w-full border border-gray-300 p-2 font-mono text-sm" value={formData.description} onChange={e => setFormData({...formData, description: e.target.value})} />
               
               <div className="grid grid-cols-2 gap-4">

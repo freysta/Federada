@@ -19,6 +19,7 @@ import { TeamMember } from './cms/entities/team-member.entity';
 import { News } from './cms/entities/news.entity';
 import { Event } from './cms/entities/event.entity';
 import { MailerModule } from '@nestjs-modules/mailer';
+import { CouponsModule } from './coupons/coupons.module';
 
 @Module({
   imports: [
@@ -79,6 +80,7 @@ import { MailerModule } from '@nestjs-modules/mailer';
     ProductsModule,
     AuthModule,
     CmsModule,
+    CouponsModule,
   ],
   controllers: [AppController],
   providers: [

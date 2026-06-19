@@ -11,6 +11,7 @@ interface Product {
   imageUrl: string;
   extraImages?: string[];
   sizes: string[];
+  originalPrice?: number;
   category?: string;
   isCustomizable?: boolean;
 }
@@ -115,9 +116,16 @@ export default function ProductGrid({ limit }: { limit?: number }) {
 										<h3 className="text-sm md:text-lg font-bold leading-tight uppercase group-hover:text-gray-500 group-active:text-gray-500 transition-colors">
 											{product.name}
 										</h3>
-										<span className="font-mono font-bold text-xs md:text-sm text-black mt-1 md:mt-0">
-											R$ {Number(product.price).toFixed(2).replace('.', ',')}
-										</span>
+										<div className="flex flex-col items-end mt-1 md:mt-0">
+											{product.originalPrice && (
+												<span className="text-xs text-gray-400 line-through">
+													R$ {Number(product.originalPrice).toFixed(2).replace('.', ',')}
+												</span>
+											)}
+											<span className="font-mono font-bold text-xs md:text-sm text-black">
+												R$ {Number(product.price).toFixed(2).replace('.', ',')}
+											</span>
+										</div>
 									</div>
 									<div className="text-[10px] md:text-sm text-gray-500">
 										{product.category}

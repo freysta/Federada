@@ -11,6 +11,7 @@ interface Product {
   imageUrl: string;
   extraImages?: string[];
   sizes: string[];
+  originalPrice?: number;
   category?: string;
   isCustomizable?: boolean;
 }
@@ -148,10 +149,17 @@ export default function ProductModal({ product, onClose }: ProductModalProps) {
 
           <div className="mb-6">
             <h2 className="text-2xl md:text-3xl font-bold uppercase mb-3 text-gray-900 tracking-tight">{product.name}</h2>
-            <div className="text-2xl text-gray-900">
-              R$ {Number(product.price).toFixed(2).replace('.', ',')}
+            <div className="flex items-end gap-3 mb-2">
+              {product.originalPrice && (
+                <div className="text-lg text-gray-400 line-through">
+                  R$ {Number(product.originalPrice).toFixed(2).replace('.', ',')}
+                </div>
+              )}
+              <div className="text-2xl text-gray-900 font-bold">
+                R$ {Number(product.price).toFixed(2).replace('.', ',')}
+              </div>
             </div>
-            <p className="text-sm text-gray-500 mt-2">Em até 3x sem juros</p>
+            <p className="text-sm text-gray-500 mt-2">Em até 3x sem juros no cartão ou <strong className="text-green-600">desconto no PIX</strong>.</p>
           </div>
 
           {/* Sizes */}
