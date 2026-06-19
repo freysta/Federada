@@ -55,9 +55,9 @@ export default function Navbar() {
 					<Link to="/gallery" className="hover:underline underline-offset-4">
 						GALERIA
 					</Link>
-					<button onClick={() => handleScrollTo('caads')} className="hover:underline underline-offset-4 cursor-pointer">
+					<Link to="/caads" className="hover:underline underline-offset-4">
 						CAADS
-					</button>
+					</Link>
 					<Link to="/loja" className="hover:underline underline-offset-4">
 						LOJA
 					</Link>
@@ -123,9 +123,9 @@ export default function Navbar() {
 					<Link to="/gallery" onClick={() => setIsOpen(false)} className="py-3 w-full border-b border-gray-50 active:bg-gray-50 transition-colors">
 						GALERIA
 					</Link>
-					<button onClick={() => handleScrollTo('caads')} className="py-3 w-full text-left border-b border-gray-50 active:bg-gray-50 transition-colors">
+					<Link to="/caads" onClick={() => setIsOpen(false)} className="py-3 w-full border-b border-gray-50 active:bg-gray-50 transition-colors">
 						CAADS
-					</button>
+					</Link>
 					<Link to="/loja" onClick={() => setIsOpen(false)} className="py-3 w-full border-b border-gray-50 active:bg-gray-50 transition-colors">
 						LOJA
 					</Link>

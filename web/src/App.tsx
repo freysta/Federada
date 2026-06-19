@@ -6,6 +6,7 @@ import StoreFront from "./pages/StoreFront";
 import Store from "./pages/Store";
 import Forum from "./pages/Forum";
 import GalleryPage from "./pages/GalleryPage";
+import CaadsPage from "./pages/CaadsPage";
 import VerifyEmail from "./pages/VerifyEmail";
 import AdminLayout from "./pages/admin/AdminLayout";
 import AdminOverview from "./pages/admin/AdminOverview";
@@ -30,6 +31,7 @@ function App() {
           <Route path="/loja" element={<Store />} />
           <Route path="/forum" element={<Forum />} />
           <Route path="/gallery" element={<GalleryPage />} />
+          <Route path="/caads" element={<CaadsPage />} />
           <Route path="/verify-email" element={<VerifyEmail />} />
 
           {/* Rotas do Painel Administrativo */}

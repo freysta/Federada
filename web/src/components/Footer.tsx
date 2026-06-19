@@ -77,9 +77,9 @@ export default function Footer() {
 								{[
 									{ name: "INÍCIO", path: "/" },
 									{ name: "LOJA", path: "#store" },
-									{ name: "NOTÍCIAS", path: "#news" },
-									{ name: "ACADÊMICO", path: "#caads" },
-									{ name: "SOBRE", path: "#about" }
+									{ name: "MENSALIDADE", path: "/mensalidade" },
+									{ name: "ACADÊMICO", path: "/caads" },
+									{ name: "FÓRUM", path: "/forum" }
 								].map((item, i) => (
 									<li key={i}>
 										<a
