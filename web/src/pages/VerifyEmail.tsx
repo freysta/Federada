@@ -4,8 +4,10 @@ import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import { API_URL } from "../config";
 import { CheckCircle, XCircle, Loader2 } from "lucide-react";
+import { useAuth } from "../contexts/AuthContext";
 
 export default function VerifyEmail() {
+  const { login } = useAuth();
   const [searchParams] = useSearchParams();
   const token = searchParams.get("token");
   
@@ -25,6 +27,9 @@ export default function VerifyEmail() {
         if (!res.ok) throw new Error(data.message || 'Erro ao verificar e-mail.');
         setStatus('success');
         setMessage(data.message);
+        if (data.access_token && data.user) {
+          login(data.access_token, data.user);
+        }
       })
       .catch((err) => {
         setStatus('error');
@@ -53,7 +58,7 @@ export default function VerifyEmail() {
                 <h2 className="text-xl font-bold font-mono text-green-600">E-MAIL VERIFICADO!</h2>
                 <p className="text-gray-600">{message}</p>
                 <Link to="/" className="mt-4 bg-black text-white px-6 py-3 font-bold font-mono hover:bg-neutral-800 transition-colors inline-block border border-black w-full">
-                  VOLTAR PARA A LOJA E LOGAR
+                  IR PARA A LOJA (LOGADO)
                 </Link>
               </div>
             )}
