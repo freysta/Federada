@@ -47,9 +47,9 @@ export default function Hero() {
       <div className="flex">
         
         {/* SLIDE 1: Original Hero */}
-        <div className="flex-[0_0_100%] min-w-0">
-          <section className="relative min-h-screen flex flex-col justify-center pt-20 overflow-hidden bg-white text-black">
-            <div className="max-w-7xl mx-auto px-6 w-full grid md:grid-cols-2 gap-12 items-center">
+        <div className="flex-[0_0_100%] min-w-0 h-full flex flex-col">
+          <section className="relative flex-1 min-h-screen flex flex-col justify-center pb-12 md:pb-0 pt-24 md:pt-20 overflow-hidden bg-white text-black">
+            <div className="max-w-7xl mx-auto px-6 w-full grid md:grid-cols-2 gap-8 md:gap-12 items-center">
               
               {/* Text Content */}
               <div className="z-10 order-2 md:order-1">
@@ -58,7 +58,7 @@ export default function Hero() {
                   <span className="font-mono text-sm tracking-widest uppercase text-gray-600">Desde 2024</span>
                 </div>
                 
-                <h1 className="text-5xl sm:text-6xl md:text-[7rem] leading-[0.9] mb-6 font-bold tracking-normal">
+                <h1 className="text-[2.5rem] sm:text-5xl md:text-[7rem] leading-[0.9] md:leading-[0.85] mb-6 font-bold tracking-normal">
                   <span className="glitch" data-text="FEDERADA:">FEDERADA:</span><br/>
                   ESTILO &<br/>
                   PERFORMANCE
@@ -71,11 +71,11 @@ export default function Hero() {
 
                 <button 
                   onClick={() => navigate('/loja')}
-                  className="group flex items-center gap-4 bg-black text-white px-10 py-5 hover:bg-[#00f0ff] hover:text-black transition-all duration-300 shadow-xl hover:shadow-[6px_6px_0_0_#000] hover:-translate-y-1 relative overflow-hidden"
+                  className="group flex w-full md:w-auto justify-center items-center gap-4 bg-black text-white px-6 md:px-10 py-4 md:py-5 hover:bg-[#00f0ff] hover:text-black transition-all duration-300 shadow-xl hover:shadow-[6px_6px_0_0_#000] hover:-translate-y-1 relative overflow-hidden"
                 >
                   <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
                   <ShoppingBag className="w-5 h-5 relative z-10" />
-                  <span className="font-sans text-xl tracking-wider font-bold relative z-10">VER COLEÇÃO 2026</span>
+                  <span className="font-sans text-lg md:text-xl tracking-wider font-bold relative z-10">VER COLEÇÃO 2026</span>
                 </button>
               </div>
 
@@ -116,7 +116,7 @@ export default function Hero() {
             {/* Scroll Indicator */}
             <button 
               onClick={() => window.scrollTo({ top: window.innerHeight, behavior: 'smooth' })}
-              className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-3 z-20 group cursor-pointer"
+              className="absolute bottom-8 left-1/2 -translate-x-1/2 hidden md:flex flex-col items-center gap-3 z-20 group cursor-pointer"
             >
               <div className="w-12 h-12 border border-black/20 rounded-full flex justify-center items-center relative overflow-hidden group-hover:border-black/50 transition-colors bg-white">
                   <div className="absolute inset-0 bg-[conic-gradient(from_0deg,transparent_70%,rgba(0,240,255,0.4)_100%)] animate-spin" style={{ animationDuration: '3s' }}></div>
@@ -130,8 +130,8 @@ export default function Hero() {
         </div>
 
         {/* SLIDE 2: Placeholder Drop */}
-        <div className="flex-[0_0_100%] min-w-0">
-          <section className="relative min-h-screen flex flex-col justify-center pt-20 overflow-hidden bg-[#050505] text-white">
+        <div className="flex-[0_0_100%] min-w-0 bg-[#050505] h-full flex flex-col">
+          <section className="relative flex-1 min-h-screen flex flex-col justify-center pt-20 overflow-hidden text-white">
             
             {/* Grid Hacker Background */}
             <div className="absolute inset-0 opacity-20 pointer-events-none" style={{ backgroundImage: 'linear-gradient(rgba(0, 240, 255, 0.2) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 240, 255, 0.2) 1px, transparent 1px)', backgroundSize: '30px 30px' }}></div>
