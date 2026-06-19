@@ -112,22 +112,7 @@ export default function LoginModal({ isOpen, onClose }: { isOpen: boolean; onClo
                 </div>
               )}
 
-              <div className="mb-4">
-                <GoogleLogin
-                  onSuccess={handleGoogleSuccess}
-                  onError={() => toast.error('Falha ao conectar com o Google')}
-                  useOneTap
-                  theme="outline"
-                  text="continue_with"
-                  width="100%"
-                />
-              </div>
 
-              <div className="flex items-center gap-2 mb-4">
-                <div className="h-px bg-gray-200 flex-1"></div>
-                <span className="text-xs font-mono text-gray-400">OU</span>
-                <div className="h-px bg-gray-200 flex-1"></div>
-              </div>
 
               {mode === 'register' && (
                 <>
@@ -166,6 +151,23 @@ export default function LoginModal({ isOpen, onClose }: { isOpen: boolean; onClo
               {loading ? <Loader2 size={16} className="animate-spin" /> : (mode === 'login' ? <LogIn size={16} /> : <UserPlus size={16} />)}
               <span className="tracking-widest">{mode === 'login' ? 'ENTRAR' : 'CRIAR CONTA'}</span>
             </button>
+
+            <div className="flex items-center gap-2 my-4">
+              <div className="h-px bg-gray-200 flex-1"></div>
+              <span className="text-xs font-mono text-gray-400">OU</span>
+              <div className="h-px bg-gray-200 flex-1"></div>
+            </div>
+
+            <div className="mb-2 flex justify-center">
+              <GoogleLogin
+                onSuccess={handleGoogleSuccess}
+                onError={() => toast.error('Falha ao conectar com o Google')}
+                useOneTap
+                theme="outline"
+                text="continue_with"
+                width="100%"
+              />
+            </div>
           </form>
           <div className="mt-4 text-center">
             {mode === 'login' ? (
