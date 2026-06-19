@@ -82,6 +82,7 @@ async function run() {
       cpf: '00000000000',
       phone: '00000000000',
       role: 'ADMIN',
+      emailVerified: true,
     });
     await userRepo.save(admin);
     console.log('Admin user seeded (email: admin@federada.com.br | password: admin123).');
