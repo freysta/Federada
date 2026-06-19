@@ -59,7 +59,7 @@ export default function AdminLayout() {
           <div className="flex items-center justify-between mb-4 px-2">
             <div className="flex flex-col">
               <span className="text-xs font-mono text-gray-400">LOGADO COMO</span>
-              <span className="text-sm font-bold truncate max-w-[150px]">{user.name}</span>
+              <span className="text-sm font-sans font-semibold tracking-normal truncate max-w-[150px]">{user.name}</span>
             </div>
           </div>
           <Link 
