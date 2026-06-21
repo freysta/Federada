@@ -20,6 +20,14 @@ import { News } from './cms/entities/news.entity';
 import { Event } from './cms/entities/event.entity';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { CouponsModule } from './coupons/coupons.module';
+import { TeamsModule } from './teams/teams.module';
+import { ChampionshipsModule } from './championships/championships.module';
+
+import { Team } from './teams/entities/team.entity';
+import { AthleteProfile } from './teams/entities/athlete-profile.entity';
+import { Championship } from './championships/entities/championship.entity';
+import { Modality } from './championships/entities/modality.entity';
+import { Subscription } from './championships/entities/subscription.entity';
 
 @Module({
   imports: [
@@ -62,7 +70,7 @@ import { CouponsModule } from './coupons/coupons.module';
           return {
             type: 'postgres',
             url: dbUrl,
-            entities: [Order, OrderItem, User, Product, TeamMember, News, Event],
+            entities: [Order, OrderItem, User, Product, TeamMember, News, Event, Team, AthleteProfile, Championship, Modality, Subscription],
             synchronize: process.env.NODE_ENV !== 'production',
             ssl: process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : false,
           };
@@ -71,7 +79,7 @@ import { CouponsModule } from './coupons/coupons.module';
         return {
           type: 'sqlite',
           database: 'data/database.sqlite',
-          entities: [Order, OrderItem, User, Product, TeamMember, News, Event],
+          entities: [Order, OrderItem, User, Product, TeamMember, News, Event, Team, AthleteProfile, Championship, Modality, Subscription],
           synchronize: true,
         };
       },
@@ -81,6 +89,8 @@ import { CouponsModule } from './coupons/coupons.module';
     AuthModule,
     CmsModule,
     CouponsModule,
+    TeamsModule,
+    ChampionshipsModule,
   ],
   controllers: [AppController],
   providers: [
