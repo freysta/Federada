@@ -30,4 +30,10 @@ export class TeamsController {
   getTeamMembers(@Param('id') id: string) {
     return this.teamsService.getTeamMembers(id);
   }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('my/profile')
+  getMyProfile(@Request() req) {
+    return this.teamsService.getMyProfile(req.user.userId);
+  }
 }

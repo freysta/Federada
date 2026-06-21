@@ -59,4 +59,11 @@ export class TeamsService {
       relations: ['user'],
     });
   }
+
+  async getMyProfile(userId: string) {
+    return this.athleteProfileRepository.findOne({
+      where: { user: { id: userId } },
+      relations: ['team', 'team.owner'],
+    });
+  }
 }

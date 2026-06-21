@@ -55,6 +55,9 @@ export default function Navbar() {
 					<Link to="/gallery" className="hover:underline underline-offset-4">
 						GALERIA
 					</Link>
+					<Link to="/campeonatos" className="hover:underline underline-offset-4 text-orange-600 font-bold">
+						CAMPEONATOS
+					</Link>
 					<Link to="/caads" className="hover:underline underline-offset-4">
 						CAADS
 					</Link>
@@ -127,6 +130,9 @@ export default function Navbar() {
 					</Link>
 					<Link to="/gallery" onClick={() => setIsOpen(false)} className="py-3 w-full border-b border-gray-50 active:bg-gray-50 transition-colors">
 						GALERIA
+					</Link>
+					<Link to="/campeonatos" onClick={() => setIsOpen(false)} className="py-3 w-full border-b border-gray-50 active:bg-gray-50 transition-colors text-orange-600 font-bold">
+						CAMPEONATOS
 					</Link>
 					<Link to="/caads" onClick={() => setIsOpen(false)} className="py-3 w-full border-b border-gray-50 active:bg-gray-50 transition-colors">
 						CAADS

@@ -8,6 +8,7 @@ import Forum from "./pages/Forum";
 import GalleryPage from "./pages/GalleryPage";
 import CaadsPage from "./pages/CaadsPage";
 import VerifyEmail from "./pages/VerifyEmail";
+import ChampionshipsPage from "./pages/ChampionshipsPage";
 import AdminLayout from "./pages/admin/AdminLayout";
 import AdminOverview from "./pages/admin/AdminOverview";
 import AdminProducts from "./pages/admin/AdminProducts";
@@ -32,6 +33,7 @@ function App() {
           <Route path="/forum" element={<Forum />} />
           <Route path="/gallery" element={<GalleryPage />} />
           <Route path="/caads" element={<CaadsPage />} />
+          <Route path="/campeonatos" element={<ChampionshipsPage />} />
           <Route path="/verify-email" element={<VerifyEmail />} />
 
           {/* Rotas do Painel Administrativo */}
