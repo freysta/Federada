@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
 import { API_URL } from '../config';
+import { useState, useEffect } from 'react';
+import { API_URL } from '../config';
 import { useAuth } from '../contexts/AuthContext';
-import { Loader2, Trophy, Users, Shield, ArrowRight, Info, Plus } from 'lucide-react';
+import { Loader2, Trophy, Users, Shield, ArrowRight, Info, Plus, Copy, CheckCircle2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 export default function ChampionshipsPage() {
@@ -21,6 +23,11 @@ export default function ChampionshipsPage() {
   const [isCreatingTeam, setIsCreatingTeam] = useState(false);
   const [newTeamName, setNewTeamName] = useState('');
   const [newTeamUniversity, setNewTeamUniversity] = useState('');
+  
+  // President Admin State
+  const [teamMembers, setTeamMembers] = useState<any[]>([]);
+  const [loadingMembers, setLoadingMembers] = useState(false);
+  const [copiedCode, setCopiedCode] = useState(false);
 
   const fetchChampionships = () => {
     setLoading(true);
@@ -46,10 +53,31 @@ export default function ChampionshipsPage() {
     .then(data => {
       setAthleteProfile(data || null);
       setLoadingProfile(false);
+      
+      // Se for o dono, busca os membros do time
+      if (data?.team?.owner?.id === user?.id) {
+        fetchTeamMembers(data.team.id);
+      }
     })
     .catch(err => {
       console.error('Erro ao buscar perfil', err);
       setLoadingProfile(false);
+    });
+  };
+
+  const fetchTeamMembers = (teamId: string) => {
+    setLoadingMembers(true);
+    fetch(`${API_URL}/teams/${teamId}/members`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    })
+    .then(res => res.json())
+    .then(data => {
+      setTeamMembers(data);
+      setLoadingMembers(false);
+    })
+    .catch(err => {
+      console.error('Erro ao buscar membros', err);
+      setLoadingMembers(false);
     });
   };
 
@@ -121,7 +149,7 @@ export default function ChampionshipsPage() {
       
       toast.success('Atlética criada! O código de convite é: ' + data.inviteCode, { duration: 10000 });
       setIsCreatingTeam(false);
-      // Optional: automatically join the team just created
+      fetchProfile();
     } catch (err: any) {
       toast.error(err.message);
     }
@@ -251,42 +279,119 @@ export default function ChampionshipsPage() {
                 {loadingProfile ? (
                   <div className="flex justify-center py-20"><Loader2 className="animate-spin text-black" size={48} /></div>
                 ) : athleteProfile && athleteProfile.team ? (
-                  /* Perfil do Atleta (Já vinculado) */
-                  <div className="bg-white border-2 border-black p-8 relative overflow-hidden">
-                    <div className="absolute top-0 right-0 bg-[#00f0ff] text-black font-bold font-mono text-xs px-4 py-1 border-b border-l border-black">
-                      STATUS DOC: {athleteProfile.status}
-                    </div>
-                    
-                    <div className="flex flex-col md:flex-row gap-8 items-center md:items-start">
-                      <div className="w-32 h-32 bg-gray-100 rounded-full flex items-center justify-center font-bold text-4xl border-4 border-black overflow-hidden shrink-0 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-                        {athleteProfile.team.logoUrl ? <img src={athleteProfile.team.logoUrl} className="w-full h-full object-cover" /> : athleteProfile.team.name.charAt(0)}
+                  <div className="space-y-8">
+                    {/* Perfil do Atleta (Já vinculado) */}
+                    <div className="bg-white border-2 border-black p-8 relative overflow-hidden">
+                      <div className="absolute top-0 right-0 bg-[#00f0ff] text-black font-bold font-mono text-xs px-4 py-1 border-b border-l border-black">
+                        STATUS DOC: {athleteProfile.status}
                       </div>
-                      <div className="flex-1 text-center md:text-left">
-                        <h2 className="text-3xl font-bold uppercase">{athleteProfile.team.name}</h2>
-                        <p className="text-gray-600 text-lg mb-6 flex items-center justify-center md:justify-start gap-2">
-                          <Users size={18} /> {athleteProfile.team.university || 'Universidade não informada'}
-                        </p>
-                        
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          <div className="bg-gray-50 border border-gray-200 p-4">
-                            <span className="block text-xs font-mono font-bold text-gray-400 mb-1">ATLETA</span>
-                            <span className="font-bold">{user.name}</span>
+                      
+                      <div className="flex flex-col md:flex-row gap-8 items-center md:items-start">
+                        <div className="w-32 h-32 bg-gray-100 rounded-full flex items-center justify-center font-bold text-4xl border-4 border-black overflow-hidden shrink-0 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+                          {athleteProfile.team.logoUrl ? <img src={athleteProfile.team.logoUrl} className="w-full h-full object-cover" /> : athleteProfile.team.name.charAt(0)}
+                        </div>
+                        <div className="flex-1 text-center md:text-left">
+                          <div className="flex items-center justify-center md:justify-start gap-3 mb-2">
+                            <h2 className="text-3xl font-bold uppercase">{athleteProfile.team.name}</h2>
+                            {athleteProfile.team.owner?.id === user?.id && (
+                              <span className="bg-black text-white text-xs font-bold px-2 py-1 uppercase tracking-widest">
+                                PRESIDENTE
+                              </span>
+                            )}
                           </div>
-                          <div className="bg-gray-50 border border-gray-200 p-4">
-                            <span className="block text-xs font-mono font-bold text-gray-400 mb-1">CPF</span>
-                            <span className="font-bold font-mono">{athleteProfile.cpf}</span>
-                          </div>
-                          <div className="bg-gray-50 border border-gray-200 p-4">
-                            <span className="block text-xs font-mono font-bold text-gray-400 mb-1">DATA DE NASCIMENTO</span>
-                            <span className="font-bold">{athleteProfile.birthDate}</span>
-                          </div>
-                          <div className="bg-gray-50 border border-gray-200 p-4">
-                            <span className="block text-xs font-mono font-bold text-gray-400 mb-1">PRESIDENTE RESPONSÁVEL</span>
-                            <span className="font-bold">{athleteProfile.team.owner?.name || 'Desconhecido'}</span>
+                          
+                          <p className="text-gray-600 text-lg mb-6 flex items-center justify-center md:justify-start gap-2">
+                            <Users size={18} /> {athleteProfile.team.university || 'Universidade não informada'}
+                          </p>
+                          
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="bg-gray-50 border border-gray-200 p-4">
+                              <span className="block text-xs font-mono font-bold text-gray-400 mb-1">ATLETA</span>
+                              <span className="font-bold">{user?.name}</span>
+                            </div>
+                            <div className="bg-gray-50 border border-gray-200 p-4">
+                              <span className="block text-xs font-mono font-bold text-gray-400 mb-1">CPF</span>
+                              <span className="font-bold font-mono">{athleteProfile.cpf}</span>
+                            </div>
+                            <div className="bg-gray-50 border border-gray-200 p-4">
+                              <span className="block text-xs font-mono font-bold text-gray-400 mb-1">DATA DE NASCIMENTO</span>
+                              <span className="font-bold">{athleteProfile.birthDate}</span>
+                            </div>
+                            <div className="bg-gray-50 border border-gray-200 p-4">
+                              <span className="block text-xs font-mono font-bold text-gray-400 mb-1">PRESIDENTE RESPONSÁVEL</span>
+                              <span className="font-bold">{athleteProfile.team.owner?.name || 'Desconhecido'}</span>
+                            </div>
                           </div>
                         </div>
                       </div>
                     </div>
+
+                    {/* PAINEL DO PRESIDENTE */}
+                    {athleteProfile.team.owner?.id === user?.id && (
+                      <div className="bg-neutral-100 border-2 border-black p-8">
+                        <h3 className="text-2xl font-bold uppercase mb-6 flex items-center gap-3">
+                          <Shield size={28} /> Painel Administrativo da Atlética
+                        </h3>
+
+                        <div className="bg-white border border-black p-6 mb-8 flex flex-col md:flex-row justify-between items-center gap-4">
+                          <div>
+                            <h4 className="font-bold text-gray-600 uppercase text-sm mb-1">CÓDIGO DE CONVITE (COMPARTILHE COM OS ATLETAS)</h4>
+                            <p className="font-mono text-3xl font-bold">{athleteProfile.team.inviteCode}</p>
+                          </div>
+                          <button 
+                            onClick={() => {
+                              navigator.clipboard.writeText(athleteProfile.team.inviteCode);
+                              setCopiedCode(true);
+                              toast.success('Código copiado!');
+                              setTimeout(() => setCopiedCode(false), 2000);
+                            }}
+                            className="bg-black text-white px-6 py-3 font-bold uppercase hover:bg-neutral-800 flex items-center gap-2"
+                          >
+                            {copiedCode ? <CheckCircle2 size={20} /> : <Copy size={20} />}
+                            {copiedCode ? 'COPIADO!' : 'COPIAR CÓDIGO'}
+                          </button>
+                        </div>
+
+                        <h4 className="font-bold text-xl mb-4 border-b border-gray-300 pb-2">Elenco de Atletas</h4>
+                        
+                        {loadingMembers ? (
+                          <div className="flex justify-center py-10"><Loader2 className="animate-spin text-black" size={32} /></div>
+                        ) : teamMembers.length === 0 ? (
+                          <div className="text-center py-10 text-gray-500 border border-dashed border-gray-400 bg-white">
+                            Nenhum atleta se vinculou ainda. Compartilhe o código!
+                          </div>
+                        ) : (
+                          <div className="overflow-x-auto bg-white border border-black">
+                            <table className="w-full text-left border-collapse">
+                              <thead>
+                                <tr className="bg-gray-100 border-b border-black text-sm uppercase font-mono">
+                                  <th className="p-4 border-r border-gray-200">Nome do Atleta</th>
+                                  <th className="p-4 border-r border-gray-200">E-mail</th>
+                                  <th className="p-4 border-r border-gray-200">CPF</th>
+                                  <th className="p-4 border-r border-gray-200">Nascimento</th>
+                                  <th className="p-4">Status Doc</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {teamMembers.map((member: any) => (
+                                  <tr key={member.id} className="border-b border-gray-200 hover:bg-gray-50">
+                                    <td className="p-4 border-r border-gray-200 font-bold">{member.user?.name || '---'}</td>
+                                    <td className="p-4 border-r border-gray-200 text-sm text-gray-600">{member.user?.email || '---'}</td>
+                                    <td className="p-4 border-r border-gray-200 font-mono text-sm">{member.cpf}</td>
+                                    <td className="p-4 border-r border-gray-200">{member.birthDate}</td>
+                                    <td className="p-4">
+                                      <span className="bg-green-100 text-green-800 border border-green-300 text-xs px-2 py-1 font-mono font-bold">
+                                        {member.status}
+                                      </span>
+                                    </td>
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </table>
+                          </div>
+                        )}
+                      </div>
+                    )}
                   </div>
                 ) : (
                   /* Formulários de Vinculação / Criação */
