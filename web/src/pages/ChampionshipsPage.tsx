@@ -1,7 +1,5 @@
 import { useState, useEffect } from 'react';
 import { API_URL } from '../config';
-import { useState, useEffect } from 'react';
-import { API_URL } from '../config';
 import { useAuth } from '../contexts/AuthContext';
 import { Loader2, Trophy, Users, Shield, ArrowRight, Info, Plus, Copy, CheckCircle2 } from 'lucide-react';
 import toast from 'react-hot-toast';
