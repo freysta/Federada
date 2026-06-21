@@ -18,7 +18,7 @@ export class ChampionshipsController {
 
   @UseGuards(JwtAuthGuard)
   @Post(':modalityId/subscribe')
-  subscribe(@Request() req, @Param('modalityId') modalityId: string) {
+  subscribe(@Request() req: any, @Param('modalityId') modalityId: string) {
     return this.championshipsService.subscribeAthlete(req.user.userId, modalityId);
   }
 }

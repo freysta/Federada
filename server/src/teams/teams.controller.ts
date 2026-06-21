@@ -10,7 +10,7 @@ export class TeamsController {
 
   @UseGuards(JwtAuthGuard)
   @Post()
-  createTeam(@Request() req, @Body() body: { name: string; university?: string; logoUrl?: string }) {
+  createTeam(@Request() req: any, @Body() body: { name: string; university?: string; logoUrl?: string }) {
     return this.teamsService.createTeam(req.user.userId, body);
   }
 
@@ -21,7 +21,7 @@ export class TeamsController {
 
   @UseGuards(JwtAuthGuard)
   @Post('join')
-  joinTeam(@Request() req, @Body() body: { inviteCode: string; cpf: string; birthDate: Date; enrollmentProofUrl?: string }) {
+  joinTeam(@Request() req: any, @Body() body: { inviteCode: string; cpf: string; birthDate: Date; enrollmentProofUrl?: string }) {
     return this.teamsService.joinTeam(req.user.userId, body.inviteCode, body);
   }
 
@@ -33,7 +33,7 @@ export class TeamsController {
 
   @UseGuards(JwtAuthGuard)
   @Get('my/profile')
-  getMyProfile(@Request() req) {
+  getMyProfile(@Request() req: any) {
     return this.teamsService.getMyProfile(req.user.userId);
   }
 }
