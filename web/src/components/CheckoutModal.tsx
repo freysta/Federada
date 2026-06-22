@@ -195,7 +195,7 @@ export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
                     <input required type="email" autoComplete="email" className="w-full bg-white border border-gray-300 p-4 md:p-3 text-sm font-mono focus:border-black focus:ring-0 outline-none" placeholder="SEU@EMAIL.COM" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} />
                   </div>
                   <div className="grid grid-cols-2 gap-4">
-                    <input type="tel" inputMode="numeric" placeholder="CPF (Opcional)" className="w-full bg-white border border-gray-300 p-4 md:p-3 text-sm font-mono focus:border-black focus:ring-0 outline-none" value={formData.cpf} onChange={(e) => setFormData({ ...formData, cpf: e.target.value })} />
+                    <input required type="tel" inputMode="numeric" placeholder="CPF" className="w-full bg-white border border-gray-300 p-4 md:p-3 text-sm font-mono focus:border-black focus:ring-0 outline-none" value={formData.cpf} onChange={(e) => setFormData({ ...formData, cpf: e.target.value })} />
                     <input required type="tel" inputMode="numeric" autoComplete="tel" placeholder="WHATSAPP" className="w-full bg-white border border-gray-300 p-4 md:p-3 text-sm font-mono focus:border-black focus:ring-0 outline-none" value={formData.phone} onChange={(e) => setFormData({ ...formData, phone: e.target.value })} />
                   </div>
                   

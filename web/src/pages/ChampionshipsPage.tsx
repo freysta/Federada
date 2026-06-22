@@ -281,8 +281,9 @@ export default function ChampionshipsPage() {
               </div>
             </div>
           ) : !user && (
-            <div className="bg-white/10 backdrop-blur-md rounded-2xl px-6 py-4 border border-white/20">
-              <p className="font-medium text-sm">Faça login para ver sua equipe</p>
+            <div className="bg-white/10 backdrop-blur-md rounded-2xl px-6 py-4 border border-white/20 flex flex-col gap-1">
+              <p className="font-medium text-sm">Você não está logado.</p>
+              <p className="text-xs text-blue-200">Crie sua conta no menu superior.</p>
             </div>
           )}
         </div>
@@ -290,8 +291,8 @@ export default function ChampionshipsPage() {
 
       <div className="max-w-6xl mx-auto px-6 py-10">
         
-        {/* ONBOARDING SE NÃO ESTIVER EM UMA ATLÉTICA */}
-        {user && (!athleteProfile || !athleteProfile.team) ? (
+        {/* ONBOARDING SE NÃO ESTIVER EM UMA ATLÉTICA OU NÃO LOGADO */}
+        {(!user || !athleteProfile || !athleteProfile.team) ? (
           <div className="bg-white rounded-3xl shadow-sm border border-slate-200 p-8 md:p-12 max-w-3xl mx-auto mt-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
             <div className="text-center mb-10">
               <div className="bg-blue-50 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6">
@@ -301,8 +302,18 @@ export default function ChampionshipsPage() {
               <p className="text-slate-500 text-lg">Para se inscrever nos campeonatos, você precisa estar vinculado a uma equipe oficial.</p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              {/* Form de Atleta */}
+            {!user ? (
+              <div className="text-center p-8 bg-slate-50 rounded-2xl border border-slate-200 flex flex-col items-center justify-center">
+                <h3 className="font-bold text-xl mb-3 text-slate-800">Primeiro Passo</h3>
+                <p className="text-slate-600 mb-6 max-w-md">Para se vincular a uma atlética e gerenciar suas inscrições, você precisa ter uma conta gratuita na plataforma.</p>
+                <div className="bg-blue-100 text-blue-800 px-6 py-4 rounded-xl font-bold flex items-center gap-2 animate-pulse border border-blue-200">
+                  <span>⬆️</span>
+                  Clique em "ENTRAR / CADASTRAR" no menu superior
+                </div>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                {/* Form de Atleta */}
               <div className="bg-slate-50 rounded-2xl p-6 border border-slate-100">
                 <h3 className="font-bold text-lg mb-4 flex items-center gap-2">
                   <Users size={20} className="text-blue-500" /> Sou um Atleta
@@ -401,10 +412,10 @@ export default function ChampionshipsPage() {
                   </div>
                 )}
               </div>
-            </div>
+            )}
           </div>
         ) : (
-          /* DASHBOARD DE CAMPEONATOS (Quando já tem time ou não logado para ver) */
+          /* DASHBOARD DE CAMPEONATOS (Quando já tem time) */
           <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
             {loading ? (
               <div className="flex justify-center py-20"><Loader2 className="animate-spin text-blue-600" size={48} /></div>
