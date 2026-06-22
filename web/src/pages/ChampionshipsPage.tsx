@@ -669,19 +669,25 @@ export default function ChampionshipsPage() {
                         <th className="p-4 font-semibold">E-mail</th>
                         <th className="p-4 font-semibold">CPF</th>
                         <th className="p-4 font-semibold">Nascimento</th>
-                        <th className="p-4 font-semibold">Status</th>
+                        <th className="p-4 font-semibold text-center">RG</th>
+                        <th className="p-4 font-semibold text-center">Matrícula</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-100">
                       {teamMembers.map((member: any) => (
                         <tr key={member.id} className="hover:bg-slate-50/50 transition-colors">
                           <td className="p-4 font-bold text-slate-800">{member.user?.name || '---'}</td>
-                          <td className="p-4 text-slate-500">{member.user?.email || '---'}</td>
+                          <td className="p-4 text-slate-500 text-xs">{member.user?.email || '---'}</td>
                           <td className="p-4 text-slate-600 font-mono text-xs">{member.cpf}</td>
-                          <td className="p-4 text-slate-600">{new Date(member.birthDate).toLocaleDateString()}</td>
-                          <td className="p-4">
-                            <span className="bg-green-100 text-green-700 font-bold text-xs px-2.5 py-1 rounded-md">
-                              {member.status}
+                          <td className="p-4 text-slate-600 text-sm">{new Date(member.birthDate).toLocaleDateString()}</td>
+                          <td className="p-4 text-center">
+                            <span className={`font-bold text-[10px] px-2 py-1 rounded-md uppercase ${member.documentRgStatus === 'APPROVED' ? 'bg-green-100 text-green-700' : member.documentRgStatus === 'REJECTED' ? 'bg-red-100 text-red-700' : 'bg-slate-200 text-slate-600'}`}>
+                              {member.documentRgStatus || 'MISSING'}
+                            </span>
+                          </td>
+                          <td className="p-4 text-center">
+                            <span className={`font-bold text-[10px] px-2 py-1 rounded-md uppercase ${member.documentEnrollmentStatus === 'APPROVED' ? 'bg-green-100 text-green-700' : member.documentEnrollmentStatus === 'REJECTED' ? 'bg-red-100 text-red-700' : 'bg-slate-200 text-slate-600'}`}>
+                              {member.documentEnrollmentStatus || 'MISSING'}
                             </span>
                           </td>
                         </tr>

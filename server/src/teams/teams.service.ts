@@ -105,4 +105,34 @@ export class TeamsService {
 
     return this.athleteProfileRepository.save(profile);
   }
+
+  async getPendingDocuments() {
+    return this.athleteProfileRepository.find({
+      where: [
+        { documentRgStatus: 'PENDING' },
+        { documentEnrollmentStatus: 'PENDING' }
+      ],
+      relations: ['user', 'team']
+    });
+  }
+
+  async updateDocumentStatus(profileId: string, data: { type: 'rg' | 'enrollment'; status: 'APPROVED' | 'REJECTED' }) {
+    const profile = await this.athleteProfileRepository.findOne({ where: { id: profileId } });
+    if (!profile) throw new NotFoundException('Perfil não encontrado');
+
+    if (data.type === 'rg') {
+      profile.documentRgStatus = data.status;
+    } else {
+      profile.documentEnrollmentStatus = data.status;
+    }
+
+    // Auto-update overall status
+    if (profile.documentRgStatus === 'APPROVED' && profile.documentEnrollmentStatus === 'APPROVED') {
+      profile.status = 'APPROVED';
+    } else if (profile.documentRgStatus === 'REJECTED' || profile.documentEnrollmentStatus === 'REJECTED') {
+      profile.status = 'REJECTED';
+    }
+
+    return this.athleteProfileRepository.save(profile);
+  }
 }

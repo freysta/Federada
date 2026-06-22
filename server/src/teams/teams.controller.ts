@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param, UseGuards, Request, UseInterceptors, UploadedFile } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Body, Param, UseGuards, Request, UseInterceptors, UploadedFile } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { TeamsService } from './teams.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
@@ -36,6 +36,23 @@ export class TeamsController {
   @Get('my/profile')
   getMyProfile(@Request() req: any) {
     return this.teamsService.getMyProfile(req.user.userId);
+  }
+
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ADMIN')
+  @Get('admin/documents')
+  getPendingDocuments() {
+    return this.teamsService.getPendingDocuments();
+  }
+
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ADMIN')
+  @Patch('admin/documents/:id')
+  updateDocumentStatus(
+    @Param('id') id: string,
+    @Body() body: { type: 'rg' | 'enrollment'; status: 'APPROVED' | 'REJECTED' }
+  ) {
+    return this.teamsService.updateDocumentStatus(id, body);
   }
 
   @UseGuards(JwtAuthGuard)
