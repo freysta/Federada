@@ -38,6 +38,13 @@ export default function ChampionshipsPage() {
   const [isSubscribing, setIsSubscribing] = useState(false);
   const [mySubscriptions, setMySubscriptions] = useState<string[]>([]);
 
+  // Tabs
+  const [activeTab, setActiveTab] = useState<'subscribe' | 'matches'>('subscribe');
+  
+  // Upload State
+  const [uploadingRg, setUploadingRg] = useState(false);
+  const [uploadingEnrollment, setUploadingEnrollment] = useState(false);
+
   const fetchChampionships = () => {
     setLoading(true);
     fetch(`${API_URL}/championships`)
@@ -177,6 +184,37 @@ export default function ChampionshipsPage() {
     } catch (err: any) {
       toast.error(err.message, { id: toastId });
     }
+  };
+
+  const handleUploadDocument = (type: 'rg' | 'enrollment', file: File) => {
+    if (!token) return;
+    
+    const formData = new FormData();
+    formData.append('file', file);
+    
+    if (type === 'rg') setUploadingRg(true);
+    else setUploadingEnrollment(true);
+    
+    fetch(`${API_URL}/teams/my/documents/${type}`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`
+      },
+      body: formData
+    })
+    .then(res => {
+      if (!res.ok) throw new Error('Falha no upload');
+      return res.json();
+    })
+    .then(data => {
+      toast.success('Documento enviado com sucesso!');
+      setAthleteProfile(data);
+    })
+    .catch(err => toast.error(err.message))
+    .finally(() => {
+      if (type === 'rg') setUploadingRg(false);
+      else setUploadingEnrollment(false);
+    });
   };
 
   const handleJoinTeam = async (e: React.FormEvent) => {
@@ -418,7 +456,30 @@ export default function ChampionshipsPage() {
         ) : (
           /* DASHBOARD DE CAMPEONATOS (Quando já tem time) */
           <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-            {loading ? (
+            {/* TABS */}
+            <div className="flex bg-slate-200 p-1 rounded-xl w-full sm:w-fit mx-auto sm:mx-0">
+              <button 
+                onClick={() => setActiveTab('subscribe')}
+                className={`flex-1 sm:flex-none px-6 py-2.5 rounded-lg font-bold text-sm transition-all ${activeTab === 'subscribe' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+              >
+                Inscrições Abertas
+              </button>
+              <button 
+                onClick={() => setActiveTab('matches')}
+                className={`flex-1 sm:flex-none px-6 py-2.5 rounded-lg font-bold text-sm transition-all ${activeTab === 'matches' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+              >
+                Tabela de Jogos
+              </button>
+            </div>
+
+            {activeTab === 'matches' ? (
+              <div className="bg-white rounded-3xl shadow-sm border border-slate-200 p-12 text-center">
+                <h3 className="text-2xl font-bold text-slate-800 mb-3">Tabela de Jogos</h3>
+                <p className="text-slate-500">Os jogos ainda não foram gerados pela organização.<br/>Fique de olho nas novidades!</p>
+              </div>
+            ) : (
+              <>
+                {loading ? (
               <div className="flex justify-center py-20"><Loader2 className="animate-spin text-blue-600" size={48} /></div>
             ) : championships.length === 0 ? (
               <div className="text-center py-24 bg-white rounded-3xl shadow-sm border border-slate-200">
@@ -517,6 +578,7 @@ export default function ChampionshipsPage() {
                   </div>
                 ))}
               </div>
+              </>
             )}
           </div>
         )}
@@ -644,7 +706,10 @@ export default function ChampionshipsPage() {
               <div className="relative z-10">
                 <span className="bg-white/20 text-white text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wider mb-2 inline-block">Cartão do Atleta</span>
                 <h3 className="font-bold text-3xl">{user?.name}</h3>
-                <p className="text-blue-200 font-mono mt-1">{athleteProfile.cpf}</p>
+                <p className="text-blue-200 font-mono mt-1 flex gap-4">
+                  <span>CPF: {athleteProfile.cpf}</span>
+                  <span className="bg-blue-800 px-2 rounded">ID: {athleteProfile.athleteIdCode}</span>
+                </p>
               </div>
               <button onClick={() => setShowProfileModal(false)} className="text-blue-200 hover:text-white transition-colors relative z-10">
                 <X size={24} />
@@ -665,11 +730,45 @@ export default function ChampionshipsPage() {
                   <span className="block text-xs font-semibold text-slate-400 mb-1">PERÍODO</span>
                   <span className="font-bold text-slate-800">{athleteProfile.period || '---'}</span>
                 </div>
-                <div>
-                  <span className="block text-xs font-semibold text-slate-400 mb-1">DOC STATUS</span>
-                  <span className="inline-flex items-center gap-1 bg-green-100 text-green-700 font-bold text-xs px-2 py-1 rounded-md">
-                    <CheckCircle2 size={12} /> {athleteProfile.status}
-                  </span>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 border-b border-slate-100 pb-8 mb-8">
+                {/* Upload RG */}
+                <div className="bg-slate-50 border border-slate-200 p-4 rounded-xl flex items-center justify-between">
+                  <div>
+                    <h5 className="font-bold text-sm text-slate-800">Documento Pessoal (RG)</h5>
+                    <p className="text-xs text-slate-500 mb-2">Status: <span className="font-bold">{athleteProfile.documentRgStatus}</span></p>
+                    <label className="cursor-pointer bg-blue-100 text-blue-700 px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-blue-200 transition">
+                      {uploadingRg ? 'Enviando...' : 'Fazer Upload'}
+                      <input type="file" className="hidden" accept=".pdf,image/*" onChange={e => {
+                        if (e.target.files && e.target.files[0]) handleUploadDocument('rg', e.target.files[0]);
+                      }} disabled={uploadingRg} />
+                    </label>
+                  </div>
+                  {athleteProfile.documentRgUrl && (
+                    <a href={`${API_URL}${athleteProfile.documentRgUrl}`} target="_blank" rel="noreferrer" className="text-slate-400 hover:text-blue-600">
+                      Ver DOC
+                    </a>
+                  )}
+                </div>
+
+                {/* Upload Matricula */}
+                <div className="bg-slate-50 border border-slate-200 p-4 rounded-xl flex items-center justify-between">
+                  <div>
+                    <h5 className="font-bold text-sm text-slate-800">Atestado de Matrícula</h5>
+                    <p className="text-xs text-slate-500 mb-2">Status: <span className="font-bold">{athleteProfile.documentEnrollmentStatus}</span></p>
+                    <label className="cursor-pointer bg-blue-100 text-blue-700 px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-blue-200 transition">
+                      {uploadingEnrollment ? 'Enviando...' : 'Fazer Upload'}
+                      <input type="file" className="hidden" accept=".pdf,image/*" onChange={e => {
+                        if (e.target.files && e.target.files[0]) handleUploadDocument('enrollment', e.target.files[0]);
+                      }} disabled={uploadingEnrollment} />
+                    </label>
+                  </div>
+                  {athleteProfile.documentEnrollmentUrl && (
+                    <a href={`${API_URL}${athleteProfile.documentEnrollmentUrl}`} target="_blank" rel="noreferrer" className="text-slate-400 hover:text-blue-600">
+                      Ver DOC
+                    </a>
+                  )}
                 </div>
               </div>
 
