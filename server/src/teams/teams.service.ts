@@ -107,11 +107,8 @@ export class TeamsService {
   }
 
   async getPendingDocuments() {
+    // Retorna todos para que o frontend possa agrupar por atlética e mostrar totais
     return this.athleteProfileRepository.find({
-      where: [
-        { documentRgStatus: 'PENDING' },
-        { documentEnrollmentStatus: 'PENDING' }
-      ],
       relations: ['user', 'team']
     });
   }
