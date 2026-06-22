@@ -15,6 +15,11 @@ export default function ChampionshipsPage() {
   const [inviteCode, setInviteCode] = useState('');
   const [cpf, setCpf] = useState('');
   const [birthDate, setBirthDate] = useState('');
+  const [course, setCourse] = useState('');
+  const [period, setPeriod] = useState('');
+  
+  // Modals
+  const [showProfileModal, setShowProfileModal] = useState(false);
   
   // Create Team State
   const [isCreatingTeam, setIsCreatingTeam] = useState(false);
@@ -30,6 +35,7 @@ export default function ChampionshipsPage() {
   // Bulk Registration State
   const [selectedModalities, setSelectedModalities] = useState<string[]>([]);
   const [isSubscribing, setIsSubscribing] = useState(false);
+  const [mySubscriptions, setMySubscriptions] = useState<string[]>([]);
 
   const fetchChampionships = () => {
     setLoading(true);
@@ -86,9 +92,24 @@ export default function ChampionshipsPage() {
     });
   };
 
+  const fetchMySubscriptions = () => {
+    if (!token) return;
+    fetch(`${API_URL}/championships/my-subscriptions`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    })
+    .then(res => res.json())
+    .then(data => {
+      // data is an array of Subscription entities
+      const subIds = data.map((sub: any) => sub.modality?.id);
+      setMySubscriptions(subIds.filter(Boolean));
+    })
+    .catch(err => console.error('Erro ao buscar inscrições', err));
+  };
+
   useEffect(() => {
     fetchChampionships();
     fetchProfile();
+    fetchMySubscriptions();
   }, [token]);
 
   const toggleModality = (modId: string) => {
@@ -132,12 +153,29 @@ export default function ChampionshipsPage() {
     if (successCount > 0) {
       toast.success(`${successCount} inscrição(ões) realizada(s) com sucesso!`, { id: toastId });
       setSelectedModalities([]); // clear selection
-      // Refresh to reflect changes if necessary
+      fetchMySubscriptions(); // refresh to show as INSCRITO
     } else {
       toast.error('Nenhuma inscrição foi concluída. Erro: ' + errors[0], { id: toastId });
     }
     
     setIsSubscribing(false);
+  };
+
+  const handleUnsubscribe = async (modId: string) => {
+    const toastId = toast.loading('Cancelando inscrição...');
+    try {
+      const res = await fetch(`${API_URL}/championships/${modId}/unsubscribe`, {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || 'Erro ao cancelar inscrição.');
+      
+      toast.success('Inscrição cancelada!', { id: toastId });
+      fetchMySubscriptions();
+    } catch (err: any) {
+      toast.error(err.message, { id: toastId });
+    }
   };
 
   const handleJoinTeam = async (e: React.FormEvent) => {
@@ -150,7 +188,7 @@ export default function ChampionshipsPage() {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify({ inviteCode, cpf, birthDate })
+        body: JSON.stringify({ inviteCode, cpf, birthDate, course, period })
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || 'Erro ao entrar na Atlética. Verifique os dados.');
@@ -213,7 +251,10 @@ export default function ChampionshipsPage() {
           
           {/* USER TEAM BADGE OR LOGIN PROMPT */}
           {user && athleteProfile?.team ? (
-            <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-4 flex flex-col gap-3 shadow-lg min-w-[280px]">
+            <div 
+              onClick={() => setShowProfileModal(true)}
+              className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-4 flex flex-col gap-3 shadow-lg min-w-[280px] cursor-pointer hover:bg-white/20 transition-all"
+            >
               <div className="flex items-center gap-4 border-b border-white/20 pb-3">
                 <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center text-blue-800 font-bold text-xl shrink-0 overflow-hidden shadow-inner">
                   {athleteProfile.team.logoUrl ? <img src={athleteProfile.team.logoUrl} className="w-full h-full object-cover" /> : athleteProfile.team.name.charAt(0)}
@@ -224,7 +265,7 @@ export default function ChampionshipsPage() {
                 </div>
                 {athleteProfile.team.owner?.id === user.id && (
                   <button 
-                    onClick={() => setShowAdminModal(true)}
+                    onClick={(e) => { e.stopPropagation(); setShowAdminModal(true); }}
                     className="bg-white text-blue-800 text-xs font-bold px-3 py-1.5 rounded-lg hover:bg-blue-50 transition-colors shadow-sm uppercase tracking-wide"
                   >
                     Admin
@@ -286,6 +327,24 @@ export default function ChampionshipsPage() {
                       required type="date" value={birthDate} onChange={e => setBirthDate(e.target.value)}
                       className="w-full bg-white border border-slate-300 rounded-lg p-3 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all" 
                     />
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-xs font-semibold text-slate-500 mb-1">CURSO</label>
+                      <input 
+                        required type="text" value={course} onChange={e => setCourse(e.target.value)}
+                        placeholder="Ex: Direito"
+                        className="w-full bg-white border border-slate-300 rounded-lg p-3 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all" 
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-semibold text-slate-500 mb-1">PERÍODO</label>
+                      <input 
+                        required type="text" value={period} onChange={e => setPeriod(e.target.value)}
+                        placeholder="Ex: 4º Semestre"
+                        className="w-full bg-white border border-slate-300 rounded-lg p-3 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all" 
+                      />
+                    </div>
                   </div>
                   <button type="submit" className="w-full bg-blue-600 text-white font-bold py-3 rounded-lg hover:bg-blue-700 transition-colors mt-2 shadow-sm">
                     Entrar na Equipe
@@ -381,12 +440,36 @@ export default function ChampionshipsPage() {
                       {champ.modalities && champ.modalities.length > 0 ? (
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                           {champ.modalities.map((mod: any) => {
+                            const isSubscribed = mySubscriptions.includes(mod.id);
                             const isSelected = selectedModalities.includes(mod.id);
+                            
+                            if (isSubscribed) {
+                              return (
+                                <div key={mod.id} className="relative p-5 rounded-2xl border-2 border-green-500 bg-green-50/30 overflow-hidden flex flex-col">
+                                  <div className="absolute top-0 right-0 bg-green-500 text-white text-[10px] font-bold px-3 py-1 rounded-bl-xl flex items-center gap-1">
+                                    <CheckCircle2 size={12} /> INSCRITO
+                                  </div>
+                                  <div className="pr-8 mb-4">
+                                    <span className="text-[10px] font-bold text-green-700 uppercase tracking-wider">{mod.type}</span>
+                                    <h4 className="font-bold text-slate-800 text-lg leading-tight">{mod.name}</h4>
+                                  </div>
+                                  <div className="mt-auto">
+                                    <button 
+                                      onClick={(e) => { e.stopPropagation(); handleUnsubscribe(mod.id); }}
+                                      className="text-xs font-bold text-red-500 hover:text-red-700 hover:underline"
+                                    >
+                                      Cancelar Inscrição
+                                    </button>
+                                  </div>
+                                </div>
+                              );
+                            }
+
                             return (
                               <div 
                                 key={mod.id} 
                                 onClick={() => champ.status === 'OPEN' && toggleModality(mod.id)}
-                                className={`relative p-5 rounded-2xl border-2 transition-all cursor-pointer ${
+                                className={`relative p-5 rounded-2xl border-2 transition-all cursor-pointer flex flex-col ${
                                   champ.status !== 'OPEN' ? 'opacity-50 cursor-not-allowed border-slate-100 bg-slate-50' :
                                   isSelected ? 'border-blue-500 bg-blue-50/50 shadow-md shadow-blue-500/10 transform scale-[1.02]' : 'border-slate-200 bg-white hover:border-blue-300 hover:bg-slate-50'
                                 }`}
@@ -398,13 +481,13 @@ export default function ChampionshipsPage() {
                                   {isSelected && <Check size={14} strokeWidth={3} />}
                                 </div>
                                 
-                                <div className="pr-8">
+                                <div className="pr-8 mb-4">
                                   <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{mod.type}</span>
-                                  <h4 className="font-bold text-slate-800 text-lg mb-4 leading-tight">{mod.name}</h4>
+                                  <h4 className="font-bold text-slate-800 text-lg leading-tight">{mod.name}</h4>
                                 </div>
                                 
                                 <div className="mt-auto">
-                                  <span className="font-bold text-slate-600 bg-white px-3 py-1 rounded-lg border border-slate-200 text-sm shadow-sm">
+                                  <span className="font-bold text-slate-600 bg-white px-3 py-1 rounded-lg border border-slate-200 text-sm shadow-sm inline-block">
                                     {Number(mod.price) === 0 ? 'Grátis' : `R$ ${Number(mod.price).toFixed(2).replace('.', ',')}`}
                                   </span>
                                 </div>
@@ -527,6 +610,88 @@ export default function ChampionshipsPage() {
                       ))}
                     </tbody>
                   </table>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ATHLETE PROFILE MODAL */}
+      {showProfileModal && athleteProfile?.team && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onClick={() => setShowProfileModal(false)}></div>
+          <div className="relative bg-white w-full max-w-2xl rounded-3xl shadow-2xl flex flex-col overflow-hidden animate-in zoom-in-95 duration-200">
+            <div className="bg-gradient-to-r from-blue-700 to-blue-900 text-white px-8 py-8 flex justify-between items-start relative">
+              <div className="absolute top-0 right-0 opacity-10 pointer-events-none transform translate-x-1/4 -translate-y-1/4">
+                <Shield size={200} />
+              </div>
+              <div className="relative z-10">
+                <span className="bg-white/20 text-white text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wider mb-2 inline-block">Cartão do Atleta</span>
+                <h3 className="font-bold text-3xl">{user?.name}</h3>
+                <p className="text-blue-200 font-mono mt-1">{athleteProfile.cpf}</p>
+              </div>
+              <button onClick={() => setShowProfileModal(false)} className="text-blue-200 hover:text-white transition-colors relative z-10">
+                <X size={24} />
+              </button>
+            </div>
+            
+            <div className="p-8 bg-white">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 border-b border-slate-100 pb-8 mb-8">
+                <div>
+                  <span className="block text-xs font-semibold text-slate-400 mb-1">EQUIPE</span>
+                  <span className="font-bold text-slate-800">{athleteProfile.team.name}</span>
+                </div>
+                <div>
+                  <span className="block text-xs font-semibold text-slate-400 mb-1">CURSO</span>
+                  <span className="font-bold text-slate-800">{athleteProfile.course || '---'}</span>
+                </div>
+                <div>
+                  <span className="block text-xs font-semibold text-slate-400 mb-1">PERÍODO</span>
+                  <span className="font-bold text-slate-800">{athleteProfile.period || '---'}</span>
+                </div>
+                <div>
+                  <span className="block text-xs font-semibold text-slate-400 mb-1">DOC STATUS</span>
+                  <span className="inline-flex items-center gap-1 bg-green-100 text-green-700 font-bold text-xs px-2 py-1 rounded-md">
+                    <CheckCircle2 size={12} /> {athleteProfile.status}
+                  </span>
+                </div>
+              </div>
+
+              <h4 className="font-bold text-slate-800 text-lg mb-4 flex items-center gap-2">
+                <Trophy size={20} className="text-yellow-500" /> Suas Inscrições
+              </h4>
+              
+              {mySubscriptions.length === 0 ? (
+                <div className="bg-slate-50 border border-dashed border-slate-300 rounded-xl p-6 text-center text-slate-500 text-sm">
+                  Você ainda não se inscreveu em nenhuma modalidade.
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {mySubscriptions.map(modId => {
+                    // find mod name from championships data
+                    let modName = 'Modalidade ' + modId;
+                    let champName = '';
+                    championships.forEach(c => {
+                      const m = c.modalities?.find((x: any) => x.id === modId);
+                      if (m) {
+                        modName = m.name + ' ' + m.type;
+                        champName = c.name;
+                      }
+                    });
+                    
+                    return (
+                      <div key={modId} className="flex justify-between items-center bg-white border border-slate-200 rounded-xl p-4 shadow-sm">
+                        <div>
+                          <p className="font-bold text-slate-800">{modName}</p>
+                          <p className="text-xs text-slate-500">{champName}</p>
+                        </div>
+                        <span className="bg-green-100 text-green-700 font-bold text-[10px] uppercase px-3 py-1 rounded-full flex items-center gap-1">
+                          <CheckCircle2 size={12} /> Confirmada
+                        </span>
+                      </div>
+                    );
+                  })}
                 </div>
               )}
             </div>

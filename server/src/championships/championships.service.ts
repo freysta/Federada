@@ -64,4 +64,28 @@ export class ChampionshipsService {
 
     return this.subscriptionRepository.save(sub);
   }
+
+  async getMySubscriptions(userId: string) {
+    const profile = await this.athleteProfileRepository.findOne({ where: { user: { id: userId } } });
+    if (!profile) return [];
+
+    return this.subscriptionRepository.find({
+      where: { athlete: { id: profile.id } },
+      relations: ['modality', 'championship'],
+    });
+  }
+
+  async unsubscribeAthlete(userId: string, modalityId: string) {
+    const profile = await this.athleteProfileRepository.findOne({ where: { user: { id: userId } } });
+    if (!profile) throw new BadRequestException('Perfil de atleta não encontrado.');
+
+    const existingSub = await this.subscriptionRepository.findOne({
+      where: { athlete: { id: profile.id }, modality: { id: modalityId } }
+    });
+
+    if (!existingSub) throw new NotFoundException('Inscrição não encontrada.');
+
+    await this.subscriptionRepository.remove(existingSub);
+    return { success: true, message: 'Inscrição cancelada com sucesso.' };
+  }
 }

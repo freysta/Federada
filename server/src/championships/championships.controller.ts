@@ -21,4 +21,16 @@ export class ChampionshipsController {
   subscribe(@Request() req: any, @Param('modalityId') modalityId: string) {
     return this.championshipsService.subscribeAthlete(req.user.userId, modalityId);
   }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('my-subscriptions')
+  getMySubscriptions(@Request() req: any) {
+    return this.championshipsService.getMySubscriptions(req.user.userId);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post(':modalityId/unsubscribe')
+  unsubscribe(@Request() req: any, @Param('modalityId') modalityId: string) {
+    return this.championshipsService.unsubscribeAthlete(req.user.userId, modalityId);
+  }
 }

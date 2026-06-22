@@ -18,6 +18,15 @@ export class AthleteProfile {
   birthDate: Date;
 
   @Column({ nullable: true })
+  cpf: string;
+
+  @Column({ nullable: true })
+  course: string;
+
+  @Column({ nullable: true })
+  period: string;
+
+  @Column({ nullable: true })
   enrollmentProofUrl: string;
 
   @Column({ default: 'PENDING' })

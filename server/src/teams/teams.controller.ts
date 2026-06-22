@@ -21,7 +21,7 @@ export class TeamsController {
 
   @UseGuards(JwtAuthGuard)
   @Post('join')
-  joinTeam(@Request() req: any, @Body() body: { inviteCode: string; cpf: string; birthDate: Date; enrollmentProofUrl?: string }) {
+  joinTeam(@Request() req: any, @Body() body: { inviteCode: string; cpf: string; birthDate: Date; course?: string; period?: string; enrollmentProofUrl?: string }) {
     return this.teamsService.joinTeam(req.user.userId, body.inviteCode, body);
   }
 

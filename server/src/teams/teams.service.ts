@@ -31,7 +31,7 @@ export class TeamsService {
     return this.teamRepository.find({ relations: ['owner'] });
   }
 
-  async joinTeam(userId: string, inviteCode: string, data: { cpf: string; birthDate: Date; enrollmentProofUrl?: string }) {
+  async joinTeam(userId: string, inviteCode: string, data: { cpf: string; birthDate: Date; course?: string; period?: string; enrollmentProofUrl?: string }) {
     const team = await this.teamRepository.findOne({ where: { inviteCode } });
     if (!team) {
       throw new NotFoundException('Código de convite inválido ou Atlética não encontrada.');
@@ -46,6 +46,9 @@ export class TeamsService {
     profile = this.athleteProfileRepository.create({
       user: { id: userId } as User,
       team,
+      cpf: data.cpf,
+      course: data.course,
+      period: data.period,
       birthDate: data.birthDate,
       enrollmentProofUrl: data.enrollmentProofUrl,
     });
