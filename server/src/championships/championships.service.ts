@@ -35,6 +35,25 @@ export class ChampionshipsService {
     return champ;
   }
 
+  async getDashboardStats() {
+    const totalChampionships = await this.championshipRepository.count();
+    const totalAthletes = await this.athleteProfileRepository.count();
+    const pendingDocuments = await this.athleteProfileRepository.count({
+      where: [
+        { documentRgStatus: 'PENDING' },
+        { documentEnrollmentStatus: 'PENDING' }
+      ]
+    });
+    const totalSubscriptions = await this.subscriptionRepository.count();
+
+    return {
+      totalChampionships,
+      totalAthletes,
+      pendingDocuments,
+      totalSubscriptions
+    };
+  }
+
   async createChampionship(data: any) {
     const champ = this.championshipRepository.create(data);
     return this.championshipRepository.save(champ);

@@ -18,7 +18,7 @@ export class AppController {
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('ADMIN')
+  @Roles('ADMIN', 'STORE_ADMIN', 'SPORTS_ADMIN')
   @Post('upload')
   @UseInterceptors(FileInterceptor('file', {
     storage: diskStorage({

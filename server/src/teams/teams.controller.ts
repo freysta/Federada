@@ -39,14 +39,14 @@ export class TeamsController {
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('ADMIN')
+  @Roles('ADMIN', 'SPORTS_ADMIN')
   @Get('admin/documents')
   getPendingDocuments() {
     return this.teamsService.getPendingDocuments();
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('ADMIN')
+  @Roles('ADMIN', 'SPORTS_ADMIN')
   @Patch('admin/documents/:id')
   updateDocumentStatus(
     @Param('id') id: string,

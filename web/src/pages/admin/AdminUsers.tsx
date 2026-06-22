@@ -170,8 +170,13 @@ export default function AdminUsers() {
                 <td className="p-3 font-mono text-xs">{u.phone || '-'}</td>
                 <td className="p-3">
                   <div className="flex flex-col gap-1 items-start">
-                    <span className={`text-[9px] font-mono px-2 py-0.5 font-bold ${u.role === 'ADMIN' ? 'bg-purple-100 text-purple-800 border border-purple-300' : 'bg-gray-100 text-gray-600 border border-gray-300'}`}>
-                      {u.role}
+                    <span className={`text-[9px] font-mono px-2 py-0.5 font-bold ${
+                      u.role === 'ADMIN' ? 'bg-purple-100 text-purple-800 border border-purple-300' : 
+                      u.role === 'STORE_ADMIN' ? 'bg-green-100 text-green-800 border border-green-300' :
+                      u.role === 'SPORTS_ADMIN' ? 'bg-blue-100 text-blue-800 border border-blue-300' :
+                      'bg-gray-100 text-gray-600 border border-gray-300'
+                    }`}>
+                      {u.role === 'ADMIN' ? 'SUPER ADMIN' : u.role === 'STORE_ADMIN' ? 'GERENTE LOJA' : u.role === 'SPORTS_ADMIN' ? 'ORG. ESPORTIVO' : u.role}
                     </span>
                     <span className={`text-[9px] font-mono px-2 py-0.5 font-bold ${u.isActive !== false ? 'bg-green-100 text-green-800 border border-green-300' : 'bg-red-100 text-red-800 border border-red-300'}`}>
                       {u.isActive !== false ? 'ATIVO' : 'DESATIVADO'}
@@ -328,7 +333,9 @@ export default function AdminUsers() {
                   <label className="block text-xs font-mono text-gray-600 mb-1">CARGO NO SISTEMA</label>
                   <select value={formData.role} onChange={e => setFormData({...formData, role: e.target.value})} className="w-full border border-gray-300 p-2 font-mono text-sm bg-white">
                     <option value="CUSTOMER">CLIENTE (Padrão)</option>
-                    <option value="ADMIN">ADMINISTRADOR</option>
+                    <option value="ADMIN">SUPER ADMINISTRADOR</option>
+                    <option value="STORE_ADMIN">GERENTE DA LOJA (E-Commerce/Fórum)</option>
+                    <option value="SPORTS_ADMIN">ORGANIZADOR ESPORTIVO (Campeonatos/Fórum)</option>
                   </select>
                 </div>
               </div>

@@ -6,29 +6,35 @@ export default function AdminLayout() {
   const { user, logout } = useAuth();
   const location = useLocation();
 
-  if (!user || user.role !== 'ADMIN') {
-    return <Navigate to="/" replace />;
+  if (!user || !['ADMIN', 'STORE_ADMIN', 'SPORTS_ADMIN'].includes(user.role)) {
+    return <Navigate to="/login" />;
   }
 
+  const isSuperAdmin = user.role === 'ADMIN';
+  const isStoreAdmin = user.role === 'STORE_ADMIN' || isSuperAdmin;
+  const isSportsAdmin = user.role === 'SPORTS_ADMIN' || isSuperAdmin;
+
   const menuItems = [
-    { type: 'divider', label: 'E-COMMERCE' },
-    { path: '/admin', icon: <LayoutDashboard size={20} />, label: 'Painel de Controle' },
-    { path: '/admin/products', icon: <Package size={20} />, label: 'Produtos' },
-    { path: '/admin/orders', icon: <ShoppingBag size={20} />, label: 'Pedidos' },
-    { path: '/admin/users', icon: <Users size={20} />, label: 'Usuários' },
+    { type: 'divider', label: 'E-COMMERCE', show: isStoreAdmin },
+    { path: '/admin', icon: <LayoutDashboard size={20} />, label: 'Painel de Controle', show: true },
+    { path: '/admin/products', icon: <Package size={20} />, label: 'Produtos', show: isStoreAdmin },
+    { path: '/admin/orders', icon: <ShoppingBag size={20} />, label: 'Pedidos', show: isStoreAdmin },
+    { path: '/admin/users', icon: <Users size={20} />, label: 'Usuários', show: isSuperAdmin },
     
-    { type: 'divider', label: 'HUB ESPORTIVO' },
-    { path: '/admin/championships', icon: <Trophy size={20} />, label: 'Campeonatos' },
-    { path: '/admin/documents', icon: <FileCheck2 size={20} />, label: 'Documentos' },
+    { type: 'divider', label: 'HUB ESPORTIVO', show: isSportsAdmin },
+    { path: '/admin/championships', icon: <Trophy size={20} />, label: 'Campeonatos', show: isSportsAdmin },
+    { path: '/admin/documents', icon: <FileCheck2 size={20} />, label: 'Documentos', show: isSportsAdmin },
     
-    { type: 'divider', label: 'COMUNICAÇÃO' },
-    { path: '/admin/team', icon: <Image size={20} />, label: 'Diretoria' },
-    { path: '/admin/events', icon: <Calendar size={20} />, label: 'Eventos' },
-    { path: '/admin/news', icon: <MessageSquare size={20} />, label: 'Fórum' },
+    { type: 'divider', label: 'COMUNICAÇÃO', show: isSportsAdmin || isStoreAdmin },
+    { path: '/admin/team', icon: <Image size={20} />, label: 'Diretoria', show: isSuperAdmin },
+    { path: '/admin/events', icon: <Calendar size={20} />, label: 'Eventos', show: isSportsAdmin || isStoreAdmin },
+    { path: '/admin/news', icon: <MessageSquare size={20} />, label: 'Fórum', show: isSportsAdmin || isStoreAdmin },
     
-    { type: 'divider', label: 'SISTEMA' },
-    { path: '/admin/profile', icon: <KeyRound size={20} />, label: 'Meu Perfil' },
+    { type: 'divider', label: 'SISTEMA', show: true },
+    { path: '/admin/profile', icon: <KeyRound size={20} />, label: 'Meu Perfil', show: true },
   ];
+
+  const visibleMenuItems = menuItems.filter(item => item.show !== false);
 
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col md:flex-row font-sans">
@@ -39,8 +45,8 @@ export default function AdminLayout() {
           <p className="text-xs text-gray-400 font-mono mt-2">ADMIN_PANEL v1.0</p>
         </div>
         
-        <nav className="flex md:flex-col gap-2 md:gap-0 md:space-y-2 py-4 md:py-6 px-4 overflow-x-auto hide-scrollbar whitespace-nowrap border-b border-white/20 md:border-b-0">
-          {menuItems.map((item, index) => {
+        <nav className="p-4 space-y-1">
+          {visibleMenuItems.map((item, index) => {
             if (item.type === 'divider') {
               return (
                 <div key={`div-${index}`} className="mt-4 mb-2 px-4 flex items-center gap-2">

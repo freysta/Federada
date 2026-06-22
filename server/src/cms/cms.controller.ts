@@ -43,21 +43,21 @@ export class CmsController {
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('ADMIN')
+  @Roles('ADMIN', 'STORE_ADMIN', 'SPORTS_ADMIN')
   @Post('news')
   createNews(@Body() data: NewsDto) {
     return this.cmsService.createNews(data);
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('ADMIN')
+  @Roles('ADMIN', 'STORE_ADMIN', 'SPORTS_ADMIN')
   @Put('news/:id')
   updateNews(@Param('id') id: string, @Body() data: NewsDto) {
     return this.cmsService.updateNews(id, data);
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('ADMIN')
+  @Roles('ADMIN', 'STORE_ADMIN', 'SPORTS_ADMIN')
   @Delete('news/:id')
   deleteNews(@Param('id') id: string) {
     return this.cmsService.deleteNews(id);
@@ -69,21 +69,21 @@ export class CmsController {
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('ADMIN')
+  @Roles('ADMIN', 'STORE_ADMIN', 'SPORTS_ADMIN')
   @Post('events')
   createEvent(@Body() data: EventDto) {
     return this.cmsService.createEvent(data);
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('ADMIN')
+  @Roles('ADMIN', 'STORE_ADMIN', 'SPORTS_ADMIN')
   @Put('events/:id')
   updateEvent(@Param('id') id: string, @Body() data: EventDto) {
     return this.cmsService.updateEvent(id, data);
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('ADMIN')
+  @Roles('ADMIN', 'STORE_ADMIN', 'SPORTS_ADMIN')
   @Delete('events/:id')
   deleteEvent(@Param('id') id: string) {
     return this.cmsService.deleteEvent(id);

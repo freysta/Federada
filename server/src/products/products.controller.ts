@@ -20,21 +20,21 @@ export class ProductsController {
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('ADMIN')
+  @Roles('ADMIN', 'STORE_ADMIN')
   @Post()
   create(@Body() productData: CreateProductDto) {
     return this.productsService.create(productData);
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('ADMIN')
+  @Roles('ADMIN', 'STORE_ADMIN')
   @Put(':id')
   update(@Param('id') id: string, @Body() productData: CreateProductDto) {
     return this.productsService.update(id, productData);
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('ADMIN')
+  @Roles('ADMIN', 'STORE_ADMIN')
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.productsService.remove(id);

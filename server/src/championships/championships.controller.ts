@@ -14,28 +14,35 @@ export class ChampionshipsController {
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('ADMIN')
+  @Roles('ADMIN', 'SPORTS_ADMIN')
+  @Get('dashboard')
+  getDashboardStats() {
+    return this.championshipsService.getDashboardStats();
+  }
+
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ADMIN', 'SPORTS_ADMIN')
   @Post()
   createChampionship(@Body() body: any) {
     return this.championshipsService.createChampionship(body);
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('ADMIN')
+  @Roles('ADMIN', 'SPORTS_ADMIN')
   @Patch(':id')
   updateChampionship(@Param('id') id: string, @Body() body: any) {
     return this.championshipsService.updateChampionship(id, body);
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('ADMIN')
+  @Roles('ADMIN', 'SPORTS_ADMIN')
   @Post(':id/modalities')
   addModality(@Param('id') id: string, @Body() body: any) {
     return this.championshipsService.addModality(id, body);
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('ADMIN')
+  @Roles('ADMIN', 'SPORTS_ADMIN')
   @Delete(':id/modalities/:modId')
   removeModality(@Param('id') id: string, @Param('modId') modId: string) {
     return this.championshipsService.removeModality(id, modId);

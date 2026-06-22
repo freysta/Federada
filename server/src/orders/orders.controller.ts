@@ -36,14 +36,14 @@ export class OrdersController {
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('ADMIN')
+  @Roles('ADMIN', 'STORE_ADMIN')
   @Get('dashboard')
   getDashboardStats() {
     return this.ordersService.getDashboardStats();
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('ADMIN')
+  @Roles('ADMIN', 'STORE_ADMIN')
   @Get()
   findAll() {
     return this.ordersService.findAll();
@@ -56,21 +56,21 @@ export class OrdersController {
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('ADMIN')
+  @Roles('ADMIN', 'STORE_ADMIN')
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateOrderDto: UpdateOrderDto) {
     return this.ordersService.update(id, updateOrderDto);
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('ADMIN')
+  @Roles('ADMIN', 'STORE_ADMIN')
   @Post(':id/refund')
   refund(@Param('id') id: string) {
     return this.ordersService.refund(id);
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('ADMIN')
+  @Roles('ADMIN', 'STORE_ADMIN')
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.ordersService.remove(id);
