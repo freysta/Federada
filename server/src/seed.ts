@@ -5,6 +5,13 @@ import { Order } from './orders/entities/order.entity';
 import { OrderItem } from './orders/entities/order-item.entity';
 import { TeamMember } from './cms/entities/team-member.entity';
 import { News } from './cms/entities/news.entity';
+import { Event } from './cms/entities/event.entity';
+import { Team } from './teams/entities/team.entity';
+import { AthleteProfile } from './teams/entities/athlete-profile.entity';
+import { Championship } from './championships/entities/championship.entity';
+import { Modality } from './championships/entities/modality.entity';
+import { Subscription } from './championships/entities/subscription.entity';
+import { Match } from './championships/entities/match.entity';
 import * as bcrypt from 'bcrypt';
 
 const dbUrl = process.env.DATABASE_URL;
@@ -14,14 +21,14 @@ const dataSource = new DataSource(
     ? {
         type: 'postgres',
         url: dbUrl,
-        entities: [Product, User, Order, OrderItem, TeamMember, News],
+        entities: [Product, User, Order, OrderItem, TeamMember, News, Event, Team, AthleteProfile, Championship, Modality, Subscription, Match],
         synchronize: true,
         ssl: process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : false,
       }
     : {
         type: 'sqlite',
         database: 'data/database.sqlite',
-        entities: [Product, User, Order, OrderItem, TeamMember, News],
+        entities: [Product, User, Order, OrderItem, TeamMember, News, Event, Team, AthleteProfile, Championship, Modality, Subscription, Match],
         synchronize: true,
       }
 );

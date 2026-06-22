@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { API_URL } from '../config';
 import { useAuth } from '../contexts/AuthContext';
-import { Loader2, Trophy, Users, Shield, Check, Info, Plus, Copy, CheckCircle2, X } from 'lucide-react';
+import { Loader2, Trophy, Users, Shield, Check, Plus, Copy, CheckCircle2, X } from 'lucide-react';
 import toast from 'react-hot-toast';
 import Navbar from '../components/Navbar';
 
@@ -53,7 +53,7 @@ export default function ChampionshipsPage() {
         setChampionships(data);
         setLoading(false);
       })
-      .catch(err => {
+      .catch(() => {
         toast.error('Erro ao buscar campeonatos');
         setLoading(false);
       });

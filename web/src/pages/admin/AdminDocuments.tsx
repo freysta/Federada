@@ -15,11 +15,17 @@ export default function AdminDocuments() {
     })
     .then(res => res.json())
     .then(data => {
-      setDocuments(data);
+      if (Array.isArray(data)) {
+        setDocuments(data);
+      } else {
+        toast.error(data.message || 'Erro ao buscar documentos');
+        setDocuments([]);
+      }
       setLoading(false);
     })
     .catch(err => {
-      toast.error('Erro ao buscar documentos');
+      toast.error('Erro na requisição: ' + err.message);
+      setDocuments([]);
       setLoading(false);
     });
   };
