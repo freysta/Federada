@@ -13,11 +13,7 @@ export default function LoginModal({ isOpen, onClose }: { isOpen: boolean; onClo
   const [formData, setFormData] = useState({
     name: '',
     email: '',
-    cpf: '',
-    phone: '',
-    password: '',
-    userType: 'ALUNO',
-    period: ''
+    password: ''
   });
   
   const [loading, setLoading] = useState(false);
@@ -59,7 +55,7 @@ export default function LoginModal({ isOpen, onClose }: { isOpen: boolean; onClo
       const endpoint = mode === 'login' ? '/auth/login' : '/auth/register';
       const body = mode === 'login' 
         ? { email: formData.email, password: formData.password }
-        : { ...formData, period: formData.userType === 'ALUNO' ? formData.period : undefined };
+        : { name: formData.name, email: formData.email, password: formData.password };
 
       const res = await fetch(`${API_URL}${endpoint}`, {
         method: 'POST',
@@ -115,27 +111,9 @@ export default function LoginModal({ isOpen, onClose }: { isOpen: boolean; onClo
 
 
               {mode === 'register' && (
-                <>
-                  <div className="group">
-                    <input required type="text" autoComplete="name" placeholder="NOME COMPLETO" className="w-full bg-white border border-gray-300 p-4 md:p-3 text-sm font-mono focus:border-black focus:ring-0 outline-none" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} />
-                  </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <input required type="tel" inputMode="numeric" placeholder="CPF" className="w-full bg-white border border-gray-300 p-4 md:p-3 text-sm font-mono focus:border-black focus:ring-0 outline-none" value={formData.cpf} onChange={(e) => setFormData({ ...formData, cpf: e.target.value })} />
-                    <input required type="tel" inputMode="numeric" autoComplete="tel" placeholder="WHATSAPP" className="w-full bg-white border border-gray-300 p-4 md:p-3 text-sm font-mono focus:border-black focus:ring-0 outline-none" value={formData.phone} onChange={(e) => setFormData({ ...formData, phone: e.target.value })} />
-                  </div>
-                  <div className="group">
-                    <select className="w-full bg-white border border-gray-300 p-4 md:p-3 text-sm font-mono focus:border-black focus:ring-0 outline-none" value={formData.userType} onChange={(e) => setFormData({ ...formData, userType: e.target.value })}>
-                      <option value="ALUNO">Sou Aluno</option>
-                      <option value="PROFESSOR">Sou Professor</option>
-                      <option value="FAMILIAR">Sou Familiar / Apoiador</option>
-                    </select>
-                  </div>
-                  {formData.userType === 'ALUNO' && (
-                    <div className="group">
-                      <input required type="text" placeholder="PERÍODO (Ex: 1º Período)" className="w-full bg-white border border-gray-300 p-4 md:p-3 text-sm font-mono focus:border-black focus:ring-0 outline-none" value={formData.period} onChange={(e) => setFormData({ ...formData, period: e.target.value })} />
-                    </div>
-                  )}
-                </>
+                <div className="group">
+                  <input required type="text" autoComplete="name" placeholder="NOME COMPLETO" className="w-full bg-white border border-gray-300 p-4 md:p-3 text-sm font-mono focus:border-black focus:ring-0 outline-none" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} />
+                </div>
               )}
               
               <div className="group">

@@ -16,9 +16,9 @@ export class RegisterDto {
   cpf?: string;
 
   @IsString()
-  @IsNotEmpty()
+  @IsOptional()
   @MaxLength(20)
-  phone: string;
+  phone?: string;
 
   @IsString()
   @IsNotEmpty()
@@ -27,9 +27,9 @@ export class RegisterDto {
   password: string;
 
   @IsString()
-  @IsNotEmpty()
+  @IsOptional()
   @MaxLength(20)
-  userType: string;
+  userType?: string;
 
   @IsString()
   @IsOptional()
