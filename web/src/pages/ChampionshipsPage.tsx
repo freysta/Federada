@@ -3,6 +3,7 @@ import { API_URL } from '../config';
 import { useAuth } from '../contexts/AuthContext';
 import { Loader2, Trophy, Users, Shield, Check, Info, Plus, Copy, CheckCircle2, X } from 'lucide-react';
 import toast from 'react-hot-toast';
+import Navbar from '../components/Navbar';
 
 export default function ChampionshipsPage() {
   const { token, user } = useAuth();
@@ -232,10 +233,12 @@ export default function ChampionshipsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 pb-24 font-sans text-slate-800">
-      
-      {/* HEADER LIMPO E ELEGANTE */}
-      <div className="bg-gradient-to-r from-blue-700 to-indigo-800 text-white pt-24 pb-12 px-6 shadow-md relative overflow-hidden">
+    <>
+      <Navbar />
+      <div className="min-h-screen bg-slate-50 pb-24 font-sans text-slate-800">
+        
+        {/* HEADER LIMPO E ELEGANTE */}
+        <div className="bg-gradient-to-r from-blue-700 to-indigo-800 text-white pt-24 pb-12 px-6 shadow-md relative overflow-hidden">
         <div className="absolute top-0 right-0 opacity-10 pointer-events-none transform translate-x-1/4 -translate-y-1/4">
           <Trophy size={400} />
         </div>
@@ -699,5 +702,6 @@ export default function ChampionshipsPage() {
         </div>
       )}
     </div>
+    </>
   );
 }
