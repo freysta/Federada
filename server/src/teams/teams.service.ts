@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import { Team } from './entities/team.entity';
 import { AthleteProfile } from './entities/athlete-profile.entity';
 import { User } from '../orders/entities/user.entity';
+import { FileStorageService } from '../storage/storage.service';
 
 @Injectable()
 export class TeamsService {
@@ -12,26 +13,39 @@ export class TeamsService {
     private teamRepository: Repository<Team>,
     @InjectRepository(AthleteProfile)
     private athleteProfileRepository: Repository<AthleteProfile>,
+    private fileStorageService: FileStorageService,
   ) {}
 
   async createTeam(userId: string, data: { name: string; university?: string; logoUrl?: string }) {
     // Generate a simple invite code
     const inviteCode = `${data.name.substring(0, 4).toUpperCase()}-${Math.floor(1000 + Math.random() * 9000)}`;
     
-    const team = this.teamRepository.create({
+    let team = this.teamRepository.create({
       ...data,
       owner: { id: userId } as User,
       inviteCode,
     });
     
-    return this.teamRepository.save(team);
+    team = await this.teamRepository.save(team);
+
+    // Create president profile automatically
+    const athleteIdCode = `ATL-${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
+    const profile = this.athleteProfileRepository.create({
+      user: { id: userId } as User,
+      team,
+      teamRole: 'PRESIDENT',
+      athleteIdCode,
+    });
+    await this.athleteProfileRepository.save(profile);
+
+    return team;
   }
 
   async findAll() {
     return this.teamRepository.find({ relations: ['owner'] });
   }
 
-  async joinTeam(userId: string, inviteCode: string, data: { cpf: string; birthDate: Date; course?: string; period?: string; enrollmentProofUrl?: string }) {
+  async joinTeam(userId: string, inviteCode: string, data: { cpf: string; birthDate: Date; course?: string; period?: string }) {
     const team = await this.teamRepository.findOne({ where: { inviteCode } });
     if (!team) {
       throw new NotFoundException('Código de convite inválido ou Atlética não encontrada.');
@@ -43,6 +57,8 @@ export class TeamsService {
       throw new BadRequestException('Você já possui um perfil de atleta. Para mudar de atlética, contate o administrador.');
     }
 
+    const athleteIdCode = `ATL-${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
+    
     profile = this.athleteProfileRepository.create({
       user: { id: userId } as User,
       team,
@@ -50,7 +66,8 @@ export class TeamsService {
       course: data.course,
       period: data.period,
       birthDate: data.birthDate,
-      enrollmentProofUrl: data.enrollmentProofUrl,
+      athleteIdCode,
+      teamRole: 'ATHLETE',
     });
 
     return this.athleteProfileRepository.save(profile);
@@ -68,5 +85,24 @@ export class TeamsService {
       where: { user: { id: userId } },
       relations: ['team', 'team.owner'],
     });
+  }
+
+  async uploadDocument(userId: string, type: 'rg' | 'enrollment', file: Express.Multer.File) {
+    const profile = await this.athleteProfileRepository.findOne({ where: { user: { id: userId } } });
+    if (!profile) {
+      throw new NotFoundException('Perfil de atleta não encontrado.');
+    }
+
+    const fileUrl = await this.fileStorageService.uploadFile(file, 'documents');
+
+    if (type === 'rg') {
+      profile.documentRgUrl = fileUrl;
+      profile.documentRgStatus = 'PENDING';
+    } else if (type === 'enrollment') {
+      profile.documentEnrollmentUrl = fileUrl;
+      profile.documentEnrollmentStatus = 'PENDING';
+    }
+
+    return this.athleteProfileRepository.save(profile);
   }
 }

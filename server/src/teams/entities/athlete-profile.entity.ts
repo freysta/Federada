@@ -27,10 +27,22 @@ export class AthleteProfile {
   period: string;
 
   @Column({ nullable: true })
-  enrollmentProofUrl: string;
+  documentRgUrl: string;
 
   @Column({ default: 'PENDING' })
-  status: string; // PENDING, APPROVED, REJECTED (Validação dos documentos)
+  documentRgStatus: string; // PENDING, APPROVED, REJECTED
+
+  @Column({ nullable: true })
+  documentEnrollmentUrl: string;
+
+  @Column({ default: 'PENDING' })
+  documentEnrollmentStatus: string; // PENDING, APPROVED, REJECTED
+
+  @Column({ unique: true, nullable: true })
+  athleteIdCode: string;
+
+  @Column({ default: 'ATHLETE' })
+  teamRole: string; // PRESIDENT, MEMBER, ATHLETE
 
   @CreateDateColumn()
   createdAt: Date;

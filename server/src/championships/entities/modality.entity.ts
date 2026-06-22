@@ -1,5 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, OneToMany } from 'typeorm';
 import { Championship } from './championship.entity';
+import { Match } from './match.entity';
 import { Subscription } from './subscription.entity';
 
 @Entity()
@@ -27,4 +28,7 @@ export class Modality {
 
   @UpdateDateColumn()
   updatedAt: Date;
+
+  @OneToMany(() => Match, match => match.modality)
+  matches: Match[];
 }
