@@ -11,6 +11,12 @@ export class ChampionshipsController {
     return this.championshipsService.findAll();
   }
 
+  @UseGuards(JwtAuthGuard)
+  @Get('my-subscriptions')
+  getMySubscriptions(@Request() req: any) {
+    return this.championshipsService.getMySubscriptions(req.user.userId);
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.championshipsService.findOne(id);
@@ -20,12 +26,6 @@ export class ChampionshipsController {
   @Post(':modalityId/subscribe')
   subscribe(@Request() req: any, @Param('modalityId') modalityId: string) {
     return this.championshipsService.subscribeAthlete(req.user.userId, modalityId);
-  }
-
-  @UseGuards(JwtAuthGuard)
-  @Get('my-subscriptions')
-  getMySubscriptions(@Request() req: any) {
-    return this.championshipsService.getMySubscriptions(req.user.userId);
   }
 
   @UseGuards(JwtAuthGuard)
