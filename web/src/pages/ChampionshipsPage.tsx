@@ -194,10 +194,10 @@ export default function ChampionshipsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 pt-20 pb-24 font-sans text-slate-800">
+    <div className="min-h-screen bg-slate-50 pb-24 font-sans text-slate-800">
       
       {/* HEADER LIMPO E ELEGANTE */}
-      <div className="bg-gradient-to-r from-blue-700 to-indigo-800 text-white py-12 px-6 shadow-md relative overflow-hidden">
+      <div className="bg-gradient-to-r from-blue-700 to-indigo-800 text-white pt-24 pb-12 px-6 shadow-md relative overflow-hidden">
         <div className="absolute top-0 right-0 opacity-10 pointer-events-none transform translate-x-1/4 -translate-y-1/4">
           <Trophy size={400} />
         </div>
@@ -207,28 +207,34 @@ export default function ChampionshipsPage() {
               Hub de Campeonatos
             </h1>
             <p className="text-blue-100 text-lg max-w-xl">
-              Gerencie sua equipe, selecione suas modalidades e faça todas as suas inscrições com um único clique.
+              Gerencie sua equipe, selecione suas modalidades e faça todas as suas inscrições em um só lugar.
             </p>
           </div>
           
           {/* USER TEAM BADGE OR LOGIN PROMPT */}
           {user && athleteProfile?.team ? (
-            <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-4 flex items-center gap-4 shadow-lg min-w-[280px]">
-              <div className="w-14 h-14 bg-white rounded-full flex items-center justify-center text-blue-800 font-bold text-xl shrink-0 overflow-hidden shadow-inner">
-                {athleteProfile.team.logoUrl ? <img src={athleteProfile.team.logoUrl} className="w-full h-full object-cover" /> : athleteProfile.team.name.charAt(0)}
+            <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-4 flex flex-col gap-3 shadow-lg min-w-[280px]">
+              <div className="flex items-center gap-4 border-b border-white/20 pb-3">
+                <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center text-blue-800 font-bold text-xl shrink-0 overflow-hidden shadow-inner">
+                  {athleteProfile.team.logoUrl ? <img src={athleteProfile.team.logoUrl} className="w-full h-full object-cover" /> : athleteProfile.team.name.charAt(0)}
+                </div>
+                <div className="flex-1">
+                  <span className="text-[10px] font-bold text-blue-200 uppercase tracking-wider block">Sua Equipe</span>
+                  <span className="font-bold text-lg leading-tight line-clamp-1">{athleteProfile.team.name}</span>
+                </div>
+                {athleteProfile.team.owner?.id === user.id && (
+                  <button 
+                    onClick={() => setShowAdminModal(true)}
+                    className="bg-white text-blue-800 text-xs font-bold px-3 py-1.5 rounded-lg hover:bg-blue-50 transition-colors shadow-sm uppercase tracking-wide"
+                  >
+                    Admin
+                  </button>
+                )}
               </div>
-              <div className="flex-1">
-                <span className="text-xs font-semibold text-blue-200 uppercase tracking-wider block">Sua Equipe</span>
-                <span className="font-bold text-lg leading-tight line-clamp-1">{athleteProfile.team.name}</span>
+              <div className="flex justify-between text-xs text-blue-100">
+                <span><strong className="text-white">Atleta:</strong> {user.name}</span>
+                <span><strong className="text-white">CPF:</strong> {athleteProfile.cpf}</span>
               </div>
-              {athleteProfile.team.owner?.id === user.id && (
-                <button 
-                  onClick={() => setShowAdminModal(true)}
-                  className="bg-white text-blue-800 text-xs font-bold px-3 py-1.5 rounded-lg hover:bg-blue-50 transition-colors shadow-sm"
-                >
-                  Admin
-                </button>
-              )}
             </div>
           ) : !user && (
             <div className="bg-white/10 backdrop-blur-md rounded-2xl px-6 py-4 border border-white/20">
