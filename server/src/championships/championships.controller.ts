@@ -1,6 +1,8 @@
-import { Controller, Get, Post, Body, Param, UseGuards, Request } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Delete, Body, Param, UseGuards, Request } from '@nestjs/common';
 import { ChampionshipsService } from './championships.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { RolesGuard } from '../auth/roles.guard';
+import { Roles } from '../auth/roles.decorator';
 
 @Controller('championships')
 export class ChampionshipsController {
@@ -9,6 +11,34 @@ export class ChampionshipsController {
   @Get()
   findAll() {
     return this.championshipsService.findAll();
+  }
+
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ADMIN')
+  @Post()
+  createChampionship(@Body() body: any) {
+    return this.championshipsService.createChampionship(body);
+  }
+
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ADMIN')
+  @Patch(':id')
+  updateChampionship(@Param('id') id: string, @Body() body: any) {
+    return this.championshipsService.updateChampionship(id, body);
+  }
+
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ADMIN')
+  @Post(':id/modalities')
+  addModality(@Param('id') id: string, @Body() body: any) {
+    return this.championshipsService.addModality(id, body);
+  }
+
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ADMIN')
+  @Delete(':id/modalities/:modId')
+  removeModality(@Param('id') id: string, @Param('modId') modId: string) {
+    return this.championshipsService.removeModality(id, modId);
   }
 
   @UseGuards(JwtAuthGuard)

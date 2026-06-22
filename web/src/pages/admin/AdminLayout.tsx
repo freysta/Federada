@@ -1,6 +1,6 @@
 import { Outlet, Navigate, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
-import { LayoutDashboard, ShoppingBag, Users, LogOut, Package, Image, MessageSquare, KeyRound, Store, Calendar, FileCheck2 } from 'lucide-react';
+import { LayoutDashboard, Package, ShoppingBag, Users, KeyRound, LogOut, Image, Calendar, MessageSquare, FileCheck2, Trophy, Store } from 'lucide-react';
 
 export default function AdminLayout() {
   const { user, logout } = useAuth();
@@ -18,9 +18,12 @@ export default function AdminLayout() {
     { path: '/admin/users', icon: <Users size={20} />, label: 'Usuários' },
     
     { type: 'divider', label: 'HUB ESPORTIVO' },
+    { path: '/admin/championships', icon: <Trophy size={20} />, label: 'Campeonatos' },
+    { path: '/admin/documents', icon: <FileCheck2 size={20} />, label: 'Documentos' },
+    
+    { type: 'divider', label: 'COMUNICAÇÃO' },
     { path: '/admin/team', icon: <Image size={20} />, label: 'Diretoria' },
     { path: '/admin/events', icon: <Calendar size={20} />, label: 'Eventos' },
-    { path: '/admin/documents', icon: <FileCheck2 size={20} />, label: 'Documentos' },
     { path: '/admin/news', icon: <MessageSquare size={20} />, label: 'Fórum' },
     
     { type: 'divider', label: 'SISTEMA' },

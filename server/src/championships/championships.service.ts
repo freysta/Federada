@@ -35,6 +35,34 @@ export class ChampionshipsService {
     return champ;
   }
 
+  async createChampionship(data: any) {
+    const champ = this.championshipRepository.create(data);
+    return this.championshipRepository.save(champ);
+  }
+
+  async updateChampionship(id: string, data: any) {
+    const champ = await this.findOne(id);
+    Object.assign(champ, data);
+    return this.championshipRepository.save(champ);
+  }
+
+  async addModality(champId: string, data: any) {
+    const champ = await this.findOne(champId);
+    const modality = this.modalityRepository.create({
+      ...data,
+      championship: champ
+    });
+    return this.modalityRepository.save(modality);
+  }
+
+  async removeModality(champId: string, modId: string) {
+    const modality = await this.modalityRepository.findOne({ where: { id: modId, championship: { id: champId } } });
+    if (!modality) throw new NotFoundException('Modalidade não encontrada no campeonato especificado.');
+    
+    await this.modalityRepository.remove(modality);
+    return { success: true };
+  }
+
   async subscribeAthlete(userId: string, modalityId: string) {
     const profile = await this.athleteProfileRepository.findOne({ where: { user: { id: userId } }, relations: ['team'] });
     if (!profile) {

@@ -19,6 +19,7 @@ import AdminEvents from "./pages/admin/AdminEvents";
 import AdminNews from "./pages/admin/AdminNews";
 import AdminProfile from "./pages/admin/AdminProfile";
 import AdminDocuments from "./pages/admin/AdminDocuments";
+import AdminChampionships from "./pages/admin/AdminChampionships";
 import NotFound from "./components/NotFound";
 
 function App() {
@@ -48,6 +49,7 @@ function App() {
             <Route path="documents" element={<AdminDocuments />} />
             <Route path="news" element={<AdminNews />} />
             <Route path="profile" element={<AdminProfile />} />
+            <Route path="championships" element={<AdminChampionships />} />
           </Route>
 
           {/* Fallback 404 Route */}
