@@ -11,14 +11,19 @@ export default function AdminLayout() {
   }
 
   const menuItems = [
+    { type: 'divider', label: 'E-COMMERCE' },
     { path: '/admin', icon: <LayoutDashboard size={20} />, label: 'Painel de Controle' },
     { path: '/admin/products', icon: <Package size={20} />, label: 'Produtos' },
     { path: '/admin/orders', icon: <ShoppingBag size={20} />, label: 'Pedidos' },
+    { path: '/admin/users', icon: <Users size={20} />, label: 'Usuários' },
+    
+    { type: 'divider', label: 'HUB ESPORTIVO' },
     { path: '/admin/team', icon: <Image size={20} />, label: 'Diretoria' },
     { path: '/admin/events', icon: <Calendar size={20} />, label: 'Eventos' },
     { path: '/admin/documents', icon: <FileCheck2 size={20} />, label: 'Documentos' },
     { path: '/admin/news', icon: <MessageSquare size={20} />, label: 'Fórum' },
-    { path: '/admin/users', icon: <Users size={20} />, label: 'Usuários' },
+    
+    { type: 'divider', label: 'SISTEMA' },
     { path: '/admin/profile', icon: <KeyRound size={20} />, label: 'Meu Perfil' },
   ];
 
@@ -32,16 +37,25 @@ export default function AdminLayout() {
         </div>
         
         <nav className="flex md:flex-col gap-2 md:gap-0 md:space-y-2 py-4 md:py-6 px-4 overflow-x-auto hide-scrollbar whitespace-nowrap border-b border-white/20 md:border-b-0">
-          {menuItems.map((item) => {
+          {menuItems.map((item, index) => {
+            if (item.type === 'divider') {
+              return (
+                <div key={`div-${index}`} className="mt-4 mb-2 px-4 flex items-center gap-2">
+                  <span className="text-[10px] font-bold tracking-widest text-gray-500 uppercase">{item.label}</span>
+                  <div className="flex-1 h-px bg-white/10"></div>
+                </div>
+              );
+            }
+
             const isActive = location.pathname === item.path;
             return (
               <Link
                 key={item.path}
-                to={item.path}
-                className={`flex shrink-0 items-center gap-3 px-4 py-3 font-mono text-sm transition-colors ${
+                to={item.path!}
+                className={`flex shrink-0 items-center gap-3 px-4 py-2.5 font-mono text-sm transition-colors rounded-sm mx-2 ${
                   isActive 
-                    ? 'bg-white text-black font-bold border border-transparent' 
-                    : 'text-gray-300 hover:bg-neutral-900 hover:text-white border border-transparent hover:border-white/10'
+                    ? 'bg-white text-black font-bold' 
+                    : 'text-gray-300 hover:bg-white/10 hover:text-white'
                 }`}
               >
                 {item.icon}

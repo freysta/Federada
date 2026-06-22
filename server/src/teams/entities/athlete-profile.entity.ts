@@ -44,6 +44,9 @@ export class AthleteProfile {
   @Column({ default: 'ATHLETE' })
   teamRole: string; // PRESIDENT, MEMBER, ATHLETE
 
+  @Column({ default: 'PENDING' })
+  status: string; // PENDING, APPROVED, REJECTED
+
   @CreateDateColumn()
   createdAt: Date;
 
