@@ -578,6 +578,7 @@ export default function ChampionshipsPage() {
                   </div>
                 ))}
               </div>
+              )}
               </>
             )}
           </div>
