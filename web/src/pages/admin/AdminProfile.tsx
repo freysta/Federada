@@ -94,111 +94,120 @@ export default function AdminProfile() {
   };
 
   return (
-    <div className="max-w-2xl space-y-6">
+    <div className="max-w-5xl space-y-6">
       <div>
         <h1 className="text-2xl font-bold font-mono uppercase tracking-wider">Meu Perfil</h1>
         <p className="text-sm text-gray-500 mt-1">Gerencie suas configurações de conta e segurança</p>
       </div>
 
-      <div className="bg-white border border-black shadow-[4px_4px_0_0_#000] p-6 space-y-6">
-        <div className="flex items-start gap-4">
-          <div className="bg-black text-white w-12 h-12 flex items-center justify-center font-bold text-xl uppercase font-mono">
-            {user?.name?.charAt(0) || 'U'}
-          </div>
-          <div>
-            <h2 className="text-xl font-bold uppercase">{user?.name}</h2>
-            <p className="text-sm text-gray-500 font-mono">{user?.email}</p>
-            <div className="mt-2 inline-flex items-center gap-1 bg-purple-100 text-purple-800 border border-purple-300 text-[10px] font-mono px-2 py-1 font-bold">
-              <ShieldCheck size={12} /> {user?.role}
+      <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-6 flex flex-col lg:flex-row gap-8">
+        {/* Lado Esquerdo - Perfil */}
+        <div className="flex-1 space-y-6">
+          <div className="flex items-center gap-4 bg-gray-50 p-4 rounded-lg border border-gray-200">
+            <div className="bg-blue-600 text-white w-14 h-14 rounded-full flex items-center justify-center font-bold text-2xl uppercase">
+              {user?.name?.charAt(0) || 'U'}
+            </div>
+            <div>
+              <h2 className="text-xl font-bold text-gray-800">{user?.name}</h2>
+              <p className="text-sm text-gray-500">{user?.email}</p>
+              <div className="mt-1 inline-flex items-center gap-1 bg-purple-100 text-purple-800 border border-purple-200 text-xs px-2.5 py-0.5 rounded-full font-bold">
+                <ShieldCheck size={12} /> {user?.role}
+              </div>
             </div>
           </div>
-        </div>
-
-        <hr className="border-gray-200" />
 
         <div>
-          <h3 className="font-bold uppercase flex items-center gap-2 mb-4">
+          <h3 className="font-bold text-gray-800 flex items-center gap-2 mb-4">
             Dados Pessoais
           </h3>
           <form onSubmit={handleProfileSubmit} className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="col-span-2">
-                <label className="block text-xs font-mono mb-1 text-gray-600">NOME</label>
-                <input type="text" required value={profileData.name} onChange={e => setProfileData({...profileData, name: e.target.value})} className="w-full border border-gray-300 p-2 font-mono text-sm" />
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+              <div className="md:col-span-2">
+                <label className="block text-sm font-medium text-gray-700 mb-1">Nome Completo</label>
+                <input type="text" required value={profileData.name} onChange={e => setProfileData({...profileData, name: e.target.value})} className="block w-full border border-gray-300 rounded-lg p-2.5 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all text-sm" />
               </div>
               <div>
-                <label className="block text-xs font-mono mb-1 text-gray-600">WHATSAPP</label>
-                <input type="text" placeholder="Deixe em branco para não alterar" value={profileData.phone} onChange={e => setProfileData({...profileData, phone: e.target.value})} className="w-full border border-gray-300 p-2 font-mono text-sm" />
+                <label className="block text-sm font-medium text-gray-700 mb-1">WhatsApp</label>
+                <input type="text" placeholder="Deixe em branco para manter" value={profileData.phone} onChange={e => setProfileData({...profileData, phone: e.target.value})} className="block w-full border border-gray-300 rounded-lg p-2.5 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all text-sm" />
               </div>
               <div>
-                <label className="block text-xs font-mono mb-1 text-gray-600">VÍNCULO</label>
-                <select value={profileData.userType} onChange={e => setProfileData({...profileData, userType: e.target.value})} className="w-full border border-gray-300 p-2 font-mono text-sm bg-white">
+                <label className="block text-sm font-medium text-gray-700 mb-1">Vínculo</label>
+                <select value={profileData.userType} onChange={e => setProfileData({...profileData, userType: e.target.value})} className="block w-full border border-gray-300 rounded-lg p-2.5 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all bg-white text-sm">
                   <option value="ALUNO">Aluno</option>
                   <option value="PROFESSOR">Professor</option>
                   <option value="FAMILIAR">Familiar / Apoiador</option>
                 </select>
               </div>
               {profileData.userType === 'ALUNO' && (
-                <div className="col-span-2">
-                  <label className="block text-xs font-mono mb-1 text-gray-600">PERÍODO</label>
-                  <input type="text" value={profileData.period} onChange={e => setProfileData({...profileData, period: e.target.value})} className="w-full border border-gray-300 p-2 font-mono text-sm" />
+                <div className="md:col-span-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Período</label>
+                  <input type="text" value={profileData.period} onChange={e => setProfileData({...profileData, period: e.target.value})} className="block w-full border border-gray-300 rounded-lg p-2.5 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all text-sm" />
                 </div>
               )}
             </div>
-            <button type="submit" disabled={loadingProfile} className="w-full bg-[#00f0ff] text-black font-bold font-mono py-3 mt-2 border border-black shadow-[2px_2px_0_0_#000] hover:shadow-[4px_4px_0_0_#000] transition-all disabled:bg-gray-400">
-              {loadingProfile ? 'SALVANDO...' : 'ATUALIZAR PERFIL'}
-            </button>
+            <div className="flex justify-end pt-2">
+              <button type="submit" disabled={loadingProfile} className="px-6 py-2.5 rounded-lg bg-blue-600 text-white font-bold hover:bg-blue-700 transition-all shadow-md disabled:bg-gray-400">
+                {loadingProfile ? 'Salvando...' : 'Atualizar Perfil'}
+              </button>
+            </div>
           </form>
         </div>
 
-        <hr className="border-gray-200" />
+        </div>
 
-        <div>
-          <h3 className="font-bold uppercase flex items-center gap-2 mb-4">
-            <KeyRound size={18} /> Alterar Senha
+        {/* Linha Divisória Mobile / Borda Desktop */}
+        <div className="hidden lg:block w-px bg-gray-200"></div>
+        <hr className="block lg:hidden border-gray-200" />
+
+        {/* Lado Direito - Senha */}
+        <div className="flex-1 space-y-6">
+          <h3 className="font-bold text-gray-800 flex items-center gap-2">
+            <KeyRound size={18} /> Segurança da Conta
           </h3>
           <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label className="block text-xs font-mono mb-1 text-gray-600">SENHA ATUAL</label>
-              <input 
-                type="password" 
-                required 
-                value={formData.currentPassword}
-                onChange={e => setFormData({...formData, currentPassword: e.target.value})}
-                className="w-full border border-gray-300 p-2 font-mono text-sm" 
-              />
-            </div>
-            
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
               <div>
-                <label className="block text-xs font-mono mb-1 text-gray-600">NOVA SENHA</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Senha Atual</label>
+                <input 
+                  type="password" 
+                  required 
+                  value={formData.currentPassword}
+                  onChange={e => setFormData({...formData, currentPassword: e.target.value})}
+                  className="block w-full border border-gray-300 rounded-lg p-2.5 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all text-sm" 
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Nova Senha</label>
                 <input 
                   type="password" 
                   required 
                   value={formData.newPassword}
                   onChange={e => setFormData({...formData, newPassword: e.target.value})}
-                  className="w-full border border-gray-300 p-2 font-mono text-sm" 
+                  className="block w-full border border-gray-300 rounded-lg p-2.5 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all text-sm" 
                 />
               </div>
               <div>
-                <label className="block text-xs font-mono mb-1 text-gray-600">CONFIRME A NOVA SENHA</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Confirmar Nova Senha</label>
                 <input 
                   type="password" 
                   required 
                   value={formData.confirmPassword}
                   onChange={e => setFormData({...formData, confirmPassword: e.target.value})}
-                  className="w-full border border-gray-300 p-2 font-mono text-sm" 
+                  className="block w-full border border-gray-300 rounded-lg p-2.5 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all text-sm" 
                 />
               </div>
             </div>
 
-            <button 
-              type="submit" 
-              disabled={loading}
-              className="w-full bg-black text-white font-bold font-mono py-3 mt-2 disabled:bg-gray-400 hover:bg-neutral-800 transition-colors"
-            >
-              {loading ? 'SALVANDO...' : 'ATUALIZAR SENHA'}
-            </button>
+            <div className="flex justify-end pt-2">
+              <button 
+                type="submit" 
+                disabled={loading}
+                className="px-6 py-2.5 rounded-lg bg-gray-800 text-white font-bold hover:bg-black transition-all shadow-md disabled:bg-gray-400 w-full md:w-auto"
+              >
+                {loading ? 'Salvando...' : 'Alterar Senha'}
+              </button>
+            </div>
           </form>
         </div>
       </div>
