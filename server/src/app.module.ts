@@ -30,6 +30,7 @@ import { Championship } from './championships/entities/championship.entity';
 import { Modality } from './championships/entities/modality.entity';
 import { Subscription } from './championships/entities/subscription.entity';
 import { Match } from './championships/entities/match.entity';
+import { ChampionshipDocument } from './championships/entities/championship-document.entity';
 
 @Module({
   imports: [
@@ -72,7 +73,7 @@ import { Match } from './championships/entities/match.entity';
           return {
             type: 'postgres',
             url: dbUrl,
-            entities: [Order, OrderItem, User, Product, TeamMember, News, Event, Team, AthleteProfile, Championship, Modality, Subscription, Match],
+            entities: [Order, OrderItem, User, Product, TeamMember, News, Event, Team, AthleteProfile, Championship, Modality, Subscription, Match, ChampionshipDocument],
             synchronize: process.env.NODE_ENV !== 'production',
             ssl: process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : false,
           };
@@ -81,7 +82,7 @@ import { Match } from './championships/entities/match.entity';
         return {
           type: 'sqlite',
           database: 'data/database.sqlite',
-          entities: [Order, OrderItem, User, Product, TeamMember, News, Event, Team, AthleteProfile, Championship, Modality, Subscription, Match],
+          entities: [Order, OrderItem, User, Product, TeamMember, News, Event, Team, AthleteProfile, Championship, Modality, Subscription, Match, ChampionshipDocument],
           synchronize: true,
         };
       },

@@ -60,13 +60,25 @@ export class ChampionshipsController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Post(':modalityId/subscribe')
+  @Post(':modalityId/enroll')
   subscribe(@Request() req: any, @Param('modalityId') modalityId: string) {
     return this.championshipsService.subscribeAthlete(req.user.userId, modalityId);
   }
 
   @UseGuards(JwtAuthGuard)
-  @Post(':modalityId/unsubscribe')
+  @Post('subscription/:subId/roster/:athleteId')
+  addRoster(@Request() req: any, @Param('subId') subId: string, @Param('athleteId') athleteId: string) {
+    return this.championshipsService.addAthleteToRoster(req.user.userId, subId, athleteId);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Delete('subscription/:subId/roster/:athleteId')
+  removeRoster(@Request() req: any, @Param('subId') subId: string, @Param('athleteId') athleteId: string) {
+    return this.championshipsService.removeAthleteFromRoster(req.user.userId, subId, athleteId);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post(':modalityId/unenroll')
   unsubscribe(@Request() req: any, @Param('modalityId') modalityId: string) {
     return this.championshipsService.unsubscribeAthlete(req.user.userId, modalityId);
   }

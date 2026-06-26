@@ -22,7 +22,7 @@ export class TeamsController {
 
   @UseGuards(JwtAuthGuard)
   @Post('join')
-  joinTeam(@Request() req: any, @Body() body: { inviteCode: string; cpf: string; birthDate: Date; course?: string; period?: string }) {
+  joinTeam(@Request() req: any, @Body() body: { inviteCode: string; cpf: string; birthDate: Date; course?: string; period?: string; gender?: string }) {
     return this.teamsService.joinTeam(req.user.userId, body.inviteCode, body);
   }
 
@@ -50,7 +50,7 @@ export class TeamsController {
   @Patch('admin/documents/:id')
   updateDocumentStatus(
     @Param('id') id: string,
-    @Body() body: { type: 'rg' | 'enrollment'; status: 'APPROVED' | 'REJECTED' }
+    @Body() body: { type: 'rg' | 'enrollment'; status: 'APPROVED' | 'REJECTED'; rejectionReason?: string }
   ) {
     return this.teamsService.updateDocumentStatus(id, body);
   }

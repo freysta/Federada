@@ -21,6 +21,9 @@ export class AthleteProfile {
   cpf: string;
 
   @Column({ nullable: true })
+  gender: string; // MASCULINO, FEMININO
+
+  @Column({ nullable: true })
   course: string;
 
   @Column({ nullable: true })
@@ -32,11 +35,17 @@ export class AthleteProfile {
   @Column({ default: 'PENDING' })
   documentRgStatus: string; // PENDING, APPROVED, REJECTED
 
+  @Column({ type: 'text', nullable: true })
+  documentRgRejectionReason: string | null;
+
   @Column({ nullable: true })
   documentEnrollmentUrl: string;
 
   @Column({ default: 'PENDING' })
   documentEnrollmentStatus: string; // PENDING, APPROVED, REJECTED
+
+  @Column({ type: 'text', nullable: true })
+  documentEnrollmentRejectionReason: string | null;
 
   @Column({ unique: true, nullable: true })
   athleteIdCode: string;

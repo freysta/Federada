@@ -6,6 +6,14 @@ import { AthleteProfile } from './entities/athlete-profile.entity';
 import { User } from '../orders/entities/user.entity';
 import { FileStorageService } from '../storage/storage.service';
 
+function validateCPF(cpf: string): boolean {
+  cpf = cpf.replace(/[^\d]+/g, '');
+  if (cpf.length !== 11 || !!cpf.match(/(\d)\1{10}/)) return false;
+  const cpfArray = cpf.split('').map(el => +el);
+  const rest = (count: number) => (cpfArray.slice(0, count - 12).reduce((soma, el, index) => (soma + el * (count - index)), 0) * 10) % 11 % 10;
+  return rest(10) === cpfArray[9] && rest(11) === cpfArray[10];
+}
+
 @Injectable()
 export class TeamsService {
   constructor(
@@ -45,10 +53,20 @@ export class TeamsService {
     return this.teamRepository.find({ relations: ['owner'] });
   }
 
-  async joinTeam(userId: string, inviteCode: string, data: { cpf: string; birthDate: Date; course?: string; period?: string }) {
+  async joinTeam(userId: string, inviteCode: string, data: { cpf: string; birthDate: Date; course?: string; period?: string; gender?: string }) {
+    if (!validateCPF(data.cpf)) {
+      throw new BadRequestException('CPF inválido.');
+    }
+
     const team = await this.teamRepository.findOne({ where: { inviteCode } });
     if (!team) {
       throw new NotFoundException('Código de convite inválido ou Atlética não encontrada.');
+    }
+
+    // Check se outro usuário já usa esse CPF
+    const existingCpf = await this.athleteProfileRepository.findOne({ where: { cpf: data.cpf } });
+    if (existingCpf) {
+      throw new BadRequestException('Este CPF já está em uso por outro atleta.');
     }
 
     // Check if user already has a profile
@@ -66,6 +84,7 @@ export class TeamsService {
       course: data.course,
       period: data.period,
       birthDate: data.birthDate,
+      gender: data.gender,
       athleteIdCode,
       teamRole: 'ATHLETE',
     });
@@ -103,7 +122,8 @@ export class TeamsService {
       profile.documentEnrollmentStatus = 'PENDING';
     }
 
-    return this.athleteProfileRepository.save(profile);
+    await this.athleteProfileRepository.save(profile);
+    return this.getMyProfile(userId);
   }
 
   async getPendingDocuments() {
@@ -113,14 +133,18 @@ export class TeamsService {
     });
   }
 
-  async updateDocumentStatus(profileId: string, data: { type: 'rg' | 'enrollment'; status: 'APPROVED' | 'REJECTED' }) {
+  async updateDocumentStatus(profileId: string, data: { type: 'rg' | 'enrollment'; status: 'APPROVED' | 'REJECTED'; rejectionReason?: string }) {
     const profile = await this.athleteProfileRepository.findOne({ where: { id: profileId } });
     if (!profile) throw new NotFoundException('Perfil não encontrado');
 
     if (data.type === 'rg') {
       profile.documentRgStatus = data.status;
+      if (data.status === 'REJECTED') profile.documentRgRejectionReason = data.rejectionReason || null;
+      if (data.status === 'APPROVED') profile.documentRgRejectionReason = null;
     } else {
       profile.documentEnrollmentStatus = data.status;
+      if (data.status === 'REJECTED') profile.documentEnrollmentRejectionReason = data.rejectionReason || null;
+      if (data.status === 'APPROVED') profile.documentEnrollmentRejectionReason = null;
     }
 
     // Auto-update overall status

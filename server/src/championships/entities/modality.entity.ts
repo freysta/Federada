@@ -17,6 +17,21 @@ export class Modality {
   @Column({ type: 'decimal', precision: 10, scale: 2, default: 0 })
   price: number; // Preço da inscrição (0 para gratuito)
 
+  @Column({ type: 'int', default: 0 })
+  minAthletes: number;
+
+  @Column({ type: 'int', default: 99 })
+  maxAthletes: number;
+
+  @Column({ type: 'int', default: 0 })
+  minAge: number;
+
+  @Column({ type: 'int', default: 99 })
+  maxAge: number;
+
+  @Column({ nullable: true })
+  gender: string; // MASCULINO, FEMININO, MISTO
+
   @ManyToOne(() => Championship, champ => champ.modalities, { onDelete: 'CASCADE' })
   championship: Championship;
 

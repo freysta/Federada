@@ -18,11 +18,25 @@ export class Championship {
   @Column({ type: 'date', nullable: true })
   endDate: Date;
 
+  @Column({ type: 'date', nullable: true })
+  enrollmentDeadline: Date;
+
+  @Column({ type: 'date', nullable: true })
+  documentsDeadline: Date;
+
   @Column({ default: 'OPEN' })
   status: string; // OPEN, CLOSED, IN_PROGRESS, FINISHED
 
   @OneToMany(() => Modality, modality => modality.championship)
   modalities: Modality[];
+
+  @Column({ type: 'simple-json', nullable: true })
+  settings: {
+    requireRg?: boolean;
+    requireEnrollment?: boolean;
+    customDocuments?: string[];
+    locations?: string[];
+  };
 
   @CreateDateColumn()
   createdAt: Date;

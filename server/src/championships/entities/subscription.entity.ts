@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, ManyToMany, JoinTable } from 'typeorm';
 import { Modality } from './modality.entity';
 import { AthleteProfile } from '../../teams/entities/athlete-profile.entity';
 import { Team } from '../../teams/entities/team.entity';
@@ -18,6 +18,11 @@ export class Subscription {
   // Inscrição coletiva (Opcional, atrelado a uma atlética inteira se for esporte coletivo)
   @ManyToOne(() => Team, { onDelete: 'CASCADE', nullable: true })
   team: Team;
+
+  // Elenco da equipe nesta modalidade
+  @ManyToMany(() => AthleteProfile)
+  @JoinTable({ name: 'subscription_roster' })
+  athletes: AthleteProfile[];
 
   @Column({ default: 'PENDING' })
   status: string; // PENDING, APPROVED, REJECTED
