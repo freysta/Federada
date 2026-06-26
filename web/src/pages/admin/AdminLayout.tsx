@@ -1,6 +1,6 @@
 import { Outlet, Navigate, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
-import { LayoutDashboard, Package, ShoppingBag, Users, KeyRound, LogOut, Image, Calendar, MessageSquare, FileCheck2, Trophy, Store } from 'lucide-react';
+import { LayoutDashboard, Package, ShoppingBag, Users, KeyRound, LogOut, Image, Calendar, MessageSquare, FileCheck2, Trophy, Store, ClipboardList } from 'lucide-react';
 
 export default function AdminLayout() {
   const { user, logout } = useAuth();
@@ -22,16 +22,13 @@ export default function AdminLayout() {
       { path: '/admin/users', icon: <Users size={16} />, label: 'Usuários', show: isSuperAdmin },
       
       { type: 'divider', label: 'HUB ESPORTIVO', show: isSportsAdmin },
-      { path: '/admin/championships', icon: <Trophy size={16} />, label: 'Campeonatos', show: isSportsAdmin },
       { path: '/admin/documents', icon: <FileCheck2 size={16} />, label: 'Documentos', show: isSportsAdmin },
       
       { type: 'divider', label: 'COMUNICAÇÃO', show: isSportsAdmin || isStoreAdmin },
-      { path: '/admin/team', icon: <Image size={16} />, label: 'Diretoria', show: isSuperAdmin },
       { path: '/admin/events', icon: <Calendar size={16} />, label: 'Eventos', show: isSportsAdmin || isStoreAdmin },
       { path: '/admin/news', icon: <MessageSquare size={16} />, label: 'Fórum', show: isSportsAdmin || isStoreAdmin },
       
       { type: 'divider', label: 'SISTEMA', show: true },
-      { path: '/admin/profile', icon: <KeyRound size={16} />, label: 'Meu Perfil', show: true },
     ];
   
     const visibleMenuItems = menuItems.filter(item => item.show !== false);

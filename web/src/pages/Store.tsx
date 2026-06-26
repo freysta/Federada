@@ -1,7 +1,6 @@
 import Navbar from "../components/Navbar";
 import ProductGrid from "../components/ProductGrid";
 import Footer from "../components/Footer";
-import CartSidebar from "../components/CartSidebar";
 import TerminalWidget from "../components/TerminalWidget";
 
 export default function Store() {
@@ -12,7 +11,6 @@ export default function Store() {
         <ProductGrid limit={undefined} />
       </main>
       <Footer />
-      <CartSidebar />
       <TerminalWidget />
     </>
   );

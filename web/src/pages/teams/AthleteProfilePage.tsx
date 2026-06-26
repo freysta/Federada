@@ -3,8 +3,9 @@ import { useAuth } from '../../contexts/AuthContext';
 import { API_URL } from '../../config';
 import toast from 'react-hot-toast';
 import { KeyRound, ShieldCheck } from 'lucide-react';
+import Navbar from '../../components/Navbar';
 
-export default function AdminProfile() {
+export default function AthleteProfilePage() {
   const { token, user } = useAuth();
   
   const [formData, setFormData] = useState({
@@ -94,13 +95,16 @@ export default function AdminProfile() {
   };
 
   return (
-    <div className="max-w-5xl space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold font-mono uppercase tracking-wider">Meu Perfil</h1>
-        <p className="text-sm text-gray-500 mt-1">Gerencie suas configurações de conta e segurança</p>
-      </div>
+    <>
+      <Navbar />
+      <div className="min-h-screen bg-slate-50 pt-24 pb-12">
+        <div className="max-w-5xl mx-auto px-6 space-y-6">
+          <div>
+            <h1 className="text-2xl font-bold font-mono uppercase tracking-wider">Meu Perfil</h1>
+            <p className="text-sm text-gray-500 mt-1">Gerencie suas configurações de conta e segurança</p>
+          </div>
 
-      <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-6 flex flex-col lg:flex-row gap-8">
+          <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-6 flex flex-col lg:flex-row gap-8">
         {/* Lado Esquerdo - Perfil */}
         <div className="flex-1 space-y-6">
           <div className="flex items-center gap-4 bg-gray-50 p-4 rounded-lg border border-gray-200">
@@ -211,6 +215,8 @@ export default function AdminProfile() {
           </form>
         </div>
       </div>
-    </div>
+        </div>
+      </div>
+    </>
   );
 }

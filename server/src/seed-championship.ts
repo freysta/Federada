@@ -1,7 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { Championship } from './championships/entities/championship.entity';
+import { Championship, ChampionshipStatus } from './championships/entities/championship.entity';
 import { Modality } from './championships/entities/modality.entity';
 import { Repository } from 'typeorm';
 
@@ -19,7 +19,7 @@ async function bootstrap() {
     description: 'O maior torneio do estado. Inscreva-se agora e represente sua equipe.',
     startDate: new Date('2026-08-01'),
     endDate: new Date('2026-08-15'),
-    status: 'OPEN',
+    status: ChampionshipStatus.OPEN,
   });
   await championshipRepo.save(champ);
 

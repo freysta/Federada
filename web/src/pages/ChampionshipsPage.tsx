@@ -2,11 +2,12 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { API_URL } from '../config';
 import { useAuth } from '../contexts/AuthContext';
-import { Loader2, Trophy, Users, Shield, ArrowRight, Calendar, Activity } from 'lucide-react';
+import { Loader2, Trophy, Users, Shield, ArrowRight, Calendar, Activity, Settings } from 'lucide-react';
 import toast from 'react-hot-toast';
 import Navbar from '../components/Navbar';
 import AthleteDashboard from '../components/championships/AthleteDashboard';
 import AthleteOnboarding from '../components/championships/AthleteOnboarding';
+import OrganizerDashboard from '../components/championships/OrganizerDashboard';
 
 export default function ChampionshipsPage() {
   const { token, user } = useAuth();
@@ -19,7 +20,9 @@ export default function ChampionshipsPage() {
   const [loadingProfile, setLoadingProfile] = useState(true);
   
   // Tabs
-  const [activeTab, setActiveTab] = useState<'explore' | 'my-area'>('explore');
+  const [activeTab, setActiveTab] = useState<'explore' | 'my-area' | 'manage'>('explore');
+
+  const isManager = user?.role === 'ADMIN' || user?.role === 'SPORTS_ADMIN';
 
   const fetchChampionships = () => {
     setLoading(true);
@@ -129,6 +132,14 @@ export default function ChampionshipsPage() {
                 <Shield size={16} /> Minha Área
               </button>
             )}
+            {isManager && (
+              <button 
+                onClick={() => setActiveTab('manage')}
+                className={`flex-1 sm:flex-none px-8 py-3 rounded-lg font-bold text-sm transition-all flex items-center gap-2 justify-center ${activeTab === 'manage' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+              >
+                <Settings size={16} /> Gestão
+              </button>
+            )}
           </div>
 
           {/* TAB CONTENT */}
@@ -149,8 +160,17 @@ export default function ChampionshipsPage() {
                     
                     return (
                       <Link key={champ.id} to={`/campeonatos/${champ.id}`} className="group bg-white rounded-3xl shadow-sm hover:shadow-xl border border-slate-200 transition-all overflow-hidden flex flex-col transform hover:-translate-y-1">
-                        {/* Cover Image Placeholder - could be a real image field later */}
-                        <div className="h-32 bg-gradient-to-br from-slate-100 to-slate-200 relative">
+                        <div className="h-48 relative w-full overflow-hidden">
+                          {champ.bannerUrl ? (
+                            <img 
+                              src={`${API_URL}${champ.bannerUrl}`} 
+                              alt={champ.name} 
+                              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                            />
+                          ) : (
+                            <div className="absolute inset-0 bg-gradient-to-tr from-blue-700 via-blue-600 to-indigo-800" />
+                          )}
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
                           <div className={`absolute top-4 right-4 px-3 py-1 text-[10px] font-bold rounded-full uppercase tracking-wider ${isOpen ? 'bg-green-100 text-green-700' : 'bg-slate-200 text-slate-600'}`}>
                             {isOpen ? 'Inscrições Abertas' : 'Encerrado'}
                           </div>
@@ -193,6 +213,12 @@ export default function ChampionshipsPage() {
               ) : (
                 <AthleteOnboarding onSuccess={fetchProfile} />
               )}
+            </div>
+          )}
+
+          {activeTab === 'manage' && isManager && (
+            <div className="animate-in fade-in duration-500">
+              <OrganizerDashboard />
             </div>
           )}
           

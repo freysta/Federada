@@ -23,6 +23,7 @@ import { CouponsModule } from './coupons/coupons.module';
 import { TeamsModule } from './teams/teams.module';
 import { ChampionshipsModule } from './championships/championships.module';
 import { StorageModule } from './storage/storage.module';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 
 import { Team } from './teams/entities/team.entity';
 import { AthleteProfile } from './teams/entities/athlete-profile.entity';
@@ -41,6 +42,7 @@ import { ChampionshipDocument } from './championships/entities/championship-docu
       rootPath: join(__dirname, '..', 'uploads'),
       serveRoot: '/uploads/',
     }),
+    EventEmitterModule.forRoot(),
     ThrottlerModule.forRoot([{
       ttl: 60000,
       limit: 100, // 100 requests per minute per IP

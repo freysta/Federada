@@ -1,12 +1,14 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { API_URL } from '../../config';
-import { Loader2, Plus, Edit, Trophy, Settings, X, Search } from 'lucide-react';
+import { Loader2, Plus, Edit, Trophy, Settings, X, Search, Image as ImageIcon, Upload, Play, Square, FileText } from 'lucide-react';
 import toast from 'react-hot-toast';
 import Pagination from '../../components/admin/Pagination';
 
 export default function AdminChampionships() {
-  const { token } = useAuth();
+  const { token, user } = useAuth();
+  const navigate = useNavigate();
   const [championships, setChampionships] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
@@ -29,6 +31,7 @@ export default function AdminChampionships() {
     enrollmentDeadline: '',
     documentsDeadline: '',
     status: 'OPEN',
+    bannerUrl: '',
     settings: {
       requireRg: false,
       requireEnrollment: false,
@@ -142,6 +145,54 @@ export default function AdminChampionships() {
     .catch(err => toast.error(err.message));
   };
 
+  const handleStateTransition = async (champId: string, status: string, successMsg: string) => {
+    const loadingToast = toast.loading('Processando...');
+    try {
+      const res = await fetch(`${API_URL}/championships/${champId}/status`, {
+        method: 'PATCH',
+        headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status })
+      });
+      if (!res.ok) throw new Error('Erro ao mudar o status.');
+      toast.dismiss(loadingToast);
+      toast.success(successMsg);
+      fetchChampionships();
+    } catch (err: any) {
+      toast.dismiss(loadingToast);
+      toast.error(err.message);
+    }
+  };
+
+  const handleBannerUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files || !e.target.files[0] || !currentChamp) return;
+    const file = e.target.files[0];
+    
+    const formData = new FormData();
+    formData.append('file', file);
+    
+    const loadingToast = toast.loading('Enviando banner...');
+    
+    fetch(`${API_URL}/championships/${currentChamp.id}/banner`, {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${token}` },
+      body: formData
+    })
+    .then(res => {
+      if (!res.ok) throw new Error('Erro ao fazer upload do banner');
+      return res.json();
+    })
+    .then(data => {
+      toast.dismiss(loadingToast);
+      toast.success('Banner atualizado!');
+      setFormData(prev => ({ ...prev, bannerUrl: data.bannerUrl }));
+      fetchChampionships(); // Refresh list to show updated banner
+    })
+    .catch(err => {
+      toast.dismiss(loadingToast);
+      toast.error(err.message);
+    });
+  };
+
   const openEditModal = (champ: any) => {
     setCurrentChamp(champ);
     setFormData({
@@ -152,6 +203,7 @@ export default function AdminChampionships() {
       enrollmentDeadline: champ.enrollmentDeadline ? new Date(champ.enrollmentDeadline).toISOString().split('T')[0] : '',
       documentsDeadline: champ.documentsDeadline ? new Date(champ.documentsDeadline).toISOString().split('T')[0] : '',
       status: champ.status,
+      bannerUrl: champ.bannerUrl || '',
       settings: champ.settings ? {
         requireRg: !!champ.settings.requireRg,
         requireEnrollment: !!champ.settings.requireEnrollment,
@@ -177,17 +229,13 @@ export default function AdminChampionships() {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
+      <div className="flex justify-between items-center mb-6">
         <div>
-          <h1 className="text-3xl font-bold font-mono tracking-tight uppercase">Campeonatos</h1>
-          <p className="text-gray-500 font-mono text-sm mt-1">Gerencie os campeonatos e as modalidades disponíveis para as atléticas.</p>
+          <h2 className="text-2xl font-bold font-mono tracking-tight uppercase">Meus Campeonatos</h2>
+          <p className="text-gray-500 font-mono text-sm mt-1">Gerencie os campeonatos que você organiza.</p>
         </div>
         <button 
-          onClick={() => {
-            setCurrentChamp(null);
-            setFormData({ name: '', description: '', startDate: '', endDate: '', enrollmentDeadline: '', documentsDeadline: '', status: 'OPEN', settings: { requireRg: false, requireEnrollment: false, customDocuments: '', locations: '' } });
-            setShowModal(true);
-          }}
+          onClick={() => navigate('/campeonatos/novo')}
           className="bg-black text-white px-4 py-2 font-bold font-mono text-sm hover:bg-gray-800 transition-colors flex items-center gap-2"
         >
           <Plus size={16} /> NOVO CAMPEONATO
@@ -221,7 +269,13 @@ export default function AdminChampionships() {
                 <div className="flex justify-between items-start mb-3">
                   <div>
                     <h3 className="font-bold text-lg uppercase tracking-tight flex items-center gap-2 text-gray-900 group-hover:text-blue-700 transition-colors">
-                      <Trophy size={18} className="text-blue-600" />
+                      {champ.bannerUrl ? (
+                        <div className="w-8 h-8 rounded overflow-hidden flex-shrink-0 border border-gray-200">
+                          <img src={`${API_URL}${champ.bannerUrl}`} alt={champ.name} className="w-full h-full object-cover" />
+                        </div>
+                      ) : (
+                        <Trophy size={18} className="text-blue-600" />
+                      )}
                       {champ.name}
                     </h3>
                     <div className="text-xs text-gray-500 mt-0.5">
@@ -230,20 +284,52 @@ export default function AdminChampionships() {
                     </div>
                   </div>
                   <div className="flex gap-2">
-                    <button 
-                      onClick={(e) => { e.stopPropagation(); openEditModal(champ); }}
-                      className="text-gray-600 hover:text-gray-900 bg-white border border-gray-200 p-1.5 hover:bg-gray-100 transition-all rounded-lg shadow-sm"
-                      title="Editar Campeonato"
-                    >
-                      <Edit size={14} />
-                    </button>
-                    <button 
-                      onClick={(e) => { e.stopPropagation(); openModalityModal(champ); }}
-                      className="text-blue-700 hover:text-blue-900 bg-blue-50 border border-blue-200 p-1.5 hover:bg-blue-100 transition-all rounded-lg flex items-center gap-1 shadow-sm font-medium text-xs"
-                      title="Gerenciar Modalidades"
-                    >
-                      <Settings size={14} /> Modalidades
-                    </button>
+                    {(champ.allowedActions || []).includes('edit_settings') && (
+                      <button 
+                        onClick={(e) => { e.stopPropagation(); openEditModal(champ); }}
+                        className="text-gray-600 hover:text-gray-900 bg-white border border-gray-200 p-1.5 hover:bg-gray-100 transition-all rounded-lg shadow-sm"
+                        title="Editar Campeonato"
+                      >
+                        <Edit size={14} />
+                      </button>
+                    )}
+                    
+                    {(champ.allowedActions || []).includes('manage_modalities') && (
+                      <button 
+                        onClick={(e) => { e.stopPropagation(); openModalityModal(champ); }}
+                        className="text-blue-700 hover:text-blue-900 bg-blue-50 border border-blue-200 p-1.5 hover:bg-blue-100 transition-all rounded-lg flex items-center gap-1 shadow-sm font-medium text-xs"
+                        title="Gerenciar Modalidades"
+                      >
+                        <Settings size={14} /> Modalidades
+                      </button>
+                    )}
+
+                    {(champ.allowedActions || []).includes('open_registration') && (
+                      <button 
+                        onClick={(e) => { e.stopPropagation(); handleStateTransition(champ.id, 'OPEN', 'Inscrições Abertas!'); }}
+                        className="text-green-700 hover:text-green-900 bg-green-50 border border-green-200 p-1.5 hover:bg-green-100 transition-all rounded-lg flex items-center gap-1 shadow-sm font-medium text-xs"
+                      >
+                        <Play size={14} /> Abrir Inscrições
+                      </button>
+                    )}
+
+                    {(champ.allowedActions || []).includes('close_registration') && (
+                      <button 
+                        onClick={(e) => { e.stopPropagation(); handleStateTransition(champ.id, 'CLOSED', 'Inscrições Encerradas!'); }}
+                        className="text-red-700 hover:text-red-900 bg-red-50 border border-red-200 p-1.5 hover:bg-red-100 transition-all rounded-lg flex items-center gap-1 shadow-sm font-medium text-xs"
+                      >
+                        <Square size={14} /> Encerrar Inscrições
+                      </button>
+                    )}
+
+                    {(champ.allowedActions || []).includes('manage_subscriptions') && (
+                      <button 
+                        onClick={(e) => { e.stopPropagation(); navigate(`/campeonatos/inscricoes?champId=${champ.id}`); }}
+                        className="text-purple-700 hover:text-purple-900 bg-purple-50 border border-purple-200 p-1.5 hover:bg-purple-100 transition-all rounded-lg flex items-center gap-1 shadow-sm font-medium text-xs"
+                      >
+                        <FileText size={14} /> Inscrições
+                      </button>
+                    )}
                   </div>
                 </div>
 
@@ -293,19 +379,42 @@ export default function AdminChampionships() {
             
             <form onSubmit={handleSaveChamp} className="space-y-5">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+                {/* Banner Upload Section (Only visible when editing) */}
+                {currentChamp && (
+                  <div className="md:col-span-3 border border-gray-200 rounded-lg p-4 bg-gray-50/50 flex flex-col md:flex-row gap-6 items-center">
+                    <div className="w-full md:w-48 h-32 bg-gray-200 rounded-lg border-2 border-dashed border-gray-300 overflow-hidden relative group">
+                      {formData.bannerUrl ? (
+                        <img src={`${API_URL}${formData.bannerUrl}`} alt="Banner" className="w-full h-full object-cover" />
+                      ) : (
+                        <div className="flex flex-col items-center justify-center w-full h-full text-gray-400">
+                          <ImageIcon size={32} className="mb-2" />
+                          <span className="text-xs font-bold uppercase">Sem Capa</span>
+                        </div>
+                      )}
+                      
+                      <div className="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                        <label className="cursor-pointer bg-white text-black px-3 py-1.5 rounded font-bold text-xs flex items-center gap-1 hover:bg-gray-100 transition-colors">
+                          <Upload size={14} /> MUDAR CAPA
+                          <input type="file" className="hidden" accept="image/*" onChange={handleBannerUpload} />
+                        </label>
+                      </div>
+                    </div>
+                    <div className="flex-1 text-sm text-gray-600">
+                      <h3 className="font-bold text-gray-800 text-base mb-1">Capa do Campeonato</h3>
+                      <p>Envie uma imagem para dar uma identidade visual única a este campeonato na vitrine de eventos.</p>
+                      <p className="text-xs mt-2 text-gray-500">Formatos aceitos: JPG, PNG. Máx 5MB.</p>
+                    </div>
+                  </div>
+                )}
+
                 <div className="md:col-span-2">
                   <label className="block text-gray-600 mb-1 font-medium text-sm">Nome</label>
                   <input type="text" required value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} className="w-full border border-gray-300 rounded-lg p-3 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all" placeholder="Ex: Inter-Atléticas 2026" />
                 </div>
                 
                 <div className="md:col-span-1">
-                  <label className="block text-gray-600 mb-1 font-medium text-sm">Status</label>
-                  <select value={formData.status} onChange={e => setFormData({...formData, status: e.target.value})} className="w-full border border-gray-300 rounded-lg p-3 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all bg-white">
-                    <option value="OPEN">Inscrições Abertas</option>
-                    <option value="CLOSED">Inscrições Fechadas</option>
-                    <option value="IN_PROGRESS">Em Andamento</option>
-                    <option value="FINISHED">Finalizado</option>
-                  </select>
+                  <label className="block text-gray-600 mb-1 font-medium text-sm">Status Atual</label>
+                  <input type="text" disabled value={formData.status} className="w-full border border-gray-300 rounded-lg p-3 bg-gray-100 font-bold" />
                 </div>
 
                 <div>

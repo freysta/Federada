@@ -8,6 +8,11 @@ import { ChampionshipDocument } from './entities/championship-document.entity';
 import { AthleteProfile } from '../teams/entities/athlete-profile.entity';
 import { Team } from '../teams/entities/team.entity';
 import { MailerService } from '@nestjs-modules/mailer';
+import { ChampionshipStateMachine } from './services/championship-state-machine.service';
+import { ChampionshipPermissionService } from './services/championship-permission.service';
+import { User } from '../orders/entities/user.entity';
+import { SubscriptionStatus } from './entities/subscription.entity';
+import { ChampionshipStatus } from './entities/championship.entity';
 
 @Injectable()
 export class ChampionshipsService {
@@ -25,19 +30,34 @@ export class ChampionshipsService {
     @InjectRepository(ChampionshipDocument)
     private championshipDocumentRepository: Repository<ChampionshipDocument>,
     private mailerService: MailerService,
+    private stateMachine: ChampionshipStateMachine,
+    private permissionService: ChampionshipPermissionService
   ) {}
 
-  async findAll() {
-    return this.championshipRepository.find({ relations: ['modalities'] });
+  async findAll(user: any) {
+    const findOptions = this.permissionService.buildFindOptionsForUser(user);
+    const champs = await this.championshipRepository.find({ 
+      where: findOptions,
+      relations: ['modalities'] 
+    });
+
+    return champs.map(champ => ({
+      ...champ,
+      allowedActions: this.stateMachine.getAllowedActions(champ, user?.role, this.permissionService.canManage(champ, user))
+    }));
   }
 
-  async findOne(id: string) {
+  async findOne(id: string, user?: any) {
     const champ = await this.championshipRepository.findOne({
       where: { id },
-      relations: ['modalities'],
+      relations: ['modalities', 'owner'],
     });
     if (!champ) throw new NotFoundException('Campeonato não encontrado.');
-    return champ;
+    
+    return {
+      ...champ,
+      allowedActions: this.stateMachine.getAllowedActions(champ, user?.role, this.permissionService.canManage(champ, user))
+    };
   }
 
   async getDashboardStats() {
@@ -59,19 +79,39 @@ export class ChampionshipsService {
     };
   }
 
-  async createChampionship(data: any) {
-    const champ = this.championshipRepository.create(data);
+  async createChampionship(data: any, user: any) {
+    const champ = this.championshipRepository.create({
+      ...data,
+      owner: { id: user.userId }
+    });
     return this.championshipRepository.save(champ);
   }
 
-  async updateChampionship(id: string, data: any) {
-    const champ = await this.findOne(id);
+  async updateChampionship(id: string, data: any, user: any) {
+    const champ = await this.championshipRepository.findOne({ where: { id }, relations: ['owner'] });
+    if (!champ) throw new NotFoundException('Campeonato não encontrado.');
+    
+    this.permissionService.assertCanManage(champ, user);
+
     Object.assign(champ, data);
     return this.championshipRepository.save(champ);
   }
 
-  async addModality(champId: string, data: any) {
-    const champ = await this.findOne(champId);
+  async changeStatus(id: string, newStatus: ChampionshipStatus, user: any) {
+    const champ = await this.championshipRepository.findOne({ where: { id }, relations: ['owner', 'modalities'] });
+    if (!champ) throw new NotFoundException('Campeonato não encontrado.');
+    
+    this.permissionService.assertCanManage(champ, user);
+
+    return this.stateMachine.transition(champ, newStatus, user);
+  }
+
+  async addModality(champId: string, data: any, user: any) {
+    const champ = await this.championshipRepository.findOne({ where: { id: champId }, relations: ['owner'] });
+    if (!champ) throw new NotFoundException('Campeonato não encontrado.');
+    
+    this.permissionService.assertCanManage(champ, user);
+
     const modality = this.modalityRepository.create({
       ...data,
       championship: champ
@@ -79,7 +119,12 @@ export class ChampionshipsService {
     return this.modalityRepository.save(modality);
   }
 
-  async removeModality(champId: string, modId: string) {
+  async removeModality(champId: string, modId: string, user: any) {
+    const champ = await this.championshipRepository.findOne({ where: { id: champId }, relations: ['owner'] });
+    if (!champ) throw new NotFoundException('Campeonato não encontrado.');
+    
+    this.permissionService.assertCanManage(champ, user);
+
     const modality = await this.modalityRepository.findOne({ where: { id: modId, championship: { id: champId } } });
     if (!modality) throw new NotFoundException('Modalidade não encontrada no campeonato especificado.');
     
@@ -98,6 +143,14 @@ export class ChampionshipsService {
       throw new BadRequestException('O prazo de inscrição para este campeonato já foi encerrado.');
     }
 
+    if (modality.championship.status !== ChampionshipStatus.OPEN) {
+      throw new BadRequestException('Este campeonato não está com as inscrições abertas.');
+    }
+
+    if (profile.status === 'REJECTED') {
+      throw new BadRequestException('Seu perfil possui documentação rejeitada. Regularize antes de se inscrever.');
+    }
+
     if (modality.type === 'COLETIVO') {
       if (profile.teamRole !== 'PRESIDENT') throw new BadRequestException('Apenas o presidente pode inscrever a equipe em modalidades coletivas.');
       if (!profile.team) throw new BadRequestException('Você precisa de uma equipe.');
@@ -109,7 +162,7 @@ export class ChampionshipsService {
         team: profile.team,
         modality,
         paymentStatus: modality.price > 0 ? 'PENDING' : 'FREE',
-        status: 'PENDING_ROSTER',
+        status: SubscriptionStatus.PENDING_ROSTER,
         athletes: []
       });
       return this.subscriptionRepository.save(sub);
@@ -131,7 +184,7 @@ export class ChampionshipsService {
         team: profile.team,
         modality,
         paymentStatus: modality.price > 0 ? 'PENDING' : 'FREE',
-        status: needsDocs ? 'PENDING_DOCS' : 'PENDING'
+        status: needsDocs ? SubscriptionStatus.PENDING_DOCS : SubscriptionStatus.CONFIRMED
       });
       return this.subscriptionRepository.save(sub);
     }
@@ -201,7 +254,10 @@ export class ChampionshipsService {
     sub.athletes.push(athlete);
     
     if (sub.athletes.length >= sub.modality.minAthletes) {
-       sub.status = 'PENDING';
+      if (sub.status === SubscriptionStatus.PENDING_DOCS) {
+        sub.status = SubscriptionStatus.CONFIRMED;
+        await this.subscriptionRepository.save(sub);
+      }
     }
 
     return this.subscriptionRepository.save(sub);
@@ -221,7 +277,10 @@ export class ChampionshipsService {
 
     sub.athletes = sub.athletes.filter(a => a.id !== athleteProfileId);
     if (sub.athletes.length < sub.modality.minAthletes) {
-       sub.status = 'PENDING_ROSTER';
+      if (sub.status === SubscriptionStatus.PENDING_DOCS) {
+        sub.status = SubscriptionStatus.PENDING_ROSTER;
+        await this.subscriptionRepository.save(sub);
+      }
     }
 
     return this.subscriptionRepository.save(sub);
@@ -239,5 +298,29 @@ export class ChampionshipsService {
 
     await this.subscriptionRepository.remove(existingSub);
     return { success: true, message: 'Inscrição cancelada com sucesso.' };
+  }
+
+  async getChampionshipSubscriptions(champId: string) {
+    return this.subscriptionRepository.find({
+      where: { modality: { championship: { id: champId } } },
+      relations: ['modality', 'team', 'athlete', 'athlete.user', 'athletes', 'athletes.user'],
+      order: { createdAt: 'DESC' }
+    });
+  }
+
+  async updateSubscriptionStatus(subId: string, status: SubscriptionStatus) {
+    const sub = await this.subscriptionRepository.findOne({ where: { id: subId } });
+    if (!sub) throw new NotFoundException('Inscrição não encontrada');
+    
+    sub.status = status;
+    return this.subscriptionRepository.save(sub);
+  }
+
+  async updateSubscriptionPayment(subId: string, paymentStatus: string) {
+    const sub = await this.subscriptionRepository.findOne({ where: { id: subId } });
+    if (!sub) throw new NotFoundException('Inscrição não encontrada');
+    
+    sub.paymentStatus = paymentStatus;
+    return this.subscriptionRepository.save(sub);
   }
 }

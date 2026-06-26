@@ -124,7 +124,7 @@ export default function DashboardModal({ isOpen, onClose }: { isOpen: boolean; o
         </div>
 
         <div className="p-4 bg-white border-t border-black shrink-0 flex justify-between items-center">
-          {user?.role === 'ADMIN' ? (
+          {['ADMIN', 'SPORTS_ADMIN', 'STORE_ADMIN'].includes(user?.role || '') ? (
             <Link to="/admin" onClick={onClose} className="text-xs font-mono font-bold text-blue-600 hover:underline">
               [ PAINEL ADMIN ]
             </Link>

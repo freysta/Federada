@@ -11,17 +11,20 @@ import VerifyEmail from "./pages/VerifyEmail";
 import ChampionshipsPage from "./pages/ChampionshipsPage";
 import ChampionshipDetailPage from "./pages/ChampionshipDetailPage";
 import AdminLayout from "./pages/admin/AdminLayout";
+import PrivateRoute from "./components/PrivateRoute";
 import AdminOverview from "./pages/admin/AdminOverview";
 import AdminProducts from "./pages/admin/AdminProducts";
 import AdminOrders from "./pages/admin/AdminOrders";
 import AdminUsers from "./pages/admin/AdminUsers";
-import AdminTeam from "./pages/admin/AdminTeam";
 import AdminEvents from "./pages/admin/AdminEvents";
 import AdminNews from "./pages/admin/AdminNews";
-import AdminProfile from "./pages/admin/AdminProfile";
 import AdminDocuments from "./pages/admin/AdminDocuments";
-import AdminChampionships from "./pages/admin/AdminChampionships";
+import AthleteProfilePage from "./pages/teams/AthleteProfilePage";
+import TeamPage from "./pages/teams/TeamPage";
+import ChampionshipWizardPage from './pages/championships/ChampionshipWizardPage';
+import OrganizerSubscriptionsPage from './pages/championships/OrganizerSubscriptionsPage';
 import NotFound from "./components/NotFound";
+import CartSidebar from "./components/CartSidebar";
 
 function App() {
   return (
@@ -40,23 +43,29 @@ function App() {
           <Route path="/campeonatos/:id" element={<ChampionshipDetailPage />} />
           <Route path="/verify-email" element={<VerifyEmail />} />
 
+          {/* Rotas do Atleta / Equipe (Fase 3) */}
+          <Route path="/perfil" element={<PrivateRoute><AthleteProfilePage /></PrivateRoute>} />
+          <Route path="/equipe" element={<PrivateRoute><TeamPage /></PrivateRoute>} />
+
+          {/* Rotas do Organizador (Fora do AdminLayout) */}
+          <Route path="/campeonatos/novo" element={<PrivateRoute><ChampionshipWizardPage /></PrivateRoute>} />
+          <Route path="/campeonatos/inscricoes" element={<PrivateRoute><OrganizerSubscriptionsPage /></PrivateRoute>} />
+
           {/* Rotas do Painel Administrativo */}
           <Route path="/admin" element={<AdminLayout />}>
             <Route index element={<AdminOverview />} />
             <Route path="products" element={<AdminProducts />} />
             <Route path="orders" element={<AdminOrders />} />
             <Route path="users" element={<AdminUsers />} />
-            <Route path="team" element={<AdminTeam />} />
             <Route path="events" element={<AdminEvents />} />
             <Route path="documents" element={<AdminDocuments />} />
             <Route path="news" element={<AdminNews />} />
-            <Route path="profile" element={<AdminProfile />} />
-            <Route path="championships" element={<AdminChampionships />} />
           </Route>
 
           {/* Fallback 404 Route */}
           <Route path="*" element={<NotFound />} />
         </Routes>
+        <CartSidebar />
       </div>
     </CartProvider>
   );

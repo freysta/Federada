@@ -3,7 +3,9 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Team } from './entities/team.entity';
 import { AthleteProfile } from './entities/athlete-profile.entity';
+import { AthleteAvailability } from './entities/athlete-availability.entity';
 import { User } from '../orders/entities/user.entity';
+import { Championship } from '../championships/entities/championship.entity';
 import { FileStorageService } from '../storage/storage.service';
 
 function validateCPF(cpf: string): boolean {
@@ -21,6 +23,8 @@ export class TeamsService {
     private teamRepository: Repository<Team>,
     @InjectRepository(AthleteProfile)
     private athleteProfileRepository: Repository<AthleteProfile>,
+    @InjectRepository(AthleteAvailability)
+    private availabilityRepository: Repository<AthleteAvailability>,
     private fileStorageService: FileStorageService,
   ) {}
 
@@ -156,4 +160,50 @@ export class TeamsService {
 
     return this.athleteProfileRepository.save(profile);
   }
+
+  // ==== AVAILABILITY METHODS ====
+
+  async setAvailability(userId: string, championshipId: string, isAvailable: boolean) {
+    const profile = await this.athleteProfileRepository.findOne({ where: { user: { id: userId } } });
+    if (!profile) {
+      throw new NotFoundException('Perfil de atleta não encontrado.');
+    }
+
+    let availability = await this.availabilityRepository.findOne({
+      where: {
+        athleteProfile: { id: profile.id },
+        championship: { id: championshipId }
+      }
+    });
+
+    if (!availability) {
+      availability = this.availabilityRepository.create({
+        athleteProfile: { id: profile.id } as AthleteProfile,
+        championship: { id: championshipId } as Championship,
+        status: isAvailable ? 'AVAILABLE' : 'UNAVAILABLE'
+      });
+    } else {
+      availability.status = isAvailable ? 'AVAILABLE' : 'UNAVAILABLE';
+    }
+
+    return this.availabilityRepository.save(availability);
+  }
+
+  async getAvailabilities(teamId: string, championshipId: string) {
+    // Retorna todos os registros de disponibilidade para um campeonato específico de atletas de uma determinada equipe
+    const profiles = await this.athleteProfileRepository.find({
+      where: { team: { id: teamId } },
+      select: ['id']
+    });
+
+    if (profiles.length === 0) return [];
+
+    return this.availabilityRepository.find({
+      where: {
+        championship: { id: championshipId }
+      },
+      relations: ['athleteProfile'] // carrega o perfil do atleta
+    });
+  }
 }
+

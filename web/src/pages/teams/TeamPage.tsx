@@ -4,8 +4,9 @@ import { API_URL } from '../../config';
 import { Loader2, Plus, Edit, Trash2, Search } from 'lucide-react';
 import toast from 'react-hot-toast';
 import Pagination from '../../components/admin/Pagination';
+import Navbar from '../../components/Navbar';
 
-export default function AdminTeam() {
+export default function TeamPage() {
   const { token } = useAuth();
   const [team, setTeam] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -121,13 +122,22 @@ export default function AdminTeam() {
   if (loading) return <div className="flex justify-center p-12"><Loader2 className="animate-spin text-black" size={32} /></div>;
 
   return (
-    <div>
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold font-mono">DIRETORIA (CMS)</h1>
-        <button onClick={() => openModal()} className="bg-black text-white px-4 py-2 text-sm font-bold flex items-center gap-2">
-          <Plus size={16} /> NOVO DIRETOR
-        </button>
-      </div>
+    <>
+      <Navbar />
+      <div className="min-h-screen bg-slate-50 pt-24 pb-12">
+        <div className="max-w-7xl mx-auto px-6 space-y-6">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+              <h1 className="text-2xl font-bold font-mono uppercase tracking-wider">Diretoria</h1>
+              <p className="text-sm text-gray-500 mt-1">Gerencie os membros da equipe que aparecem no site principal.</p>
+            </div>
+            <button 
+              onClick={() => { setEditingId(null); setFormData({ name: '', role: '', instagramUrl: '' }); setSelectedFile(null); setIsModalOpen(true); }}
+              className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg font-bold hover:bg-blue-700 transition-colors"
+            >
+              <Plus size={18} /> Novo Diretor
+            </button>
+          </div>
 
       <div className="bg-white border border-gray-300 rounded-xl shadow-md overflow-hidden">
         <div className="p-4 border-b border-gray-200 flex gap-4">
@@ -158,7 +168,7 @@ export default function AdminTeam() {
               </tr>
               ) : (
                 paginatedTeam.map(t => (
-              <tr key={t.id} className="hover:bg-gray-50 transition-colors cursor-pointer" onClick={() => openModal(t)}>
+              <tr key={t.id} className="hover:bg-gray-50 transition-colors cursor-pointer">
                 <td className="px-4 py-2 flex items-center gap-3">
                   <div className="w-8 h-8 bg-gray-200 overflow-hidden rounded-full shrink-0">
                     {t.imageUrl && <img src={t.imageUrl.startsWith('http') ? t.imageUrl : `${API_URL}${t.imageUrl}`} alt="" className="w-full h-full object-cover" />}
@@ -167,7 +177,7 @@ export default function AdminTeam() {
                 </td>
                 <td className="px-4 py-2 font-mono text-[11px] text-gray-600">{t.role}</td>
                 <td className="px-4 py-2 text-right">
-                  <button onClick={(e) => { e.stopPropagation(); openModal(t); }} className="p-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg mr-1 transition-colors"><Edit size={16} /></button>
+                  <button onClick={(e) => { e.stopPropagation(); setEditingId(t.id); setFormData({ name: t.name, role: t.role, instagramUrl: t.instagramUrl || '' }); setIsModalOpen(true); }} className="p-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg mr-1 transition-colors"><Edit size={16} /></button>
                   <button onClick={(e) => { e.stopPropagation(); handleDelete(t.id); }} className="p-1.5 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg transition-colors"><Trash2 size={16} /></button>
                 </td>
               </tr>
@@ -188,48 +198,38 @@ export default function AdminTeam() {
       />
     </div>
 
-      {isModalOpen && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
-          <div className="bg-white w-full max-w-2xl p-6 rounded-xl shadow-2xl overflow-y-auto max-h-[90vh] custom-scrollbar">
-            <h2 className="text-2xl font-bold font-mono text-gray-800 mb-6 border-b pb-3">{editingId ? 'Editar Diretor' : 'Novo Diretor'}</h2>
-            <form onSubmit={handleSubmit} className="space-y-5">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Nome</label>
-                  <input required type="text" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} className="block w-full border border-gray-300 rounded-lg p-3 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all" />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Cargo</label>
-                  <select required value={formData.role} onChange={e => setFormData({...formData, role: e.target.value})} className="block w-full border border-gray-300 rounded-lg p-3 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all bg-white">
-                    <option value="" disabled>Selecione um Cargo</option>
-                    <option value="Presidente">Presidente</option>
-                    <option value="Vice-Presidente">Vice-Presidente</option>
-                    <option value="Diretor(a) Financeiro">Diretor(a) Financeiro</option>
-                    <option value="Diretor(a) de Esportes">Diretor(a) de Esportes</option>
-                    <option value="Diretor(a) de Marketing">Diretor(a) de Marketing</option>
-                    <option value="Diretor(a) de Eventos">Diretor(a) de Eventos</option>
-                    <option value="Secretário(a)">Secretário(a)</option>
-                    <option value="Assessor(a)">Assessor(a)</option>
-                    <option value="Conselheiro(a)">Conselheiro(a)</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Instagram URL</label>
-                  <input type="text" value={formData.instagramUrl} onChange={e => setFormData({...formData, instagramUrl: e.target.value})} className="block w-full border border-gray-300 rounded-lg p-3 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all" />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Foto do Diretor</label>
-                  <input type="file" accept="image/*" onChange={e => setSelectedFile(e.target.files?.[0] || null)} className="block w-full border border-gray-300 rounded-lg p-2.5 outline-none focus:border-blue-500 transition-all bg-white file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" />
-                </div>
+          {isModalOpen && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+              <div className="absolute inset-0 bg-slate-900/50 backdrop-blur-sm" onClick={() => setIsModalOpen(false)}></div>
+              <div className="relative bg-white w-full max-w-md rounded-2xl p-6">
+                <h3 className="font-bold text-xl mb-4">{editingId ? 'Editar Diretor' : 'Novo Diretor'}</h3>
+                <form onSubmit={handleSubmit} className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-bold text-slate-700 mb-1">Nome</label>
+                    <input type="text" required value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} className="w-full border p-2 rounded-lg" />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-bold text-slate-700 mb-1">Cargo</label>
+                    <input type="text" required value={formData.role} onChange={e => setFormData({...formData, role: e.target.value})} className="w-full border p-2 rounded-lg" />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-bold text-slate-700 mb-1">Instagram URL (opcional)</label>
+                    <input type="url" value={formData.instagramUrl} onChange={e => setFormData({...formData, instagramUrl: e.target.value})} className="w-full border p-2 rounded-lg" />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-bold text-slate-700 mb-1">Foto (opcional)</label>
+                    <input type="file" accept="image/*" onChange={e => setSelectedFile(e.target.files?.[0] || null)} className="w-full border p-2 rounded-lg" />
+                  </div>
+                  <div className="flex justify-end gap-2 pt-4">
+                    <button type="button" onClick={() => setIsModalOpen(false)} className="px-4 py-2 text-slate-600 font-bold hover:bg-slate-100 rounded-lg">Cancelar</button>
+                    <button type="submit" className="px-4 py-2 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700">Salvar</button>
+                  </div>
+                </form>
               </div>
-              <div className="mt-6 flex justify-end gap-3 pt-2">
-                <button type="button" onClick={() => setIsModalOpen(false)} className="px-5 py-2.5 rounded-lg border border-gray-300 text-gray-700 font-medium hover:bg-gray-50 transition-colors">Cancelar</button>
-                <button type="submit" className="px-5 py-2.5 rounded-lg bg-blue-600 text-white font-bold hover:bg-blue-700 transition-colors shadow-md">Salvar Diretor</button>
-              </div>
-            </form>
-          </div>
+            </div>
+          )}
         </div>
-      )}
-    </div>
+      </div>
+    </>
   );
 }

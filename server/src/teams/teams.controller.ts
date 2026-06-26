@@ -47,12 +47,32 @@ export class TeamsController {
 
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('ADMIN', 'SPORTS_ADMIN')
-  @Patch('admin/documents/:id')
+  @Patch('profile/:profileId/documents')
   updateDocumentStatus(
-    @Param('id') id: string,
-    @Body() body: { type: 'rg' | 'enrollment'; status: 'APPROVED' | 'REJECTED'; rejectionReason?: string }
+    @Param('profileId') profileId: string,
+    @Body() data: { type: 'rg' | 'enrollment'; status: 'APPROVED' | 'REJECTED'; rejectionReason?: string }
   ) {
-    return this.teamsService.updateDocumentStatus(id, body);
+    return this.teamsService.updateDocumentStatus(profileId, data);
+  }
+
+  // ==== AVAILABILITY ====
+  @UseGuards(JwtAuthGuard)
+  @Post('availability/:championshipId')
+  setAvailability(
+    @Request() req: any,
+    @Param('championshipId') championshipId: string,
+    @Body('isAvailable') isAvailable: boolean
+  ) {
+    return this.teamsService.setAvailability(req.user.userId, championshipId, isAvailable);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get(':teamId/availability/:championshipId')
+  getAvailabilities(
+    @Param('teamId') teamId: string,
+    @Param('championshipId') championshipId: string
+  ) {
+    return this.teamsService.getAvailabilities(teamId, championshipId);
   }
 
   @UseGuards(JwtAuthGuard)

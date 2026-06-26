@@ -10,6 +10,9 @@ import { TeamsModule } from '../teams/teams.module';
 
 import { ChampionshipsController } from './championships.controller';
 import { ChampionshipsService } from './championships.service';
+import { ChampionshipStateMachine } from './services/championship-state-machine.service';
+import { ChampionshipPublicationPolicy } from './services/championship-publication.policy';
+import { ChampionshipPermissionService } from './services/championship-permission.service';
 
 @Module({
   imports: [
@@ -17,7 +20,12 @@ import { ChampionshipsService } from './championships.service';
     TeamsModule,
   ],
   controllers: [ChampionshipsController],
-  providers: [ChampionshipsService],
+  providers: [
+    ChampionshipsService,
+    ChampionshipStateMachine,
+    ChampionshipPublicationPolicy,
+    ChampionshipPermissionService
+  ],
   exports: [TypeOrmModule, ChampionshipsService],
 })
 export class ChampionshipsModule {}

@@ -3,6 +3,15 @@ import { Modality } from './modality.entity';
 import { AthleteProfile } from '../../teams/entities/athlete-profile.entity';
 import { Team } from '../../teams/entities/team.entity';
 
+export enum SubscriptionStatus {
+  PENDING_ROSTER = 'PENDING_ROSTER',
+  PENDING_DOCS = 'PENDING_DOCS',
+  DOCS_APPROVED = 'DOCS_APPROVED',
+  PENDING_PAYMENT = 'PENDING_PAYMENT',
+  CONFIRMED = 'CONFIRMED',
+  REJECTED = 'REJECTED'
+}
+
 @Entity()
 export class Subscription {
   @PrimaryGeneratedColumn('uuid')
@@ -24,8 +33,8 @@ export class Subscription {
   @JoinTable({ name: 'subscription_roster' })
   athletes: AthleteProfile[];
 
-  @Column({ default: 'PENDING' })
-  status: string; // PENDING, APPROVED, REJECTED
+  @Column({ type: 'varchar', default: SubscriptionStatus.PENDING_DOCS })
+  status: SubscriptionStatus;
 
   @Column({ default: 'PENDING' })
   paymentStatus: string; // PENDING, PAID, FREE

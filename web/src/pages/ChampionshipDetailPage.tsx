@@ -5,6 +5,8 @@ import { useAuth } from '../contexts/AuthContext';
 import { Loader2, Trophy, Users, Shield, Check, Plus, Copy, CheckCircle2, X, Info, ArrowLeft, Calendar, MapPin, AlertCircle, Clock, Search, Filter } from 'lucide-react';
 import toast from 'react-hot-toast';
 import Navbar from '../components/Navbar';
+import SubscriptionStepper from '../components/championships/SubscriptionStepper';
+import ConfirmSubscriptionModal from '../components/championships/ConfirmSubscriptionModal';
 
 export default function ChampionshipDetailPage() {
   const { id } = useParams();
@@ -13,19 +15,22 @@ export default function ChampionshipDetailPage() {
   const [champ, setChamp] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
-  // Atlética State
   const [athleteProfile, setAthleteProfile] = useState<any>(null);
+  const [mySubscriptions, setMySubscriptions] = useState<any[]>([]);
+  const [teamMembers, setTeamMembers] = useState<any[]>([]);
+  const [loadingMembers, setLoadingMembers] = useState(false);
+  const [selectedModalities, setSelectedModalities] = useState<string[]>([]);
+  const [isAvailable, setIsAvailable] = useState<boolean>(false);
+  const [loadingAvailability, setLoadingAvailability] = useState(false);
+  const [teamAvailabilities, setTeamAvailabilities] = useState<any[]>([]);
   
   // Bulk Registration State
-  const [selectedModalities, setSelectedModalities] = useState<string[]>([]);
   const [isSubscribing, setIsSubscribing] = useState(false);
-  const [mySubscriptions, setMySubscriptions] = useState<any[]>([]);
   
   // Roster Management State
   const [showRosterModal, setShowRosterModal] = useState(false);
   const [selectedSubscription, setSelectedSubscription] = useState<any>(null);
-  const [teamMembers, setTeamMembers] = useState<any[]>([]);
-  const [loadingMembers, setLoadingMembers] = useState(false);
+  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
 
   // Filters State
   const [filterText, setFilterText] = useState('');
@@ -54,8 +59,31 @@ export default function ChampionshipDetailPage() {
     .then(res => res.json())
     .then(data => {
       setAthleteProfile(data || null);
+      if (data?.team?.id) {
+        fetchAvailabilities(data.team.id, data.id);
+      }
     })
     .catch(err => console.error('Erro ao buscar perfil', err));
+  };
+
+  const fetchAvailabilities = (teamId: string, profileId: string) => {
+    if (!token || !id) return;
+    fetch(`${API_URL}/teams/${teamId}/availability/${id}`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (Array.isArray(data)) {
+        setTeamAvailabilities(data);
+        const myAvail = data.find((a: any) => a.athleteProfile?.id === profileId);
+        if (myAvail && myAvail.status === 'AVAILABLE') {
+          setIsAvailable(true);
+        } else {
+          setIsAvailable(false);
+        }
+      }
+    })
+    .catch(err => console.error('Erro ao buscar disponibilidade', err));
   };
 
   const fetchMySubscriptions = () => {
@@ -98,6 +126,29 @@ export default function ChampionshipDetailPage() {
     );
   };
 
+  const toggleAvailability = async () => {
+    if (!user || !athleteProfile?.team) return;
+    setLoadingAvailability(true);
+    try {
+      const newStatus = !isAvailable;
+      const res = await fetch(`${API_URL}/teams/availability/${id}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ isAvailable: newStatus })
+      });
+      if (!res.ok) throw new Error('Erro ao alterar disponibilidade');
+      setIsAvailable(newStatus);
+      toast.success(newStatus ? 'Sua disponibilidade foi confirmada!' : 'Você marcou como indisponível.');
+    } catch (err: any) {
+      toast.error(err.message);
+    } finally {
+      setLoadingAvailability(false);
+    }
+  };
+
   const handleBulkSubscribe = async () => {
     if (!user) {
       toast.error('Faça login para se inscrever!');
@@ -136,6 +187,7 @@ export default function ChampionshipDetailPage() {
     if (successCount > 0) {
       toast.success(`${successCount} inscrição(ões) realizada(s) com sucesso!`, { id: toastId });
       setSelectedModalities([]);
+      setIsConfirmModalOpen(false);
       fetchMySubscriptions();
     } else {
       toast.error('Nenhuma inscrição foi concluída. Erro: ' + errors[0], { id: toastId });
@@ -228,14 +280,26 @@ export default function ChampionshipDetailPage() {
       <div className="min-h-screen bg-slate-50 pb-24 font-inter text-slate-800 pt-20">
         
         {/* HERO HEADER */}
-        <div className="bg-gradient-to-r from-slate-900 to-slate-800 text-white py-12 px-6 shadow-md relative overflow-hidden">
-          <div className="absolute top-0 right-0 opacity-5 pointer-events-none transform translate-x-1/4 -translate-y-1/4">
-            <Trophy size={400} />
-          </div>
+        <div className="relative pt-32 pb-20 overflow-hidden">
+          {champ.bannerUrl ? (
+            <>
+              <div 
+                className="absolute inset-0 bg-cover bg-center"
+                style={{ backgroundImage: `url(${API_URL}${champ.bannerUrl})` }}
+              />
+              <div className="absolute inset-0 bg-blue-900/80 backdrop-blur-sm" />
+            </>
+          ) : (
+            <div className="absolute inset-0 bg-gradient-to-r from-slate-900 to-slate-800" />
+          )}
+          <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
           
-          <div className="max-w-6xl mx-auto relative z-10">
-            <Link to="/campeonatos" className="inline-flex items-center gap-2 text-slate-300 hover:text-white transition-colors mb-6 text-sm font-medium">
-              <ArrowLeft size={16} /> Voltar para Campeonatos
+          <div className="max-w-6xl mx-auto px-6 relative z-10 text-white">
+            <Link 
+              to="/campeonatos" 
+              className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/20 rounded-full text-white transition-all mb-8 text-sm font-bold tracking-wide"
+            >
+              <ArrowLeft size={16} /> Voltar
             </Link>
             
             <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
@@ -253,7 +317,7 @@ export default function ChampionshipDetailPage() {
                   )}
                 </div>
                 
-                <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight mb-4">
+                <h1 className="text-4xl md:text-5xl font-mono font-bold uppercase tracking-tighter mb-4 text-white drop-shadow-md">
                   {champ.name}
                 </h1>
                 
@@ -318,9 +382,9 @@ export default function ChampionshipDetailPage() {
                   <Info size={24} />
                 </div>
                 <div>
-                  <h3 className="font-bold text-lg text-slate-800">Quer participar?</h3>
-                  <p className="text-slate-600 text-sm">Faça login e vincule-se a uma atlética para se inscrever nas modalidades.</p>
-                </div>
+                   <h3 className="font-mono font-bold uppercase tracking-wider text-lg text-slate-800">Quer participar?</h3>
+                   <p className="text-slate-600 text-sm mt-1">Faça login e vincule-se a uma atlética para se inscrever nas modalidades.</p>
+                 </div>
               </div>
               <Link to="/" className="bg-blue-600 text-white font-bold py-2.5 px-6 rounded-xl hover:bg-blue-700 transition-colors whitespace-nowrap shadow-sm">
                 Fazer Login
@@ -335,22 +399,48 @@ export default function ChampionshipDetailPage() {
                    <Shield size={24} />
                  </div>
                  <div>
-                   <h3 className="font-bold text-lg text-slate-800">Quase lá!</h3>
-                   <p className="text-slate-600 text-sm">Você precisa estar vinculado a uma atlética para poder se inscrever.</p>
+                   <h3 className="font-mono font-bold uppercase tracking-wider text-lg text-slate-800">Quase lá!</h3>
+                   <p className="text-slate-600 text-sm mt-1">Você precisa estar vinculado a uma atlética para poder se inscrever.</p>
                  </div>
                </div>
-               <Link to="/campeonatos" className="bg-orange-600 text-white font-bold py-2.5 px-6 rounded-xl hover:bg-orange-700 transition-colors whitespace-nowrap shadow-sm">
+               <Link to="/perfil" className="bg-orange-600 text-white font-bold py-2.5 px-6 rounded-xl hover:bg-orange-700 transition-colors whitespace-nowrap shadow-sm">
                  Vincular-se a uma Atlética
                </Link>
              </div>
           )}
 
+          {/* Painel de Disponibilidade do Atleta */}
+          {user && athleteProfile?.team && athleteProfile.teamRole !== 'PRESIDENT' && isEnrollmentOpen && (
+            <div className={`border rounded-2xl p-6 flex flex-col sm:flex-row items-center justify-between gap-6 shadow-sm transition-colors duration-300 ${isAvailable ? 'bg-green-50 border-green-200' : 'bg-white border-slate-200'}`}>
+              <div className="flex items-center gap-4">
+                <div className={`w-12 h-12 rounded-full flex items-center justify-center shrink-0 ${isAvailable ? 'bg-green-100 text-green-600' : 'bg-slate-100 text-slate-500'}`}>
+                  {isAvailable ? <CheckCircle2 size={24} /> : <Info size={24} />}
+                </div>
+                <div>
+                  <h3 className="font-mono font-bold uppercase tracking-wider text-lg text-slate-800">Sua Disponibilidade</h3>
+                  <p className="text-slate-600 text-sm mt-1">
+                    {isAvailable 
+                      ? "Você está marcado como DISPONÍVEL para jogar este campeonato. Seu presidente será notificado!"
+                      : "Confirme sua disponibilidade para sinalizar ao presidente da sua equipe que você quer ser convocado."}
+                  </p>
+                </div>
+              </div>
+              <button 
+                onClick={toggleAvailability}
+                disabled={loadingAvailability}
+                className={`font-bold py-2.5 px-6 rounded-xl transition-all whitespace-nowrap shadow-sm disabled:opacity-50 ${isAvailable ? 'bg-white text-green-700 border border-green-300 hover:bg-green-50' : 'bg-green-600 text-white hover:bg-green-700'}`}
+              >
+                {loadingAvailability ? 'Atualizando...' : (isAvailable ? 'Remover Disponibilidade' : 'Estou Disponível!')}
+              </button>
+            </div>
+          )}
+
           {/* Modalities Section */}
           <div>
             <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-4 mb-6">
-              <h2 className="text-2xl font-bold text-slate-800 flex items-center gap-3">
+              <h2 className="text-2xl font-bold font-mono uppercase tracking-wider text-slate-800 flex items-center gap-3">
                 <CheckCircle2 className="text-blue-600" /> 
-                Selecione as Modalidades
+                Modalidades
               </h2>
               
               {/* Filter Bar */}
@@ -447,11 +537,9 @@ export default function ChampionshipDetailPage() {
                         </div>
                         
                         <div className="p-6 pt-4 bg-green-50/30 flex-1 flex flex-col">
-                          <div className="flex justify-between items-center mb-6">
-                            <span className="text-sm font-semibold text-green-700">Inscrição Confirmada</span>
-                          </div>
+                          <SubscriptionStepper status={subscription.status} />
                           
-                          <div className="mt-auto flex justify-between items-center gap-4">
+                          <div className="mt-4 flex justify-between items-center gap-4">
                             <button 
                               onClick={() => handleUnsubscribe(mod.id)}
                               className="text-xs font-bold text-red-500 hover:text-red-700 hover:underline px-2"
@@ -486,8 +574,8 @@ export default function ChampionshipDetailPage() {
                         isSelected ? 'border-blue-500 shadow-md shadow-blue-500/10 cursor-pointer scale-[1.02] transform' : 'border-slate-200 hover:border-blue-300 hover:shadow-md cursor-pointer'
                       }`}
                     >
-                      <div className={`absolute top-5 right-5 w-6 h-6 rounded-full border-2 flex items-center justify-center transition-colors z-10 bg-white ${
-                        isSelected ? 'border-blue-500 bg-blue-500 text-white' : 'border-slate-300'
+                      <div className={`absolute top-5 right-5 w-6 h-6 rounded-full border-2 flex items-center justify-center transition-colors z-10 ${
+                        isSelected ? 'border-blue-500 bg-blue-600 text-white' : 'border-slate-300 bg-white'
                       }`}>
                         {isSelected && <Check size={14} strokeWidth={3} />}
                       </div>
@@ -536,24 +624,23 @@ export default function ChampionshipDetailPage() {
       {selectedModalities.length > 0 && user && athleteProfile?.team && (
         <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 shadow-[0_-10px_40px_-10px_rgba(0,0,0,0.1)] p-4 px-6 z-40 transform transition-transform animate-in slide-in-from-bottom-10">
           <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold text-lg">
+            <div className="flex items-center gap-3 w-full sm:w-auto">
+              <div className="w-10 h-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold text-lg shrink-0">
                 {selectedModalities.length}
               </div>
-              <div>
+              <div className="flex-1">
                 <p className="font-bold text-slate-800 leading-tight">Modalidades selecionadas</p>
-                <p className="text-xs text-slate-500">
+                <p className="text-xs text-slate-500 line-clamp-1">
                   {selectedModalities.map(id => champ.modalities.find((m: any) => m.id === id)?.name).join(', ')}
                 </p>
               </div>
             </div>
             <button 
-              onClick={handleBulkSubscribe}
+              onClick={() => setIsConfirmModalOpen(true)}
+              className="w-full sm:w-auto bg-blue-600 text-white px-8 py-3 rounded-xl font-bold hover:bg-blue-700 active:scale-95 transition-all shadow-md shadow-blue-600/20 disabled:opacity-70 flex justify-center items-center gap-2"
               disabled={isSubscribing}
-              className="w-full sm:w-auto bg-blue-600 text-white px-8 py-3 rounded-xl font-bold hover:bg-blue-700 active:scale-95 transition-all shadow-md shadow-blue-600/20 disabled:opacity-70 disabled:active:scale-100 flex items-center justify-center gap-2"
             >
-              {isSubscribing ? <Loader2 className="animate-spin" size={20} /> : <CheckCircle2 size={20} />}
-              Confirmar Inscrições
+              {isSubscribing ? <Loader2 className="animate-spin" size={20} /> : 'Confirmar Inscrições'}
             </button>
           </div>
         </div>
@@ -582,19 +669,34 @@ export default function ChampionshipDetailPage() {
                   <div className="flex justify-center py-4"><Loader2 className="animate-spin text-blue-600" /></div>
                 ) : (
                   <div className="space-y-2 max-h-[500px] overflow-y-auto pr-2 custom-scrollbar">
-                    {teamMembers.map((member: any) => {
+                    {[...teamMembers].sort((a, b) => {
+                      const availA = teamAvailabilities.some(av => av.athleteProfile?.id === a.id && av.status === 'AVAILABLE');
+                      const availB = teamAvailabilities.some(av => av.athleteProfile?.id === b.id && av.status === 'AVAILABLE');
+                      if (availA && !availB) return -1;
+                      if (!availA && availB) return 1;
+                      return 0;
+                    }).map((member: any) => {
                       const isInRoster = selectedSubscription.athletes?.some((a: any) => a.id === member.id);
                       if (isInRoster) return null; // already in roster
+
+                      const isMemberAvailable = teamAvailabilities.some(av => av.athleteProfile?.id === member.id && av.status === 'AVAILABLE');
 
                       return (
                         <div key={member.id} className="bg-slate-50 border border-slate-200 p-3 rounded-xl flex justify-between items-center hover:bg-white hover:border-slate-300 transition-colors">
                           <div>
-                            <p className="font-bold text-slate-800 text-sm">{member.user?.name}</p>
-                            <p className="text-[10px] text-slate-500 font-mono">{member.cpf} | {member.gender || 'N/A'}</p>
+                            <div className="flex items-center gap-2">
+                              <p className="font-bold text-slate-800 text-sm">{member.user?.name}</p>
+                              {isMemberAvailable && (
+                                <span className="bg-green-100 text-green-700 text-[9px] font-bold px-1.5 py-0.5 rounded uppercase flex items-center gap-1">
+                                  <CheckCircle2 size={10} /> Disponível
+                                </span>
+                              )}
+                            </div>
+                            <p className="text-[10px] text-slate-500 font-mono mt-1">{member.cpf} | {member.gender || 'N/A'}</p>
                           </div>
                           <button 
                             onClick={() => handleAddToRoster(selectedSubscription.id, member.id)}
-                            className="bg-blue-100 text-blue-700 hover:bg-blue-200 hover:text-blue-800 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors"
+                            className="bg-blue-100 text-blue-700 hover:bg-blue-200 hover:text-blue-800 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors shrink-0"
                           >
                             Add
                           </button>
@@ -644,6 +746,16 @@ export default function ChampionshipDetailPage() {
           </div>
         </div>
       )}
+
+      {/* MODAL DE CONFIRMAÇÃO DE INSCRIÇÃO */}
+      <ConfirmSubscriptionModal 
+        isOpen={isConfirmModalOpen}
+        onClose={() => setIsConfirmModalOpen(false)}
+        onConfirm={handleBulkSubscribe}
+        selectedModalities={champ?.modalities?.filter((m: any) => selectedModalities.includes(m.id)) || []}
+        championshipSettings={champ?.settings}
+        isSubscribing={isSubscribing}
+      />
     </>
   );
 }
