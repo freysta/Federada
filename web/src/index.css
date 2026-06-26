@@ -8,6 +8,9 @@
   h1, h2, h3, h4, h5, h6 {
     @apply font-sans font-bold tracking-wide uppercase;
   }
+  button, input, select, textarea {
+    @apply font-inter;
+  }
   
   /* Custom Scrollbar */
   ::-webkit-scrollbar {

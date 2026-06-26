@@ -14,6 +14,7 @@ export default {
         'sans': ['Bebas Neue', 'sans-serif'],
         'serif': ['Playfair Display', 'serif'],
         'mono': ['JetBrains Mono', 'monospace'],
+        'inter': ['Inter', 'sans-serif'],
       },
       animation: {
         'marquee': 'marquee 25s linear infinite',
