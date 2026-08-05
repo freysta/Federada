@@ -9,6 +9,7 @@ import GalleryPage from "./pages/GalleryPage";
 import CaadsPage from "./pages/CaadsPage";
 import VerifyEmail from "./pages/VerifyEmail";
 import ChampionshipsPage from "./pages/ChampionshipsPage";
+import AthleteDashboardPage from "./pages/championships/AthleteDashboardPage";
 import ChampionshipDetailPage from "./pages/ChampionshipDetailPage";
 import PublicResultsPage from "./pages/PublicResultsPage";
 import AdminLayout from "./pages/admin/AdminLayout";
@@ -61,6 +62,7 @@ function App() {
           {/* 2. CHAMPIONSHIP LAYOUT (Módulo Esportivo) */}
           <Route path="/campeonatos" element={<ChampionshipLayout />}>
             <Route index element={<ChampionshipsPage />} />
+            <Route path="painel" element={<PrivateRoute><AthleteDashboardPage /></PrivateRoute>} />
             <Route path=":id" element={<ChampionshipDetailPage />} />
             <Route path=":id/resultados" element={<PublicResultsPage />} />
           </Route>

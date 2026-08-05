@@ -138,6 +138,9 @@ export default function ChampionshipDetailPage() {
   const [filterType, setFilterType] = useState('ALL');
   const [filterGender, setFilterGender] = useState('ALL');
 
+  // Tabs State
+  const [activeTab, setActiveTab] = useState<'overview' | 'modalities' | 'teams' | 'brackets'>('overview');
+
   const fetchChampionship = () => {
     setLoading(true);
     apiClient.get<IChampionship>(`/championships/${id}`)
@@ -409,9 +412,77 @@ export default function ChampionshipDetailPage() {
           </div>
         </div>
 
+        {/* TABS NAVIGATION */}
+        <div className="bg-white border-b border-slate-200 sticky top-20 z-30 shadow-sm">
+          <div className="max-w-6xl mx-auto px-6 flex gap-8 overflow-x-auto no-scrollbar font-mono text-sm uppercase tracking-wider font-bold">
+            <button 
+              onClick={() => setActiveTab('overview')}
+              className={`py-4 border-b-2 whitespace-nowrap transition-colors ${activeTab === 'overview' ? 'border-blue-600 text-blue-600' : 'border-transparent text-slate-500 hover:text-slate-800 hover:border-slate-300'}`}
+            >
+              Visão Geral
+            </button>
+            <button 
+              onClick={() => setActiveTab('modalities')}
+              className={`py-4 border-b-2 whitespace-nowrap transition-colors flex items-center gap-2 ${activeTab === 'modalities' ? 'border-blue-600 text-blue-600' : 'border-transparent text-slate-500 hover:text-slate-800 hover:border-slate-300'}`}
+            >
+              Modalidades
+              {champ.modalities && champ.modalities.length > 0 && (
+                <span className="bg-slate-100 text-slate-600 py-0.5 px-2 rounded-full text-xs">{champ.modalities.length}</span>
+              )}
+            </button>
+            <button 
+              onClick={() => setActiveTab('teams')}
+              className={`py-4 border-b-2 whitespace-nowrap transition-colors ${activeTab === 'teams' ? 'border-blue-600 text-blue-600' : 'border-transparent text-slate-500 hover:text-slate-800 hover:border-slate-300'}`}
+            >
+              Equipes Inscritas
+            </button>
+            <button 
+              onClick={() => setActiveTab('brackets')}
+              className={`py-4 border-b-2 whitespace-nowrap transition-colors ${activeTab === 'brackets' ? 'border-blue-600 text-blue-600' : 'border-transparent text-slate-500 hover:text-slate-800 hover:border-slate-300'}`}
+            >
+              Chaveamentos & Resultados
+            </button>
+          </div>
+        </div>
+
         <div className="max-w-6xl mx-auto px-6 py-10 space-y-10">
           
-          {!user && (
+          {activeTab === 'overview' && (
+            <div className="animate-in fade-in duration-500 space-y-10">
+              <div className="bg-white rounded-2xl p-8 border border-slate-200 shadow-sm">
+                <h3 className="text-xl font-bold text-slate-800 mb-4 font-mono uppercase tracking-wider">Sobre o Evento</h3>
+                <p className="text-slate-600 whitespace-pre-wrap">{champ.description || 'Nenhuma descrição detalhada fornecida para este campeonato.'}</p>
+              </div>
+              
+              <div className="bg-white rounded-2xl p-8 border border-slate-200 shadow-sm">
+                <h3 className="text-xl font-bold text-slate-800 mb-4 font-mono uppercase tracking-wider">Regulamento Geral</h3>
+                <div className="bg-slate-50 rounded-xl p-6 border border-slate-100 text-center">
+                  <Info className="mx-auto text-slate-400 mb-2" size={32} />
+                  <p className="text-slate-500">O regulamento ainda não foi anexado pela organização.</p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'teams' && (
+            <div className="animate-in fade-in duration-500 text-center py-20 bg-white rounded-2xl border border-slate-200 shadow-sm">
+              <Shield className="mx-auto text-slate-300 mb-4" size={48} />
+              <h3 className="text-xl font-bold text-slate-600">Equipes Inscritas</h3>
+              <p className="text-slate-500 mt-2">As equipes inscritas aparecerão aqui em breve.</p>
+            </div>
+          )}
+
+          {activeTab === 'brackets' && (
+            <div className="animate-in fade-in duration-500 text-center py-20 bg-white rounded-2xl border border-slate-200 shadow-sm">
+              <Trophy className="mx-auto text-slate-300 mb-4" size={48} />
+              <h3 className="text-xl font-bold text-slate-600">Chaveamentos em Construção</h3>
+              <p className="text-slate-500 mt-2">A tabela de confrontos será gerada após o encerramento das inscrições.</p>
+            </div>
+          )}
+
+          {activeTab === 'modalities' && (
+            <div className="animate-in fade-in duration-500 space-y-10">
+              {!user && (
             <div className="bg-blue-50 border border-blue-200 rounded-2xl p-6 flex flex-col sm:flex-row items-center justify-between gap-6 shadow-sm">
               <div className="flex items-center gap-4">
                 <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 shrink-0">
@@ -579,6 +650,8 @@ export default function ChampionshipDetailPage() {
               );
             })()}
           </div>
+            </div>
+          )}
         </div>
       </div>
 

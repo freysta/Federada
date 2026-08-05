@@ -5,21 +5,12 @@ import { apiClient } from '../utils/apiClient';
 import { useAuth } from '../contexts/AuthContext';
 import { Loader2, Trophy, ArrowRight, Calendar, Activity, Settings, Shield, Search, Filter } from 'lucide-react';
 import toast from 'react-hot-toast';
-import AthleteDashboard from '../components/championships/AthleteDashboard';
-import AthleteOnboarding from '../components/championships/AthleteOnboarding';
 
 export default function ChampionshipsPage() {
   const { user, token } = useAuth();
   
   const [championships, setChampionships] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-
-  // Profile State to determine if we show Onboarding or Dashboard
-  const [athleteProfile, setAthleteProfile] = useState<any>(null);
-  const [loadingProfile, setLoadingProfile] = useState(true);
-  
-  // Tabs
-  const [activeTab, setActiveTab] = useState<'explore' | 'my-area'>('explore');
 
   // Filters
   const [searchTerm, setSearchTerm] = useState('');
@@ -40,31 +31,8 @@ export default function ChampionshipsPage() {
       });
   };
 
-  const fetchProfile = () => {
-    if (!token) {
-      setLoadingProfile(false);
-      return;
-    }
-    setLoadingProfile(true);
-    apiClient.get<any>('/teams/my/profile')
-    .then(data => {
-      setAthleteProfile(data || null);
-      setLoadingProfile(false);
-    })
-    .catch(err => {
-      console.error('Erro ao buscar perfil', err);
-      setLoadingProfile(false);
-    });
-  };
-
   useEffect(() => {
     fetchChampionships();
-    fetchProfile();
-    
-    // Auto-switch to my-area if there's a hash
-    if (window.location.hash === '#minha-area' && user) {
-      setActiveTab('my-area');
-    }
   }, [token, user]);
 
   return (
@@ -119,35 +87,8 @@ export default function ChampionshipsPage() {
 
         <div className="max-w-6xl mx-auto px-6 py-10 space-y-10">
           
-          {/* TABS */}
-          <div className="flex bg-slate-200 p-1 rounded-xl w-full sm:w-fit mx-auto sm:mx-0 shadow-inner">
-            <button 
-              onClick={() => setActiveTab('explore')}
-              className={`flex-1 sm:flex-none px-8 py-3 rounded-lg font-bold text-sm transition-all flex items-center gap-2 justify-center ${activeTab === 'explore' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
-            >
-              <Trophy size={16} /> Explorar
-            </button>
-            {user && (
-              <button 
-                onClick={() => setActiveTab('my-area')}
-                className={`flex-1 sm:flex-none px-8 py-3 rounded-lg font-bold text-sm transition-all flex items-center gap-2 justify-center ${activeTab === 'my-area' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
-              >
-                <Shield size={16} /> Minha Área
-              </button>
-            )}
-            {isManager && (
-              <a 
-                href="/admin/championships"
-                className={`flex-1 sm:flex-none px-8 py-3 rounded-lg font-bold text-sm transition-all flex items-center gap-2 justify-center text-slate-500 hover:text-slate-700`}
-              >
-                <Settings size={16} /> Painel de Gestão
-              </a>
-            )}
-          </div>
-
-          {/* TAB CONTENT */}
-          {activeTab === 'explore' && (
-            <div className="animate-in fade-in duration-500">
+          {/* CONTENT */}
+          <div className="animate-in fade-in duration-500">
               {loading ? (
                 <div className="flex justify-center py-20"><Loader2 className="animate-spin text-blue-600" size={48} /></div>
               ) : (
@@ -301,20 +242,7 @@ export default function ChampionshipsPage() {
                 </>
               )}
             </div>
-          )}
-
-          {activeTab === 'my-area' && user && (
-            <div className="animate-in fade-in duration-500">
-              {loadingProfile ? (
-                <div className="flex justify-center py-20"><Loader2 className="animate-spin text-blue-600" size={48} /></div>
-              ) : athleteProfile?.team ? (
-                <AthleteDashboard />
-              ) : (
-                <AthleteOnboarding onSuccess={fetchProfile} />
-              )}
             </div>
-          )}
-        </div>
       </div>
     </>
   );

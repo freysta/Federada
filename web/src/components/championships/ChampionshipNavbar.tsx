@@ -24,6 +24,12 @@ export default function ChampionshipNavbar() {
 					<Link to="/campeonatos" className="hover:text-blue-400 transition-colors underline-offset-4 text-blue-500 font-bold">
 						HUB DE CAMPEONATOS
 					</Link>
+					
+					{user && (
+						<Link to="/campeonatos/painel" className="hover:text-blue-400 transition-colors font-bold">
+							MEU PAINEL
+						</Link>
+					)}
 
 					{(user?.role === 'ADMIN' || user?.role === 'SPORTS_ADMIN') && (
 						<Link to="/admin" className="hover:text-orange-400 transition-colors font-bold">
