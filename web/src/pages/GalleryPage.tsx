@@ -3,7 +3,7 @@ import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import FadeIn from "../components/FadeIn";
 import { X, ZoomIn, Instagram, Share2, Camera } from "lucide-react";
-import { API_URL } from "../config";
+import { apiClient } from "../utils/apiClient";
 
 export default function GalleryPage() {
   const [posts, setPosts] = useState<any[]>([]);
@@ -13,8 +13,7 @@ export default function GalleryPage() {
   useEffect(() => {
     window.scrollTo(0, 0);
 
-    fetch(`${API_URL}/cms/instagram`)
-      .then(res => res.json())
+    apiClient.get<any[]>('/cms/instagram')
       .then(data => {
         // Distribuir span styles aleatoriamente ou sequencialmente para o mosaico
         const spans = [

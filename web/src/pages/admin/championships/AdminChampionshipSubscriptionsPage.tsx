@@ -1,48 +1,22 @@
 import { useState, useEffect } from 'react';
-import { useAuth } from '../../contexts/AuthContext';
-import { API_URL } from '../../config';
-import { Loader2, Search, CheckCircle, XCircle, Clock, DollarSign, Users, User as UserIcon } from 'lucide-react';
-import { useSearchParams, useNavigate } from 'react-router-dom';
-import Navbar from '../../components/Navbar';
+import { API_URL } from '../../../config';
+import { apiClient } from '../../../utils/apiClient';
+import { Loader2, Search, CheckCircle, XCircle, DollarSign, Clock, Users, User as UserIcon } from 'lucide-react';
+import { useParams } from 'react-router-dom';
 import toast from 'react-hot-toast';
 
-export default function AdminSubscriptions() {
-  const { token } = useAuth();
-  const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
-  const [championships, setChampionships] = useState<any[]>([]);
-  const [selectedChampId, setSelectedChampId] = useState<string>(searchParams.get('champId') || '');
+export default function AdminChampionshipSubscriptionsPage() {
+  const { id } = useParams();
   const [subscriptions, setSubscriptions] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
   const [loadingSubs, setLoadingSubs] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
 
-  // Fetch championships for the dropdown
+  // Fetch subscriptions when championship is mounted
   useEffect(() => {
-    fetch(`${API_URL}/championships`)
-      .then(res => res.json())
-      .then(data => {
-        setChampionships(data);
-        if (data.length > 0 && !selectedChampId) {
-          setSelectedChampId(data[0].id);
-        }
-        setLoading(false);
-      })
-      .catch(() => {
-        toast.error('Erro ao carregar campeonatos');
-        setLoading(false);
-      });
-  }, [selectedChampId]);
-
-  // Fetch subscriptions when a championship is selected
-  useEffect(() => {
-    if (!selectedChampId) return;
+    if (!id) return;
     
     setLoadingSubs(true);
-    fetch(`${API_URL}/championships/${selectedChampId}/subscriptions`, {
-      headers: { 'Authorization': `Bearer ${token}` }
-    })
-      .then(res => res.json())
+    apiClient.get<any[]>(`/championships/${id}/subscriptions`)
       .then(data => {
         setSubscriptions(Array.isArray(data) ? data : []);
         setLoadingSubs(false);
@@ -51,22 +25,11 @@ export default function AdminSubscriptions() {
         toast.error('Erro ao carregar inscrições');
         setLoadingSubs(false);
       });
-  }, [selectedChampId, token]);
+  }, [id]);
 
   const updateStatus = (subId: string, status: string) => {
     const loadingToast = toast.loading('Atualizando status...');
-    fetch(`${API_URL}/championships/subscription/${subId}/status`, {
-      method: 'PATCH',
-      headers: { 
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ status })
-    })
-    .then(res => {
-      if (!res.ok) throw new Error('Erro ao atualizar');
-      return res.json();
-    })
+    apiClient.patch(`/championships/subscription/${subId}/status`, { status })
     .then(() => {
       toast.dismiss(loadingToast);
       toast.success('Status atualizado!');
@@ -80,18 +43,7 @@ export default function AdminSubscriptions() {
 
   const updatePayment = (subId: string, paymentStatus: string) => {
     const loadingToast = toast.loading('Atualizando pagamento...');
-    fetch(`${API_URL}/championships/subscription/${subId}/payment`, {
-      method: 'PATCH',
-      headers: { 
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ paymentStatus })
-    })
-    .then(res => {
-      if (!res.ok) throw new Error('Erro ao atualizar');
-      return res.json();
-    })
+    apiClient.patch(`/championships/subscription/${subId}/payment`, { paymentStatus })
     .then(() => {
       toast.dismiss(loadingToast);
       toast.success('Pagamento atualizado!');
@@ -130,53 +82,32 @@ export default function AdminSubscriptions() {
     }
   };
 
-  if (loading) {
-    return <div className="flex justify-center py-20"><Loader2 className="animate-spin text-black" size={32} /></div>;
-  }
+
 
   return (
-    <div className="bg-slate-50 min-h-screen">
-      <Navbar />
-      <div className="max-w-6xl mx-auto space-y-6 pb-20 pt-28 px-4 sm:px-6">
-        <div className="flex justify-between items-center mb-2">
-          <div>
-            <h1 className="text-3xl font-bold font-mono tracking-tight uppercase text-slate-800">Inscrições</h1>
-            <p className="text-gray-500 font-mono text-sm mt-1">Gerencie as atléticas inscritas e aprove documentos.</p>
-          </div>
-          <button onClick={() => navigate('/campeonatos')} className="bg-white border border-gray-300 text-gray-700 px-4 py-2 font-bold font-mono text-sm hover:bg-gray-50 rounded-lg">
-            VOLTAR
-          </button>
+    <div className="space-y-6">
+      <div className="flex justify-between items-center mb-2">
+        <div>
+          <h1 className="text-3xl font-bold font-mono tracking-tight uppercase text-slate-800">Inscrições</h1>
+          <p className="text-gray-500 font-mono text-sm mt-1">Gerencie as equipes inscritas e aprove documentos.</p>
         </div>
+      </div>
 
-        <div className="bg-white border border-gray-300 rounded-xl shadow-md p-4">
-          <div className="flex flex-col md:flex-row gap-4">
-            <div className="flex-1">
-              <label className="block text-xs font-bold text-gray-600 mb-1 uppercase">Selecione o Campeonato</label>
-              <select 
-                value={selectedChampId} 
-                onChange={e => setSelectedChampId(e.target.value)}
-                className="w-full border border-gray-300 rounded-lg p-2.5 outline-none focus:border-blue-500 font-mono text-sm bg-gray-50"
-              >
-                {championships.map(champ => (
-                  <option key={champ.id} value={champ.id}>{champ.name} ({champ.status})</option>
-                ))}
-              </select>
-            </div>
-            <div className="flex-1">
-              <label className="block text-xs font-bold text-gray-600 mb-1 uppercase">Buscar Inscrição</label>
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
-                <input 
-                  type="text" 
-                  placeholder="Buscar por atlética, atleta ou modalidade..." 
-                  value={searchQuery}
-                  onChange={e => setSearchQuery(e.target.value)}
-                  className="w-full border border-gray-300 rounded-lg pl-9 pr-4 py-2.5 outline-none focus:border-blue-500 font-mono text-sm bg-gray-50"
-                />
-              </div>
-            </div>
+      <div className="bg-white border border-gray-300 rounded-xl shadow-md p-4">
+        <div className="flex-1">
+          <label className="block text-xs font-bold text-gray-600 mb-1 uppercase">Buscar Inscrição</label>
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
+            <input 
+              type="text" 
+              placeholder="Buscar por equipe, atleta ou modalidade..." 
+              value={searchQuery}
+              onChange={e => setSearchQuery(e.target.value)}
+              className="w-full border border-gray-300 rounded-lg pl-9 pr-4 py-2.5 outline-none focus:border-blue-500 font-mono text-sm bg-gray-50"
+            />
           </div>
         </div>
+      </div>
 
         <div className="bg-white border border-gray-300 rounded-xl shadow-md overflow-hidden">
           {loadingSubs ? (
@@ -190,7 +121,7 @@ export default function AdminSubscriptions() {
               <table className="w-full text-left border-collapse">
                 <thead>
                   <tr className="bg-gray-100 border-b border-gray-200 text-xs uppercase tracking-wider text-gray-600 font-bold">
-                    <th className="p-4">Inscrito (Atlética / Atleta)</th>
+                    <th className="p-4">Inscrito (Equipe / Atleta)</th>
                     <th className="p-4">Modalidade</th>
                     <th className="p-4">Status Inscrição</th>
                     <th className="p-4">Pagamento</th>
@@ -269,6 +200,5 @@ export default function AdminSubscriptions() {
           )}
         </div>
       </div>
-    </div>
   );
 }

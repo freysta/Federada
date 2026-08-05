@@ -32,6 +32,8 @@ import { Modality } from './championships/entities/modality.entity';
 import { Subscription } from './championships/entities/subscription.entity';
 import { Match } from './championships/entities/match.entity';
 import { ChampionshipDocument } from './championships/entities/championship-document.entity';
+import { Coupon } from './coupons/entities/coupon.entity';
+import { AthleteAvailability } from './teams/entities/athlete-availability.entity';
 
 @Module({
   imports: [
@@ -43,10 +45,12 @@ import { ChampionshipDocument } from './championships/entities/championship-docu
       serveRoot: '/uploads/',
     }),
     EventEmitterModule.forRoot(),
-    ThrottlerModule.forRoot([{
-      ttl: 60000,
-      limit: 100, // 100 requests per minute per IP
-    }]),
+    ThrottlerModule.forRoot([
+      {
+        ttl: 60000,
+        limit: 100, // 100 requests per minute per IP
+      },
+    ]),
     MailerModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
@@ -75,16 +79,53 @@ import { ChampionshipDocument } from './championships/entities/championship-docu
           return {
             type: 'postgres',
             url: dbUrl,
-            entities: [Order, OrderItem, User, Product, TeamMember, News, Event, Team, AthleteProfile, Championship, Modality, Subscription, Match, ChampionshipDocument],
+            entities: [
+              Order,
+              OrderItem,
+              User,
+              Product,
+              TeamMember,
+              News,
+              Event,
+              Team,
+              AthleteProfile,
+              Championship,
+              Modality,
+              Subscription,
+              Match,
+              ChampionshipDocument,
+              Coupon,
+              AthleteAvailability,
+            ],
             synchronize: process.env.NODE_ENV !== 'production',
-            ssl: process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : false,
+            ssl:
+              process.env.DB_SSL === 'true'
+                ? { rejectUnauthorized: false }
+                : false,
           };
         }
         // Fallback para SQLite em ambiente de dev local (sem URL de banco)
         return {
           type: 'sqlite',
           database: 'data/database.sqlite',
-          entities: [Order, OrderItem, User, Product, TeamMember, News, Event, Team, AthleteProfile, Championship, Modality, Subscription, Match, ChampionshipDocument],
+          entities: [
+            Order,
+            OrderItem,
+            User,
+            Product,
+            TeamMember,
+            News,
+            Event,
+            Team,
+            AthleteProfile,
+            Championship,
+            Modality,
+            Subscription,
+            Match,
+            ChampionshipDocument,
+            Coupon,
+            AthleteAvailability,
+          ],
           synchronize: true,
         };
       },
@@ -104,7 +145,7 @@ import { ChampionshipDocument } from './championships/entities/championship-docu
     {
       provide: APP_GUARD,
       useClass: ThrottlerGuard,
-    }
+    },
   ],
 })
 export class AppModule {}

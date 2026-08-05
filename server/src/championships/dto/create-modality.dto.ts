@@ -1,4 +1,13 @@
-import { IsString, IsNumber, Min, IsEnum, IsOptional } from 'class-validator';
+import {
+  IsString,
+  IsNotEmpty,
+  IsNumber,
+  Min,
+  Max,
+  IsEnum,
+  IsOptional,
+  MaxLength,
+} from 'class-validator';
 
 export enum ModalityType {
   INDIVIDUAL = 'INDIVIDUAL',
@@ -13,6 +22,8 @@ export enum ModalityGender {
 
 export class CreateModalityDto {
   @IsString()
+  @IsNotEmpty()
+  @MaxLength(100)
   name: string;
 
   @IsEnum(ModalityType)
@@ -20,6 +31,7 @@ export class CreateModalityDto {
 
   @IsNumber()
   @Min(0)
+  @Max(99999)
   price: number;
 
   @IsNumber()
@@ -41,4 +53,9 @@ export class CreateModalityDto {
   @IsOptional()
   @IsEnum(ModalityGender)
   gender?: ModalityGender;
+
+  @IsOptional()
+  @IsNumber()
+  @Min(1)
+  maxSpots?: number;
 }

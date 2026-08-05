@@ -1,12 +1,11 @@
 import { useState, useEffect } from 'react';
-import { useAuth } from '../../contexts/AuthContext';
 import { API_URL } from '../../config';
+import { apiClient } from '../../utils/apiClient';
 import { Loader2, CheckCircle2, XCircle, FileText, ChevronDown, ChevronUp, Search } from 'lucide-react';
 import toast from 'react-hot-toast';
 import Pagination from '../../components/admin/Pagination';
 
 export default function AdminDocuments() {
-  const { token } = useAuth();
   const [documents, setDocuments] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [expandedTeam, setExpandedTeam] = useState<string | null>(null);
@@ -19,15 +18,12 @@ export default function AdminDocuments() {
   }, [searchQuery]);
 
   const fetchDocuments = () => {
-    fetch(`${API_URL}/teams/admin/documents`, {
-      headers: { 'Authorization': `Bearer ${token}` }
-    })
-    .then(res => res.json())
+    apiClient.get<any[]>('/teams/admin/documents')
     .then(data => {
       if (Array.isArray(data)) {
         setDocuments(data);
       } else {
-        toast.error(data.message || 'Erro ao buscar documentos');
+        toast.error('Erro ao buscar documentos');
         setDocuments([]);
       }
       setLoading(false);
@@ -41,7 +37,7 @@ export default function AdminDocuments() {
 
   useEffect(() => {
     fetchDocuments();
-  }, [token]);
+  }, []);
 
   const handleValidation = (id: string, type: 'rg' | 'enrollment', status: 'APPROVED' | 'REJECTED') => {
     let rejectionReason = undefined;
@@ -55,18 +51,7 @@ export default function AdminDocuments() {
       rejectionReason = reason;
     }
 
-    fetch(`${API_URL}/teams/admin/documents/${id}`, {
-      method: 'PATCH',
-      headers: { 
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ type, status, rejectionReason })
-    })
-    .then(res => {
-      if (!res.ok) throw new Error('Erro ao validar documento');
-      return res.json();
-    })
+    apiClient.patch(`/teams/admin/documents/${id}`, { type, status, rejectionReason })
     .then(() => {
       toast.success(`Documento ${status === 'APPROVED' ? 'Aprovado' : 'Reprovado'} com sucesso!`);
       fetchDocuments(); // Refresh list
@@ -114,7 +99,7 @@ export default function AdminDocuments() {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
             <input 
               type="text" 
-              placeholder="Buscar atlética..." 
+              placeholder="Buscar equipe..." 
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full border border-gray-300 rounded-lg pl-10 pr-4 py-2 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all bg-white"
@@ -126,7 +111,7 @@ export default function AdminDocuments() {
           <div className="flex justify-center py-10"><Loader2 className="animate-spin" size={32} /></div>
         ) : paginatedTeams.length === 0 ? (
           <div className="text-center py-10 text-gray-500 text-sm">
-            {searchQuery ? 'Nenhuma atlética encontrada na busca.' : 'Nenhuma atlética com atletas cadastrados no momento.'}
+            {searchQuery ? 'Nenhuma equipe encontrada na busca.' : 'Nenhuma equipe com atletas cadastrados no momento.'}
           </div>
         ) : (
           <div className="space-y-4">

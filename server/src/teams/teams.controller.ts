@@ -1,9 +1,25 @@
-import { Controller, Get, Post, Patch, Body, Param, UseGuards, Request, UseInterceptors, UploadedFile } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Patch,
+  Body,
+  Param,
+  UseGuards,
+  Request,
+  UseInterceptors,
+  UploadedFile,
+  ParseFilePipe,
+  MaxFileSizeValidator,
+  FileTypeValidator,
+} from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { TeamsService } from './teams.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
+import { CreateTeamDto } from './dto/create-team.dto';
+import { JoinTeamDto } from './dto/join-team.dto';
 
 @Controller('teams')
 export class TeamsController {
@@ -11,10 +27,11 @@ export class TeamsController {
 
   @UseGuards(JwtAuthGuard)
   @Post()
-  createTeam(@Request() req: any, @Body() body: { name: string; university?: string; logoUrl?: string }) {
+  createTeam(@Request() req: any, @Body() body: CreateTeamDto) {
     return this.teamsService.createTeam(req.user.userId, body);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get()
   findAll() {
     return this.teamsService.findAll();
@@ -22,8 +39,13 @@ export class TeamsController {
 
   @UseGuards(JwtAuthGuard)
   @Post('join')
-  joinTeam(@Request() req: any, @Body() body: { inviteCode: string; cpf: string; birthDate: Date; course?: string; period?: string; gender?: string }) {
+  joinTeam(@Request() req: any, @Body() body: JoinTeamDto) {
     return this.teamsService.joinTeam(req.user.userId, body.inviteCode, body);
+  }
+
+  @Get('invite/:code')
+  getInviteInfo(@Param('code') code: string) {
+    return this.teamsService.getInviteInfo(code);
   }
 
   @UseGuards(JwtAuthGuard)
@@ -50,7 +72,12 @@ export class TeamsController {
   @Patch('profile/:profileId/documents')
   updateDocumentStatus(
     @Param('profileId') profileId: string,
-    @Body() data: { type: 'rg' | 'enrollment'; status: 'APPROVED' | 'REJECTED'; rejectionReason?: string }
+    @Body()
+    data: {
+      type: 'rg' | 'enrollment';
+      status: 'APPROVED' | 'REJECTED';
+      rejectionReason?: string;
+    },
   ) {
     return this.teamsService.updateDocumentStatus(profileId, data);
   }
@@ -61,16 +88,20 @@ export class TeamsController {
   setAvailability(
     @Request() req: any,
     @Param('championshipId') championshipId: string,
-    @Body('isAvailable') isAvailable: boolean
+    @Body('isAvailable') isAvailable: boolean,
   ) {
-    return this.teamsService.setAvailability(req.user.userId, championshipId, isAvailable);
+    return this.teamsService.setAvailability(
+      req.user.userId,
+      championshipId,
+      isAvailable,
+    );
   }
 
   @UseGuards(JwtAuthGuard)
   @Get(':teamId/availability/:championshipId')
   getAvailabilities(
     @Param('teamId') teamId: string,
-    @Param('championshipId') championshipId: string
+    @Param('championshipId') championshipId: string,
   ) {
     return this.teamsService.getAvailabilities(teamId, championshipId);
   }
@@ -81,7 +112,15 @@ export class TeamsController {
   uploadDocument(
     @Request() req: any,
     @Param('type') type: 'rg' | 'enrollment',
-    @UploadedFile() file: Express.Multer.File,
+    @UploadedFile(
+      new ParseFilePipe({
+        validators: [
+          new MaxFileSizeValidator({ maxSize: 5 * 1024 * 1024 }), // 5MB
+          new FileTypeValidator({ fileType: '.(png|jpeg|jpg|pdf)' }),
+        ],
+      }),
+    )
+    file: Express.Multer.File,
   ) {
     return this.teamsService.uploadDocument(req.user.userId, type, file);
   }

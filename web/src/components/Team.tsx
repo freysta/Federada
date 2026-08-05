@@ -3,17 +3,14 @@ import FadeIn from './FadeIn';
 import TiltCard from './TiltCard';
 import { Shield } from 'lucide-react';
 import { API_URL } from '../config';
+import { apiClient } from '../utils/apiClient';
 
 export default function Team() {
   const [teamMembers, setTeamMembers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch(`${API_URL}/cms/team`)
-      .then(res => {
-        if (!res.ok) throw new Error('Falha');
-        return res.json();
-      })
+    apiClient.get<any[]>('/cms/team')
       .then(data => {
         if (Array.isArray(data)) setTeamMembers(data);
         else setTeamMembers([]);

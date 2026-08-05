@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { X, Loader2, LogIn, UserPlus } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
-import { API_URL } from '../config';
+import { apiClient } from '../utils/apiClient';
 import { createPortal } from 'react-dom';
 import toast from 'react-hot-toast';
 import { GoogleLogin } from '@react-oauth/google';
@@ -25,16 +25,7 @@ export default function LoginModal({ isOpen, onClose }: { isOpen: boolean; onClo
     setLoading(true);
     setError('');
     try {
-      const res = await fetch(`${API_URL}/auth/google`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ token: credentialResponse.credential })
-      });
-      if (!res.ok) {
-        const errorData = await res.json();
-        throw new Error(errorData.message || 'Erro no login com Google');
-      }
-      const data = await res.json();
+      const data = await apiClient.post<any>('/auth/google', { token: credentialResponse.credential });
       login(data.access_token, data.user);
       toast.success('Login efetuado!');
       onClose();
@@ -57,18 +48,7 @@ export default function LoginModal({ isOpen, onClose }: { isOpen: boolean; onClo
         ? { email: formData.email, password: formData.password }
         : { name: formData.name, email: formData.email, password: formData.password };
 
-      const res = await fetch(`${API_URL}${endpoint}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body)
-      });
-
-      if (!res.ok) {
-        const errorData = await res.json();
-        throw new Error(errorData.message || (mode === 'login' ? 'Credenciais inválidas' : 'Erro ao criar conta.'));
-      }
-
-      const data = await res.json();
+      const data = await apiClient.post<any>(endpoint, body);
       if (mode === 'register') {
         toast.success(data.message || 'Conta criada com sucesso! Verifique seu e-mail.');
         setMode('login');

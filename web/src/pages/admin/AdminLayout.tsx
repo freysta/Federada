@@ -1,13 +1,13 @@
 import { Outlet, Navigate, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
-import { LayoutDashboard, Package, ShoppingBag, Users, KeyRound, LogOut, Image, Calendar, MessageSquare, FileCheck2, Trophy, Store, ClipboardList } from 'lucide-react';
+import { LayoutDashboard, Package, ShoppingBag, Users, LogOut, Calendar, MessageSquare, FileCheck2, Store, Ticket, Trophy } from 'lucide-react';
 
 export default function AdminLayout() {
   const { user, logout } = useAuth();
   const location = useLocation();
 
   if (!user || !['ADMIN', 'STORE_ADMIN', 'SPORTS_ADMIN'].includes(user.role)) {
-    return <Navigate to="/login" />;
+    return <Navigate to="/" replace />;
   }
 
   const isSuperAdmin = user.role === 'ADMIN';
@@ -15,20 +15,25 @@ export default function AdminLayout() {
   const isSportsAdmin = user.role === 'SPORTS_ADMIN' || isSuperAdmin;
 
     const menuItems = [
-      { type: 'divider', label: 'E-COMMERCE', show: isStoreAdmin },
-      { path: '/admin', icon: <LayoutDashboard size={16} />, label: 'Painel de Controle', show: true },
+      { path: '/admin', icon: <LayoutDashboard size={16} />, label: 'Dashboard', show: true },
+
+      { type: 'divider', label: 'LOJA', show: isStoreAdmin },
       { path: '/admin/products', icon: <Package size={16} />, label: 'Produtos', show: isStoreAdmin },
       { path: '/admin/orders', icon: <ShoppingBag size={16} />, label: 'Pedidos', show: isStoreAdmin },
+      { path: '/admin/coupons', icon: <Ticket size={16} />, label: 'Cupons', show: isStoreAdmin },
+      
+      { type: 'divider', label: 'CAMPEONATOS', show: isSportsAdmin },
+      { path: '/admin/championships', icon: <Trophy size={16} />, label: 'Campeonatos', show: isSportsAdmin },
+      
+      { type: 'divider', label: 'USUÁRIOS', show: isSuperAdmin },
       { path: '/admin/users', icon: <Users size={16} />, label: 'Usuários', show: isSuperAdmin },
-      
-      { type: 'divider', label: 'HUB ESPORTIVO', show: isSportsAdmin },
-      { path: '/admin/documents', icon: <FileCheck2 size={16} />, label: 'Documentos', show: isSportsAdmin },
-      
+
       { type: 'divider', label: 'COMUNICAÇÃO', show: isSportsAdmin || isStoreAdmin },
       { path: '/admin/events', icon: <Calendar size={16} />, label: 'Eventos', show: isSportsAdmin || isStoreAdmin },
       { path: '/admin/news', icon: <MessageSquare size={16} />, label: 'Fórum', show: isSportsAdmin || isStoreAdmin },
       
       { type: 'divider', label: 'SISTEMA', show: true },
+      { path: '/admin/documents', icon: <FileCheck2 size={16} />, label: 'Documentos', show: isSportsAdmin },
     ];
   
     const visibleMenuItems = menuItems.filter(item => item.show !== false);

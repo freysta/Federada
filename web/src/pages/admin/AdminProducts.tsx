@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
-import { useAuth } from '../../contexts/AuthContext';
 import { API_URL } from '../../config';
+import { apiClient } from '../../utils/apiClient';
+import type { IProduct } from '../../types';
 import { Loader2, Plus, Edit, Trash2, X, Search } from 'lucide-react';
 import toast from 'react-hot-toast';
 import Pagination from '../../components/admin/Pagination';
@@ -19,15 +20,14 @@ interface Product {
 }
 
 export default function AdminProducts() {
-  const { token } = useAuth();
-  const [products, setProducts] = useState<any[]>([]);
+  const [products, setProducts] = useState<IProduct[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
-  const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
   useEffect(() => {
-    setCurrentPage(1);
+    setPage(1);
   }, [searchQuery]);
 
   // Modal State
@@ -67,10 +67,9 @@ export default function AdminProducts() {
   const fetchProducts = async () => {
     setLoading(true);
     try {
-      const res = await fetch(`${API_URL}/products`);
-      if (!res.ok) throw new Error('Falha');
-      const data = await res.json();
-      setProducts(data);
+      const result = await apiClient.get<{data: IProduct[], totalPages: number}>(`/products?page=${page}&limit=10`);
+      setProducts(result.data || []);
+      setTotalPages(result.totalPages || 1);
     } catch (err) {
       toast.error('Erro ao carregar produtos');
     } finally {
@@ -80,21 +79,17 @@ export default function AdminProducts() {
 
   useEffect(() => {
     fetchProducts();
-  }, []);
+  }, [page]);
 
   const uploadImage = async (file: File): Promise<string> => {
     const fd = new FormData();
     fd.append('file', file);
-    const res = await fetch(`${API_URL}/upload`, { 
-      method: 'POST', 
-      body: fd,
-      headers: {
-        'Authorization': `Bearer ${token}`
-      }
-    });
-    if (!res.ok) throw new Error('Falha no upload da imagem');
-    const data = await res.json();
-    return data.url;
+    try {
+      const data = await apiClient.post<any>('/upload', fd);
+      return data.url;
+    } catch (err) {
+      throw new Error('Falha no upload da imagem');
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -125,21 +120,13 @@ export default function AdminProducts() {
         extraImages
       };
 
-      const url = editingProduct ? `${API_URL}/products/${editingProduct.id}` : `${API_URL}/products`;
-      const method = editingProduct ? 'PUT' : 'POST';
-
-      const res = await fetch(url, {
-        method,
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify(payload)
-      });
+      if (editingProduct) {
+        await apiClient.put(`/products/${editingProduct.id}`, payload);
+      } else {
+        await apiClient.post('/products', payload);
+      }
 
       toast.dismiss(loadingToast);
-
-      if (!res.ok) throw new Error('Erro ao salvar produto');
 
       toast.success(editingProduct ? 'Produto atualizado!' : 'Produto criado!');
       setIsModalOpen(false);
@@ -175,11 +162,7 @@ export default function AdminProducts() {
   const handleDelete = async (id: string) => {
     if (!confirm('Tem certeza que deseja excluir?')) return;
     try {
-      const res = await fetch(`${API_URL}/products/${id}`, {
-        method: 'DELETE',
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-      if (!res.ok) throw new Error('Erro ao deletar');
+      await apiClient.delete(`/products/${id}`);
       toast.success('Produto excluído');
       fetchProducts();
     } catch (err: any) {
@@ -222,9 +205,6 @@ export default function AdminProducts() {
     (p.category && p.category.toLowerCase().includes(searchQuery.toLowerCase()))
   );
 
-  const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
-  const paginatedProducts = filteredProducts.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
-
   return (
     <div className="space-y-6 relative">
       <div className="flex justify-between items-end border-b-2 border-black pb-2">
@@ -259,13 +239,13 @@ export default function AdminProducts() {
               </tr>
           </thead>
           <tbody className="divide-y divide-gray-200">
-              {paginatedProducts.length === 0 ? (
+              {filteredProducts.length === 0 ? (
                 <tr>
                   <td colSpan={5} className="p-8 text-center text-gray-500 text-sm">Nenhum produto encontrado.</td>
                 </tr>
               ) : (
-                paginatedProducts.map((p) => (
-              <tr key={p.id} className="hover:bg-gray-50 transition-colors cursor-pointer" onClick={() => handleEdit(p)}>
+                filteredProducts.map((p) => (
+              <tr key={p.id} className="hover:bg-gray-50 transition-colors cursor-pointer" onClick={() => handleEdit(p as any)}>
                 <td className="px-4 py-2">
                   <div className="flex items-center">
                     <div className="w-10 h-10 bg-gray-200 overflow-hidden rounded-lg mr-3 border border-gray-300 shrink-0">
@@ -282,7 +262,7 @@ export default function AdminProducts() {
                 <td className="px-4 py-2 font-mono text-xs text-gray-600">{p.sizes ? p.sizes.join(', ') : '-'}</td>
                 <td className="px-4 py-2 text-right">
                   <div className="flex justify-end gap-2">
-                    <button onClick={(e) => { e.stopPropagation(); handleEdit(p); }} className="p-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors"><Edit size={16} /></button>
+                    <button onClick={(e) => { e.stopPropagation(); handleEdit(p as any); }} className="p-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors"><Edit size={16} /></button>
                     <button onClick={(e) => { e.stopPropagation(); handleDelete(p.id); }} className="p-1.5 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg transition-colors"><Trash2 size={16} /></button>
                   </div>
                 </td>
@@ -292,15 +272,12 @@ export default function AdminProducts() {
         </table>
         </div>
         <Pagination
-          currentPage={currentPage}
+          currentPage={page}
           totalPages={totalPages}
-          totalItems={filteredProducts.length}
-          itemsPerPage={itemsPerPage}
-          onPageChange={setCurrentPage}
-          onItemsPerPageChange={(items) => {
-            setItemsPerPage(items);
-            setCurrentPage(1);
-          }}
+          totalItems={totalPages * 10} // Approximated
+          itemsPerPage={10}
+          onPageChange={setPage}
+          onItemsPerPageChange={() => {}}
         />
       </div>
 

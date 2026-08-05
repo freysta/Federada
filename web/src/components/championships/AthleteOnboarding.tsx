@@ -1,6 +1,5 @@
 import { useState } from 'react';
-import { API_URL } from '../../config';
-import { useAuth } from '../../contexts/AuthContext';
+import { apiClient } from '../../utils/apiClient';
 import { Loader2, Users, Trophy, Plus, Shield } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -9,7 +8,6 @@ interface AthleteOnboardingProps {
 }
 
 export default function AthleteOnboarding({ onSuccess }: AthleteOnboardingProps) {
-  const { token } = useAuth();
   
   // Athlete Form
   const [inviteCode, setInviteCode] = useState('');
@@ -24,6 +22,10 @@ export default function AthleteOnboarding({ onSuccess }: AthleteOnboardingProps)
   const [isCreatingTeam, setIsCreatingTeam] = useState(false);
   const [newTeamName, setNewTeamName] = useState('');
   const [newTeamUniversity, setNewTeamUniversity] = useState('');
+  const [newTeamCnpj, setNewTeamCnpj] = useState('');
+  const [newTeamCity, setNewTeamCity] = useState('');
+  const [newTeamState, setNewTeamState] = useState('');
+  const [newTeamInstagram, setNewTeamInstagram] = useState('');
   const [isCreating, setIsCreating] = useState(false);
 
   const handleJoinTeam = async (e: React.FormEvent) => {
@@ -31,16 +33,7 @@ export default function AthleteOnboarding({ onSuccess }: AthleteOnboardingProps)
     setIsJoining(true);
     const toastId = toast.loading('Entrando na equipe...');
     try {
-      const res = await fetch(`${API_URL}/teams/join`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({ inviteCode, cpf, birthDate, course, period, gender })
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message || 'Erro ao entrar na Atlética. Verifique os dados.');
+      await apiClient.post('/teams/join', { inviteCode, cpf, birthDate, course, period, gender });
       
       toast.success('Bem-vindo à equipe!', { id: toastId });
       onSuccess();
@@ -54,20 +47,18 @@ export default function AthleteOnboarding({ onSuccess }: AthleteOnboardingProps)
   const handleCreateTeam = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsCreating(true);
-    const toastId = toast.loading('Criando a Atlética...');
+    const toastId = toast.loading('Criando a Equipe...');
     try {
-      const res = await fetch(`${API_URL}/teams`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({ name: newTeamName, university: newTeamUniversity })
+      await apiClient.post('/teams', { 
+        name: newTeamName, 
+        university: newTeamUniversity,
+        cnpj: newTeamCnpj,
+        city: newTeamCity,
+        state: newTeamState,
+        instagram: newTeamInstagram
       });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message || 'Erro ao criar Atlética');
       
-      toast.success('Atlética criada com sucesso!', { id: toastId, duration: 5000 });
+      toast.success('Equipe criada com sucesso!', { id: toastId, duration: 5000 });
       onSuccess();
     } catch (err: any) {
       toast.error(err.message, { id: toastId });
@@ -85,7 +76,7 @@ export default function AthleteOnboarding({ onSuccess }: AthleteOnboardingProps)
         <div className="relative z-10 text-white">
           <h2 className="text-3xl font-extrabold mb-2">Vincule-se a uma Equipe</h2>
           <p className="text-blue-100 max-w-lg mx-auto">
-            Para competir nos campeonatos e gerenciar suas inscrições, você precisa fazer parte de uma atlética oficial.
+            Para competir nos campeonatos e gerenciar suas inscrições, você precisa fazer parte de uma equipe oficial.
           </p>
         </div>
       </div>
@@ -100,7 +91,7 @@ export default function AthleteOnboarding({ onSuccess }: AthleteOnboardingProps)
           <h3 className="font-bold text-xl mb-6 flex items-center gap-2 text-slate-800">
             <Users size={24} className="text-blue-600" /> Sou um Atleta
           </h3>
-          <p className="text-sm text-slate-500 mb-6">Recebeu o código de convite do presidente da sua atlética? Insira abaixo para entrar no plantel.</p>
+          <p className="text-sm text-slate-500 mb-6">Recebeu o código de convite do presidente da sua equipe? Insira abaixo para entrar no plantel.</p>
           
           <form onSubmit={handleJoinTeam} className="space-y-5 relative z-10">
             <div>
@@ -175,7 +166,7 @@ export default function AthleteOnboarding({ onSuccess }: AthleteOnboardingProps)
           {!isCreatingTeam ? (
             <div className="flex-1 flex flex-col items-center justify-center text-center relative z-10">
               <p className="text-slate-600 mb-8 max-w-sm">
-                Sua atlética ainda não está na plataforma? Crie a delegação agora, receba o código de convite e traga seus atletas.
+                Sua equipe ainda não está na plataforma? Crie a delegação agora, receba o código de convite e traga seus atletas.
               </p>
               <button 
                 onClick={() => setIsCreatingTeam(true)}
@@ -184,7 +175,7 @@ export default function AthleteOnboarding({ onSuccess }: AthleteOnboardingProps)
                 <div className="bg-slate-100 p-3 rounded-full">
                   <Plus size={32} />
                 </div>
-                Registrar Nova Atlética
+                Registrar Nova Equipe
               </button>
             </div>
           ) : (
@@ -205,9 +196,45 @@ export default function AthleteOnboarding({ onSuccess }: AthleteOnboardingProps)
                   className="w-full bg-white border border-slate-300 rounded-xl p-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all shadow-sm" 
                 />
               </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-bold text-slate-600 mb-1">CNPJ (Opcional)</label>
+                  <input 
+                    type="text" value={newTeamCnpj} onChange={e => setNewTeamCnpj(e.target.value)}
+                    placeholder="00.000.000/0000-00"
+                    className="w-full bg-white border border-slate-300 rounded-xl p-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all shadow-sm font-mono text-sm" 
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-slate-600 mb-1">INSTAGRAM (Opcional)</label>
+                  <input 
+                    type="text" value={newTeamInstagram} onChange={e => setNewTeamInstagram(e.target.value)}
+                    placeholder="@atletica"
+                    className="w-full bg-white border border-slate-300 rounded-xl p-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all shadow-sm" 
+                  />
+                </div>
+              </div>
+              <div className="grid grid-cols-3 gap-4">
+                <div className="col-span-2">
+                  <label className="block text-xs font-bold text-slate-600 mb-1">CIDADE</label>
+                  <input 
+                    required type="text" value={newTeamCity} onChange={e => setNewTeamCity(e.target.value)}
+                    placeholder="Ex: Cacoal"
+                    className="w-full bg-white border border-slate-300 rounded-xl p-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all shadow-sm" 
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-slate-600 mb-1">ESTADO</label>
+                  <input 
+                    required type="text" value={newTeamState} onChange={e => setNewTeamState(e.target.value)}
+                    placeholder="Ex: RO" maxLength={2}
+                    className="w-full bg-white border border-slate-300 rounded-xl p-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all shadow-sm uppercase" 
+                  />
+                </div>
+              </div>
               
               <div className="bg-yellow-50 text-yellow-800 p-4 rounded-xl border border-yellow-200 text-sm mt-6">
-                <strong>Atenção:</strong> Ao criar a atlética, você se tornará o <strong>Presidente</strong> e será o único responsável por inscrever a equipe em modalidades coletivas.
+                <strong>Atenção:</strong> Ao criar a equipe, você se tornará o <strong>Presidente</strong> e será o único responsável por inscrever a equipe em modalidades coletivas.
               </div>
 
               <div className="flex gap-3 pt-4">

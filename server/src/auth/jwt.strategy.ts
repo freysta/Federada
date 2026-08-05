@@ -8,12 +8,16 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(private configService: ConfigService) {
     const secret = configService.get<string>('JWT_SECRET');
     if (!secret) {
-      console.warn('⚠️  WARNING: JWT_SECRET not set in JwtStrategy! Using development fallback.');
+      console.warn(
+        '⚠️  WARNING: JWT_SECRET not set in JwtStrategy! Using development fallback.',
+      );
     }
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
-      secretOrKey: secret || 'dev_fallback_xK9mP2vL7nQ4wR8jT5cF1bY3hA6gD0eZ_CHANGE_IN_PROD',
+      secretOrKey:
+        secret ||
+        'dev_fallback_xK9mP2vL7nQ4wR8jT5cF1bY3hA6gD0eZ_CHANGE_IN_PROD',
     });
   }
 

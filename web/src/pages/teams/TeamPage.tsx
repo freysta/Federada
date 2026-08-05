@@ -1,13 +1,12 @@
 import { useState, useEffect } from 'react';
-import { useAuth } from '../../contexts/AuthContext';
 import { API_URL } from '../../config';
+import { apiClient } from '../../utils/apiClient';
 import { Loader2, Plus, Edit, Trash2, Search } from 'lucide-react';
 import toast from 'react-hot-toast';
 import Pagination from '../../components/admin/Pagination';
 import Navbar from '../../components/Navbar';
 
 export default function TeamPage() {
-  const { token } = useAuth();
   const [team, setTeam] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
@@ -31,9 +30,7 @@ export default function TeamPage() {
   const fetchTeam = async () => {
     setLoading(true);
     try {
-      const res = await fetch(`${API_URL}/cms/team`);
-      if (!res.ok) throw new Error('Falha ao carregar equipe');
-      const data = await res.json();
+      const data = await apiClient.get<any[]>('/cms/team');
       setTeam(data);
     } catch (err) {
       toast.error('Erro ao carregar diretoria');
@@ -49,14 +46,12 @@ export default function TeamPage() {
   const uploadImage = async (file: File): Promise<string> => {
     const formData = new FormData();
     formData.append('file', file);
-    const res = await fetch(`${API_URL}/upload`, { 
-      method: 'POST', 
-      body: formData,
-      headers: { 'Authorization': `Bearer ${token}` }
-    });
-    if (!res.ok) throw new Error('Falha no upload');
-    const data = await res.json();
-    return data.url;
+    try {
+      const data = await apiClient.post<any>('/upload', formData);
+      return data.url;
+    } catch (err) {
+      throw new Error('Falha no upload');
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -66,16 +61,11 @@ export default function TeamPage() {
       if (selectedFile) imageUrl = await uploadImage(selectedFile);
 
       const payload = { ...formData, imageUrl };
-      const url = editingId ? `${API_URL}/cms/team/${editingId}` : `${API_URL}/cms/team`;
-      const method = editingId ? 'PUT' : 'POST';
-
-      const res = await fetch(url, {
-        method,
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-        body: JSON.stringify(payload)
-      });
-
-      if (!res.ok) throw new Error('Erro ao salvar');
+      if (editingId) {
+        await apiClient.put(`/cms/team/${editingId}`, payload);
+      } else {
+        await apiClient.post('/cms/team', payload);
+      }
       toast.success('Salvo com sucesso!');
       setIsModalOpen(false);
       fetchTeam();
@@ -87,11 +77,7 @@ export default function TeamPage() {
   const handleDelete = async (id: string) => {
     if (!window.confirm('Excluir este diretor?')) return;
     try {
-      const res = await fetch(`${API_URL}/cms/team/${id}`, {
-        method: 'DELETE',
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-      if (!res.ok) throw new Error('Erro ao excluir');
+      await apiClient.delete(`/cms/team/${id}`);
       toast.success('Excluído');
       fetchTeam();
     } catch (err: any) {
@@ -99,17 +85,6 @@ export default function TeamPage() {
     }
   };
 
-  const openModal = (member?: any) => {
-    if (member) {
-      setFormData({ name: member.name, role: member.role, instagramUrl: member.instagramUrl || '' });
-      setEditingId(member.id);
-    } else {
-      setFormData({ name: '', role: '', instagramUrl: '' });
-      setEditingId(null);
-    }
-    setSelectedFile(null);
-    setIsModalOpen(true);
-  };
 
   const filteredTeam = team.filter(t => 
     t.name.toLowerCase().includes(searchQuery.toLowerCase()) || 

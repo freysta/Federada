@@ -1,4 +1,13 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, OneToOne, JoinColumn } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+  ManyToOne,
+  OneToOne,
+  JoinColumn,
+} from 'typeorm';
 import { User } from '../../orders/entities/user.entity';
 import { Team } from './team.entity';
 
@@ -11,7 +20,10 @@ export class AthleteProfile {
   @JoinColumn()
   user: User;
 
-  @ManyToOne(() => Team, team => team.athletes, { onDelete: 'SET NULL', nullable: true })
+  @ManyToOne(() => Team, (team) => team.athletes, {
+    onDelete: 'SET NULL',
+    nullable: true,
+  })
   team: Team;
 
   @Column({ type: 'date', nullable: true })

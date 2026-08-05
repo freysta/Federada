@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { GitCommit } from 'lucide-react';
 import FadeIn from './FadeIn';
-import { API_URL } from '../config';
+import { apiClient } from '../utils/apiClient';
 
 export default function Roadmap() {
   const [events, setEvents] = useState<any[]>([]);
@@ -9,8 +9,7 @@ export default function Roadmap() {
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    fetch(`${API_URL}/cms/events`)
-      .then(res => res.json())
+    apiClient.get<any[]>('/cms/events')
       .then(data => {
         if (Array.isArray(data)) setEvents(data);
         else setEvents([]);

@@ -1,103 +1,106 @@
-import { DataSource } from 'typeorm';
-import { Product } from './products/entities/product.entity';
+import { NestFactory } from '@nestjs/core';
+import { AppModule } from './app.module';
+import { getRepositoryToken } from '@nestjs/typeorm';
 import { User } from './orders/entities/user.entity';
-import { Order } from './orders/entities/order.entity';
-import { OrderItem } from './orders/entities/order-item.entity';
-import { TeamMember } from './cms/entities/team-member.entity';
-import { News } from './cms/entities/news.entity';
-import { Event } from './cms/entities/event.entity';
-import { Team } from './teams/entities/team.entity';
-import { AthleteProfile } from './teams/entities/athlete-profile.entity';
-import { Championship } from './championships/entities/championship.entity';
-import { Modality } from './championships/entities/modality.entity';
-import { Subscription } from './championships/entities/subscription.entity';
-import { Match } from './championships/entities/match.entity';
+import {
+  Championship,
+  ChampionshipStatus,
+} from './championships/entities/championship.entity';
+import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 
-const dbUrl = process.env.DATABASE_URL;
+async function bootstrap() {
+  const app = await NestFactory.createApplicationContext(AppModule);
+  const userRepository = app.get<Repository<User>>(getRepositoryToken(User));
+  const championshipRepository = app.get<Repository<Championship>>(
+    getRepositoryToken(Championship),
+  );
 
-const dataSource = new DataSource(
-  dbUrl
-    ? {
-        type: 'postgres',
-        url: dbUrl,
-        entities: [Product, User, Order, OrderItem, TeamMember, News, Event, Team, AthleteProfile, Championship, Modality, Subscription, Match],
-        synchronize: true,
-        ssl: process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : false,
-      }
-    : {
-        type: 'sqlite',
-        database: 'data/database.sqlite',
-        entities: [Product, User, Order, OrderItem, TeamMember, News, Event, Team, AthleteProfile, Championship, Modality, Subscription, Match],
-        synchronize: true,
-      }
-);
+  console.log('🌱 Iniciando Seed...');
 
-async function run() {
-  await dataSource.initialize();
-  
-  const productRepo = dataSource.getRepository(Product);
-
-  const existingProducts = await productRepo.count();
-  if (existingProducts === 0) {
-    console.log('Seeding products...');
-    await productRepo.save([
-      {
-        name: 'CAMISA DRY-FIT FEDERADA',
-        description: 'Tecido Dry-Fit Tecnológico, Cor: Azul Oficial',
-        price: 69.90,
-        imageUrl: '/uploads/merchs/camisas/camiseta-federada-v2.jpg',
-        sizes: ['P', 'M', 'G', 'GG'],
-      },
-      {
-        name: 'CAMISA DRY-FIT ADS',
-        description: 'Malha Esportiva Premium, Cor: Preta',
-        price: 69.90,
-        imageUrl: '/uploads/merchs/camisas/camiseta-ads-v1.jpg',
-        sizes: ['P', 'M', 'G', 'GG'],
-      },
-      {
-        name: 'CAMISA OFICIAL ATLÉTICA',
-        description: 'Tecido Leve e Respirável, Design Minimalista',
-        price: 59.90,
-        imageUrl: '/uploads/merchs/camisas/camiseta-atletica-v1-front.jpg',
-        sizes: ['P', 'M', 'G', 'GG'],
-      },
-      {
-        name: 'CANECA TÉRMICA FEDERADA',
-        description: 'Cerâmica de Alta Qualidade, 350ml',
-        price: 45.90,
-        imageUrl: '/uploads/merchs/canecas/caneca-federada-v1.jpeg',
-        sizes: [],
-      }
-    ]);
-    console.log('Products seeded successfully.');
-  } else {
-    console.log('Products already exist.');
-  }
-
-  const userRepo = dataSource.getRepository(User);
-  const adminExists = await userRepo.findOne({ where: { email: 'admin@federada.com.br' } });
-  
-  if (!adminExists) {
-    console.log('Seeding initial admin user...');
-    const hashedPassword = await bcrypt.hash('admin123', 10);
-    const admin = userRepo.create({
-      name: 'Administrador',
-      email: 'admin@federada.com.br',
-      password: hashedPassword,
-      cpf: '00000000000',
-      phone: '00000000000',
+  // Criar ADMIN
+  const adminEmail = 'admin@federada.com';
+  let admin = await userRepository.findOne({ where: { email: adminEmail } });
+  if (!admin) {
+    admin = userRepository.create({
+      name: 'Super Admin',
+      email: adminEmail,
+      password: await bcrypt.hash('123456', 10),
       role: 'ADMIN',
       emailVerified: true,
+      isActive: true,
     });
-    await userRepo.save(admin);
-    console.log('Admin user seeded (email: admin@federada.com.br | password: admin123).');
+    await userRepository.save(admin);
+    console.log('✅ Admin criado:', adminEmail, '/ 123456');
   } else {
-    console.log('Admin user already exists.');
+    console.log('ℹ️ Admin já existe.');
   }
 
-  await dataSource.destroy();
+  // Criar SPORTS_ADMIN (Organizador)
+  const sportsAdminEmail = 'organizador@federada.com';
+  let sportsAdmin = await userRepository.findOne({
+    where: { email: sportsAdminEmail },
+  });
+  if (!sportsAdmin) {
+    sportsAdmin = userRepository.create({
+      name: 'Organizador de Campeonatos',
+      email: sportsAdminEmail,
+      password: await bcrypt.hash('123456', 10),
+      role: 'SPORTS_ADMIN',
+      emailVerified: true,
+      isActive: true,
+    });
+    await userRepository.save(sportsAdmin);
+    console.log('✅ Organizador criado:', sportsAdminEmail, '/ 123456');
+  } else {
+    console.log('ℹ️ Organizador já existe.');
+  }
+
+  // Criar ATHLETE (Atleta)
+  const athleteEmail = 'atleta@federada.com';
+  let athlete = await userRepository.findOne({
+    where: { email: athleteEmail },
+  });
+  if (!athlete) {
+    athlete = userRepository.create({
+      name: 'Atleta Teste',
+      email: athleteEmail,
+      password: await bcrypt.hash('123456', 10),
+      role: 'ATHLETE',
+      emailVerified: true,
+      isActive: true,
+    });
+    await userRepository.save(athlete);
+    console.log('✅ Atleta criado:', athleteEmail, '/ 123456');
+  } else {
+    console.log('ℹ️ Atleta já existe.');
+  }
+
+  // Criar um campeonato inicial para o Organizador
+  const existingChamp = await championshipRepository.findOne({
+    where: { owner: { id: sportsAdmin.id } },
+    relations: ['owner'],
+  });
+  if (!existingChamp) {
+    const champ = championshipRepository.create({
+      name: 'Campeonato de Seed',
+      description: 'Campeonato gerado automaticamente pelo seed.',
+      startDate: new Date('2026-08-01'),
+      endDate: new Date('2026-08-10'),
+      status: ChampionshipStatus.DRAFT,
+      owner: sportsAdmin,
+    });
+    await championshipRepository.save(champ);
+    console.log('✅ Campeonato de Seed criado.');
+  } else {
+    console.log('ℹ️ Campeonato já existe.');
+  }
+
+  await app.close();
+  console.log('🎉 Seed finalizado com sucesso!');
 }
 
-run().catch(console.error);
+bootstrap().catch((err) => {
+  console.error('❌ Erro no seed:', err);
+  process.exit(1);
+});

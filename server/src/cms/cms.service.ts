@@ -73,7 +73,10 @@ export class CmsService {
   async getInstagramFeed() {
     const CACHE_TTL = 3600 * 1000; // 1 hour
 
-    if (this.instagramCache && (Date.now() - this.instagramCacheTime < CACHE_TTL)) {
+    if (
+      this.instagramCache &&
+      Date.now() - this.instagramCacheTime < CACHE_TTL
+    ) {
       return this.instagramCache;
     }
 
@@ -84,7 +87,9 @@ export class CmsService {
     }
 
     try {
-      const response = await fetch(`https://graph.instagram.com/me/media?fields=id,caption,media_type,media_url,thumbnail_url,permalink,timestamp&access_token=${token}`);
+      const response = await fetch(
+        `https://graph.instagram.com/me/media?fields=id,caption,media_type,media_url,thumbnail_url,permalink,timestamp&access_token=${token}`,
+      );
       const data = await response.json();
 
       if (data.error) {
@@ -94,7 +99,10 @@ export class CmsService {
 
       // Format data
       const feed = (data.data || [])
-        .filter((item: any) => item.media_type === 'IMAGE' || item.media_type === 'CAROUSEL_ALBUM')
+        .filter(
+          (item: any) =>
+            item.media_type === 'IMAGE' || item.media_type === 'CAROUSEL_ALBUM',
+        )
         .slice(0, 12) // Get last 12 items
         .map((item: any) => ({
           id: item.id,

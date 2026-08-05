@@ -1,4 +1,15 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, ManyToMany, JoinTable } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+  DeleteDateColumn,
+  Index,
+  ManyToOne,
+  ManyToMany,
+  JoinTable,
+} from 'typeorm';
 import { Modality } from './modality.entity';
 import { AthleteProfile } from '../../teams/entities/athlete-profile.entity';
 import { Team } from '../../teams/entities/team.entity';
@@ -9,15 +20,18 @@ export enum SubscriptionStatus {
   DOCS_APPROVED = 'DOCS_APPROVED',
   PENDING_PAYMENT = 'PENDING_PAYMENT',
   CONFIRMED = 'CONFIRMED',
-  REJECTED = 'REJECTED'
+  REJECTED = 'REJECTED',
 }
 
 @Entity()
+@Index(['status', 'modality'])
 export class Subscription {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @ManyToOne(() => Modality, modality => modality.subscriptions, { onDelete: 'CASCADE' })
+  @ManyToOne(() => Modality, (modality) => modality.subscriptions, {
+    onDelete: 'CASCADE',
+  })
   modality: Modality;
 
   // Inscrição individual
@@ -44,4 +58,7 @@ export class Subscription {
 
   @UpdateDateColumn()
   updatedAt: Date;
+
+  @DeleteDateColumn()
+  deletedAt: Date;
 }

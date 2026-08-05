@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useSearchParams, Link } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
-import { API_URL } from "../config";
+import { apiClient } from "../utils/apiClient";
 import { CheckCircle, XCircle, Loader2 } from "lucide-react";
 import { useAuth } from "../contexts/AuthContext";
 
@@ -21,10 +21,8 @@ export default function VerifyEmail() {
       return;
     }
 
-    fetch(`${API_URL}/auth/verify-email?token=` + token)
-      .then(async (res) => {
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.message || 'Erro ao verificar e-mail.');
+    apiClient.get<any>('/auth/verify-email?token=' + token)
+      .then((data) => {
         setStatus('success');
         setMessage(data.message);
         if (data.access_token && data.user) {

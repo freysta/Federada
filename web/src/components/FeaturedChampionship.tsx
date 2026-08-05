@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Trophy, ArrowUpRight, Calendar } from 'lucide-react';
 import { API_URL } from '../config';
+import { apiClient } from '../utils/apiClient';
 import FadeIn from './FadeIn';
 
 export default function FeaturedChampionship() {
@@ -9,10 +10,10 @@ export default function FeaturedChampionship() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch(`${API_URL}/championships`)
-      .then(res => res.json())
-      .then(data => {
-        const openChamps = data.filter((c: any) => c.status === 'OPEN');
+    apiClient.get<any>('/championships')
+      .then(result => {
+        const champs = result.data || [];
+        const openChamps = champs.filter((c: any) => c.status === 'OPEN');
         if (openChamps.length > 0) {
           setChamp(openChamps[0]);
         }

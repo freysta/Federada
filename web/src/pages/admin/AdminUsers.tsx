@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
-import { API_URL } from '../../config';
+import { apiClient } from '../../utils/apiClient';
 import { Loader2, Edit, Ban, CheckCircle, Package, MessageCircle, Trash2, Search, X } from 'lucide-react';
 import toast from 'react-hot-toast';
 import Pagination from '../../components/admin/Pagination';
 
 export default function AdminUsers() {
-  const { token, user: currentUser } = useAuth();
+  const { user: currentUser } = useAuth();
   const [users, setUsers] = useState<any[]>([]);
   const [orders, setOrders] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -38,13 +38,12 @@ export default function AdminUsers() {
 
   const fetchData = async () => {
     try {
-      const [resUsers, resOrders] = await Promise.all([
-        fetch(`${API_URL}/users`, { headers: { Authorization: `Bearer ${token}` } }),
-        fetch(`${API_URL}/orders`, { headers: { Authorization: `Bearer ${token}` } })
+      const [resUsers, ordersRes] = await Promise.all([
+        apiClient.get<any[]>('/users'),
+        apiClient.get<any>('/orders')
       ]);
-      if (!resUsers.ok || !resOrders.ok) throw new Error('Falha na requisição');
-      setUsers(await resUsers.json());
-      setOrders(await resOrders.json());
+      setUsers(resUsers);
+      setOrders(ordersRes.data || []);
     } catch (err) {
       toast.error('Erro ao carregar dados');
     } finally {
@@ -52,28 +51,21 @@ export default function AdminUsers() {
     }
   };
 
-  useEffect(() => { fetchData(); }, [token]);
+  useEffect(() => { fetchData(); }, []);
 
   const handleSubmitUser = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
       const isEdit = !!editingId;
-      const url = isEdit ? `${API_URL}/users/${editingId}` : `${API_URL}/users/admin-create`;
-      const method = isEdit ? 'PUT' : 'POST';
-
       const payload = { ...formData };
       if (!payload.password) {
         delete (payload as any).password;
       }
 
-      const res = await fetch(url, {
-        method,
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-        body: JSON.stringify(payload)
-      });
-      if (!res.ok) {
-        const errorData = await res.json();
-        throw new Error(errorData.message || 'Erro ao salvar usuário');
+      if (isEdit) {
+        await apiClient.put(`/users/${editingId}`, payload);
+      } else {
+        await apiClient.post('/users/admin-create', payload);
       }
       toast.success(isEdit ? 'Usuário atualizado!' : 'Usuário criado!');
       setIsModalOpen(false);
@@ -107,12 +99,7 @@ export default function AdminUsers() {
   const handleToggleActive = async (u: any) => {
     if (!window.confirm(`Deseja ${u.isActive === false ? 'ativar' : 'desativar'} este usuário?`)) return;
     try {
-      const res = await fetch(`${API_URL}/users/${u.id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-        body: JSON.stringify({ isActive: u.isActive === false ? true : false })
-      });
-      if (!res.ok) throw new Error('Erro ao alterar status');
+      await apiClient.put(`/users/${u.id}`, { isActive: u.isActive === false ? true : false });
       toast.success('Status atualizado!');
       fetchData();
       if (selectedUser?.id === u.id) setSelectedUser({ ...u, isActive: !u.isActive });
@@ -124,11 +111,7 @@ export default function AdminUsers() {
   const handleDeleteUser = async (u: any) => {
     if (!window.confirm(`ATENÇÃO: Tem certeza que deseja EXCLUIR DEFINITIVAMENTE o usuário ${u.name}? Esta ação não pode ser desfeita e excluirá todos os pedidos relacionados.`)) return;
     try {
-      const res = await fetch(`${API_URL}/users/${u.id}`, {
-        method: 'DELETE',
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-      if (!res.ok) throw new Error('Erro ao excluir usuário');
+      await apiClient.delete(`/users/${u.id}`);
       toast.success('Usuário excluído com sucesso!');
       setIsDetailsOpen(false);
       fetchData();

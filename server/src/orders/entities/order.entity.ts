@@ -1,8 +1,19 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToOne,
+  OneToMany,
+  CreateDateColumn,
+  UpdateDateColumn,
+  DeleteDateColumn,
+  Index,
+} from 'typeorm';
 import { User } from './user.entity';
 import { OrderItem } from './order-item.entity';
 
 @Entity()
+@Index(['status', 'createdAt'])
 export class Order {
   @PrimaryGeneratedColumn('uuid')
   id: string;
@@ -25,6 +36,12 @@ export class Order {
   @Column({ type: 'text', nullable: true })
   trackingCode: string | null;
 
+  @Column({ type: 'text', nullable: true })
+  couponCode: string | null;
+
+  @Column({ type: 'decimal', precision: 10, scale: 2, nullable: true })
+  discountAmount: number | null;
+
   @CreateDateColumn()
   createdAt: Date;
 
@@ -33,4 +50,7 @@ export class Order {
 
   @ManyToOne(() => User, (user) => user.orders, { onDelete: 'CASCADE' })
   user: User;
+
+  @DeleteDateColumn()
+  deletedAt: Date;
 }

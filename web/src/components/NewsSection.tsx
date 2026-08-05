@@ -1,6 +1,6 @@
 import { Calendar, ArrowUpRight } from 'lucide-react';
 import { useState, useEffect } from 'react';
-import { API_URL } from '../config';
+import { apiClient } from '../utils/apiClient';
 import FadeIn from './FadeIn';
 
 export default function NewsSection() {
@@ -9,11 +9,7 @@ export default function NewsSection() {
   const [expandedNews, setExpandedNews] = useState<string | null>(null);
 
   useEffect(() => {
-    fetch(`${API_URL}/cms/news`)
-      .then(res => {
-        if (!res.ok) throw new Error('Falha');
-        return res.json();
-      })
+    apiClient.get<any[]>('/cms/news')
       .then(data => {
         if (Array.isArray(data)) setNews(data);
         else setNews([]);

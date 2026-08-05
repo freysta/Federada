@@ -1,4 +1,4 @@
-import { X, AlertTriangle, ShieldCheck, HelpCircle } from 'lucide-react';
+import { X, ShieldCheck, AlertTriangle } from 'lucide-react';
 import { useState } from 'react';
 
 interface ConfirmSubscriptionModalProps {
@@ -38,7 +38,7 @@ export default function ConfirmSubscriptionModal({
         </div>
 
         <p className="text-slate-600 mb-6">
-          Você está prestes a inscrever sua atlética nas seguintes modalidades. Verifique se os dados estão corretos:
+          Você está prestes a confirmar a inscrição nas seguintes modalidades. Verifique se os dados estão corretos:
         </p>
 
         <div className="bg-slate-50 border border-slate-200 rounded-xl overflow-hidden mb-6">

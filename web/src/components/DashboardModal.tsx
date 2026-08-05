@@ -1,6 +1,6 @@
 import { X, Package, Loader2 } from 'lucide-react';
 import { useState, useEffect } from 'react';
-import { API_URL } from '../config';
+import { apiClient } from '../utils/apiClient';
 import { useAuth } from '../contexts/AuthContext';
 import { createPortal } from 'react-dom';
 import { Link } from 'react-router-dom';
@@ -26,20 +26,14 @@ interface Order {
 }
 
 export default function DashboardModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
-  const { user, token, logout } = useAuth();
+  const { user, logout, token } = useAuth();
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (isOpen && token) {
       setLoading(true);
-      fetch(`${API_URL}/orders/me`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      })
-      .then(res => {
-        if (!res.ok) throw new Error('Falha ao buscar pedidos');
-        return res.json();
-      })
+      apiClient.get<Order[]>('/orders/me')
       .then(data => {
         setOrders(data);
         setLoading(false);
@@ -49,7 +43,7 @@ export default function DashboardModal({ isOpen, onClose }: { isOpen: boolean; o
         setLoading(false);
       });
     }
-  }, [isOpen, token]);
+  }, [isOpen]);
 
   if (!isOpen) return null;
 

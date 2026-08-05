@@ -1,15 +1,35 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
-import { API_URL } from '../../config';
+import { apiClient } from '../../utils/apiClient';
 import { DollarSign, Package, ShoppingCart, XCircle, Clock, CheckCircle, Trophy, Users, FileCheck2, Activity } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { Loader2 } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
+import type { IOrder } from '../../types';
+
+interface StoreStats {
+  totalRevenue: number;
+  totalItemsSold: number;
+  ordersCount: number;
+  paidCount: number;
+  pendingCount: number;
+  cancelledCount: number;
+  chartData: { date: string; vendas: number }[];
+  recentOrders: IOrder[];
+}
+
+interface SportsStats {
+  totalChampionships: number;
+  totalAthletes: number;
+  pendingDocuments: number;
+  totalSubscriptions: number;
+}
+
 export default function AdminOverview() {
-  const { token, user } = useAuth();
-  const [storeStats, setStoreStats] = useState<any>(null);
-  const [sportsStats, setSportsStats] = useState<any>(null);
+  const { user, token } = useAuth();
+  const [storeStats, setStoreStats] = useState<StoreStats | null>(null);
+  const [sportsStats, setSportsStats] = useState<SportsStats | null>(null);
   const [loading, setLoading] = useState(true);
 
   const isSuperAdmin = user?.role === 'ADMIN';
@@ -21,16 +41,14 @@ export default function AdminOverview() {
 
     if (isStoreAdmin) {
       fetchPromises.push(
-        fetch(`${API_URL}/orders/dashboard`, { headers: { Authorization: `Bearer ${token}` } })
-          .then(res => res.ok ? res.json() : Promise.reject('Store Falha'))
+        apiClient.get<StoreStats>('/orders/dashboard')
           .then(data => setStoreStats(data))
       );
     }
 
     if (isSportsAdmin) {
       fetchPromises.push(
-        fetch(`${API_URL}/championships/dashboard`, { headers: { Authorization: `Bearer ${token}` } })
-          .then(res => res.ok ? res.json() : Promise.reject('Sports Falha'))
+        apiClient.get<SportsStats>('/championships/dashboard')
           .then(data => setSportsStats(data))
       );
     }
@@ -155,7 +173,7 @@ export default function AdminOverview() {
                     cursor={{fill: '#f3f4f6'}}
                     contentStyle={{backgroundColor: '#000', color: '#fff', border: 'none', fontFamily: 'monospace', fontSize: '12px'}}
                     itemStyle={{color: '#00f0ff'}}
-                    formatter={(value: any) => [`R$ ${Number(value).toFixed(2).replace('.', ',')}`, 'Vendas']}
+                    formatter={(value: any) => [`R$ ${value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`, 'Faturamento']}
                   />
                   <Bar dataKey="vendas" fill="#000" radius={[4, 4, 0, 0]} />
                 </BarChart>
@@ -176,7 +194,7 @@ export default function AdminOverview() {
                   </tr>
                 </thead>
                 <tbody>
-                  {storeStats.recentOrders?.map((order: any) => (
+                  {storeStats.recentOrders?.map((order: IOrder) => (
                     <tr key={order.id} className="border-b border-gray-200 last:border-0 hover:bg-gray-50">
                       <td className="p-3 font-mono text-xs">{order.id.slice(0,8)}</td>
                       <td className="p-3">{new Date(order.createdAt).toLocaleDateString('pt-BR')}</td>

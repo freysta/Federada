@@ -1,12 +1,10 @@
 import { useState, useEffect } from 'react';
-import { useAuth } from '../../contexts/AuthContext';
-import { API_URL } from '../../config';
+import { apiClient } from '../../utils/apiClient';
 import { Loader2, Plus, Edit, Trash2, Search } from 'lucide-react';
 import toast from 'react-hot-toast';
 import Pagination from '../../components/admin/Pagination';
 
 export default function AdminEvents() {
-  const { token } = useAuth();
   const [events, setEvents] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
@@ -31,9 +29,7 @@ export default function AdminEvents() {
   const fetchEvents = async () => {
     setLoading(true);
     try {
-      const res = await fetch(`${API_URL}/cms/events`);
-      if (!res.ok) throw new Error('Falha ao carregar eventos');
-      const data = await res.json();
+      const data = await apiClient.get<any[]>('/cms/events');
       if (Array.isArray(data)) setEvents(data);
       else setEvents([]);
     } catch (err) {
@@ -50,16 +46,12 @@ export default function AdminEvents() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const url = editingId ? `${API_URL}/cms/events/${editingId}` : `${API_URL}/cms/events`;
-      const method = editingId ? 'PUT' : 'POST';
+      if (editingId) {
+        await apiClient.put(`/cms/events/${editingId}`, formData);
+      } else {
+        await apiClient.post('/cms/events', formData);
+      }
 
-      const res = await fetch(url, {
-        method,
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-        body: JSON.stringify(formData)
-      });
-
-      if (!res.ok) throw new Error('Erro ao salvar');
       toast.success('Salvo com sucesso!');
       setIsModalOpen(false);
       fetchEvents();
@@ -71,11 +63,7 @@ export default function AdminEvents() {
   const handleDelete = async (id: string) => {
     if (!window.confirm('Excluir este evento?')) return;
     try {
-      const res = await fetch(`${API_URL}/cms/events/${id}`, {
-        method: 'DELETE',
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-      if (!res.ok) throw new Error('Erro ao excluir');
+      await apiClient.delete(`/cms/events/${id}`);
       toast.success('Excluído');
       fetchEvents();
     } catch (err: any) {
@@ -94,7 +82,7 @@ export default function AdminEvents() {
     setIsModalOpen(true);
   };
 
-  const filteredEvents = events.filter(e => 
+  const filteredEvents = events.filter((e: any) => 
     e.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
     (e.description && e.description.toLowerCase().includes(searchQuery.toLowerCase()))
   );
@@ -142,7 +130,7 @@ export default function AdminEvents() {
                 <td colSpan={4} className="p-8 text-center text-gray-500 text-sm">Nenhum evento encontrado.</td>
               </tr>
               ) : (
-                paginatedEvents.map(e => (
+                paginatedEvents.map((e: any) => (
               <tr key={e.id} className="hover:bg-gray-50 transition-colors cursor-pointer" onClick={() => openModal(e)}>
                 <td className="px-4 py-2">
                   <div className="font-bold text-gray-800">{e.date}</div>

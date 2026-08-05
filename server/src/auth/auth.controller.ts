@@ -1,4 +1,11 @@
-import { Controller, Post, Body, Get, Query, BadRequestException } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  Get,
+  Query,
+  BadRequestException,
+} from '@nestjs/common';
 import { Throttle } from '@nestjs/throttler';
 import { AuthService } from './auth.service';
 import { RegisterDto, LoginDto } from './dto/auth.dto';
@@ -12,11 +19,7 @@ export class AuthController {
     return this.authService.verifyEmail(token);
   }
 
-  @Get('fix-users')
-  fixUsers() {
-    return this.authService.fixUsers();
-  }
-
+  @Throttle({ default: { limit: 5, ttl: 60000 } })
   @Post('register')
   register(@Body() registerDto: RegisterDto) {
     return this.authService.register(registerDto);

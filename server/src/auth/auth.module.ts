@@ -17,11 +17,22 @@ import { JwtStrategy } from './jwt.strategy';
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => {
         const secret = configService.get<string>('JWT_SECRET');
+        const isProd = process.env.NODE_ENV === 'production';
         if (!secret) {
-          console.warn('⚠️  WARNING: JWT_SECRET not set! Using development fallback. DO NOT use in production!');
+          if (isProd) {
+            console.error(
+              '❌ FATAL ERROR: JWT_SECRET is NOT set in production environment. Refusing to start.',
+            );
+            process.exit(1);
+          }
+          console.warn(
+            '⚠️  WARNING: JWT_SECRET not set! Using development fallback. DO NOT use in production!',
+          );
         }
         return {
-          secret: secret || 'dev_fallback_xK9mP2vL7nQ4wR8jT5cF1bY3hA6gD0eZ_CHANGE_IN_PROD',
+          secret:
+            secret ||
+            'dev_fallback_xK9mP2vL7nQ4wR8jT5cF1bY3hA6gD0eZ_CHANGE_IN_PROD',
           signOptions: { expiresIn: '7d' },
         };
       },

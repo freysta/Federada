@@ -1,7 +1,10 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Championship, ChampionshipStatus } from '../entities/championship.entity';
+import {
+  Championship,
+  ChampionshipStatus,
+} from '../entities/championship.entity';
 import { ChampionshipPublicationPolicy } from './championship-publication.policy';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 
@@ -11,10 +14,14 @@ export class ChampionshipStateMachine {
     @InjectRepository(Championship)
     private championshipRepository: Repository<Championship>,
     private publicationPolicy: ChampionshipPublicationPolicy,
-    private eventEmitter: EventEmitter2
+    private eventEmitter: EventEmitter2,
   ) {}
 
-  async transition(championship: Championship, targetState: ChampionshipStatus, user: any): Promise<Championship> {
+  async transition(
+    championship: Championship,
+    targetState: ChampionshipStatus,
+    user: any,
+  ): Promise<Championship> {
     // Idempotency check
     if (championship.status === targetState) {
       return championship;
@@ -22,7 +29,9 @@ export class ChampionshipStateMachine {
 
     // Validate transition
     if (!this.canTransition(championship.status, targetState)) {
-      throw new BadRequestException(`Transição inválida de ${championship.status} para ${targetState}`);
+      throw new BadRequestException(
+        `Transição inválida de ${championship.status} para ${targetState}`,
+      );
     }
 
     // State-specific validations
@@ -33,7 +42,7 @@ export class ChampionshipStateMachine {
     // Apply state and timestamps
     championship.status = targetState;
     const now = new Date();
-    
+
     switch (targetState) {
       case ChampionshipStatus.PUBLISHED:
         championship.publishedAt = now;
@@ -56,20 +65,32 @@ export class ChampionshipStateMachine {
     }
 
     const saved = await this.championshipRepository.save(championship);
-    
+
     // Domain Events
     this.eventEmitter.emit(`championship.${targetState.toLowerCase()}`, saved);
 
     return saved;
   }
 
-  canTransition(fromState: ChampionshipStatus, toState: ChampionshipStatus): boolean {
+  canTransition(
+    fromState: ChampionshipStatus,
+    toState: ChampionshipStatus,
+  ): boolean {
     const validTransitions: Record<ChampionshipStatus, ChampionshipStatus[]> = {
       [ChampionshipStatus.DRAFT]: [ChampionshipStatus.PUBLISHED],
-      [ChampionshipStatus.PUBLISHED]: [ChampionshipStatus.OPEN, ChampionshipStatus.DRAFT],
+      [ChampionshipStatus.PUBLISHED]: [
+        ChampionshipStatus.OPEN,
+        ChampionshipStatus.DRAFT,
+      ],
       [ChampionshipStatus.OPEN]: [ChampionshipStatus.CLOSED],
-      [ChampionshipStatus.CLOSED]: [ChampionshipStatus.GENERATING_BRACKET, ChampionshipStatus.OPEN],
-      [ChampionshipStatus.GENERATING_BRACKET]: [ChampionshipStatus.ONGOING, ChampionshipStatus.CLOSED],
+      [ChampionshipStatus.CLOSED]: [
+        ChampionshipStatus.GENERATING_BRACKET,
+        ChampionshipStatus.OPEN,
+      ],
+      [ChampionshipStatus.GENERATING_BRACKET]: [
+        ChampionshipStatus.ONGOING,
+        ChampionshipStatus.CLOSED,
+      ],
       [ChampionshipStatus.ONGOING]: [ChampionshipStatus.FINISHED],
       [ChampionshipStatus.FINISHED]: [ChampionshipStatus.ARCHIVED],
       [ChampionshipStatus.ARCHIVED]: [],
@@ -79,13 +100,17 @@ export class ChampionshipStateMachine {
     return allowed.includes(toState);
   }
 
-  getAllowedActions(championship: Championship, userRole: string, isOwner: boolean): string[] {
+  getAllowedActions(
+    championship: Championship,
+    userRole: string,
+    isOwner: boolean,
+  ): string[] {
     const actions: string[] = [];
-    
+
     // Simple RBAC + Status logic
     if (userRole === 'ADMIN' || (userRole === 'SPORTS_ADMIN' && isOwner)) {
       actions.push('edit_settings');
-      
+
       if (championship.status === ChampionshipStatus.DRAFT) {
         actions.push('publish');
         actions.push('manage_modalities');

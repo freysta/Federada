@@ -1,4 +1,13 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, OneToMany, ManyToOne } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+  DeleteDateColumn,
+  OneToMany,
+  ManyToOne,
+} from 'typeorm';
 import { Modality } from './modality.entity';
 import { User } from '../../orders/entities/user.entity';
 
@@ -10,7 +19,7 @@ export enum ChampionshipStatus {
   GENERATING_BRACKET = 'GENERATING_BRACKET',
   ONGOING = 'ONGOING',
   FINISHED = 'FINISHED',
-  ARCHIVED = 'ARCHIVED'
+  ARCHIVED = 'ARCHIVED',
 }
 
 @Entity()
@@ -45,25 +54,25 @@ export class Championship {
   @Column({ type: 'varchar', default: ChampionshipStatus.DRAFT })
   status: ChampionshipStatus;
 
-  @Column({ type: 'timestamp', nullable: true })
-  publishedAt: Date;
+  @Column({ type: 'datetime', nullable: true })
+  publishedAt: Date | null;
 
-  @Column({ type: 'timestamp', nullable: true })
-  registrationOpenedAt: Date;
+  @Column({ type: 'datetime', nullable: true })
+  registrationOpenedAt: Date | null;
 
-  @Column({ type: 'timestamp', nullable: true })
-  registrationClosedAt: Date;
+  @Column({ type: 'datetime', nullable: true })
+  registrationClosedAt: Date | null;
 
-  @Column({ type: 'timestamp', nullable: true })
-  startedAt: Date;
+  @Column({ type: 'datetime', nullable: true })
+  startedAt: Date | null;
 
-  @Column({ type: 'timestamp', nullable: true })
-  finishedAt: Date;
+  @Column({ type: 'datetime', nullable: true })
+  finishedAt: Date | null;
 
-  @Column({ type: 'timestamp', nullable: true })
-  archivedAt: Date;
+  @Column({ type: 'datetime', nullable: true })
+  archivedAt: Date | null;
 
-  @OneToMany(() => Modality, modality => modality.championship)
+  @OneToMany(() => Modality, (modality) => modality.championship)
   modalities: Modality[];
 
   @Column({ type: 'simple-json', nullable: true })
@@ -79,4 +88,7 @@ export class Championship {
 
   @UpdateDateColumn()
   updatedAt: Date;
+
+  @DeleteDateColumn()
+  deletedAt: Date;
 }

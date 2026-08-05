@@ -1,4 +1,13 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, OneToMany } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+  DeleteDateColumn,
+  ManyToOne,
+  OneToMany,
+} from 'typeorm';
 import { Championship } from './championship.entity';
 import { Match } from './match.entity';
 import { Subscription } from './subscription.entity';
@@ -32,10 +41,15 @@ export class Modality {
   @Column({ nullable: true })
   gender: string; // MASCULINO, FEMININO, MISTO
 
-  @ManyToOne(() => Championship, champ => champ.modalities, { onDelete: 'CASCADE' })
+  @Column({ type: 'int', nullable: true })
+  maxSpots?: number; // Limite de vagas (equipes ou atletas dependendo do tipo)
+
+  @ManyToOne(() => Championship, (champ) => champ.modalities, {
+    onDelete: 'CASCADE',
+  })
   championship: Championship;
 
-  @OneToMany(() => Subscription, sub => sub.modality)
+  @OneToMany(() => Subscription, (sub) => sub.modality)
   subscriptions: Subscription[];
 
   @CreateDateColumn()
@@ -44,6 +58,9 @@ export class Modality {
   @UpdateDateColumn()
   updatedAt: Date;
 
-  @OneToMany(() => Match, match => match.modality)
+  @OneToMany(() => Match, (match) => match.modality)
   matches: Match[];
+
+  @DeleteDateColumn()
+  deletedAt: Date;
 }

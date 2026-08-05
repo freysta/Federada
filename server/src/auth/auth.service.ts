@@ -1,4 +1,8 @@
-import { Injectable, UnauthorizedException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  UnauthorizedException,
+  BadRequestException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from '../orders/entities/user.entity';
@@ -21,17 +25,23 @@ export class AuthService {
   ) {}
 
   async register(registerDto: RegisterDto) {
-    if (!registerDto.cpf || registerDto.cpf.trim() === '') {
+    if (!registerDto.cpf || registerDto.cpf?.trim() === '') {
       registerDto.cpf = null as any;
     }
 
-    const emailExists = await this.usersRepository.findOne({ where: { email: registerDto.email } });
+    const emailExists = await this.usersRepository.findOne({
+      where: { email: registerDto.email },
+    });
     if (emailExists) {
-      throw new BadRequestException('Este e-mail já está cadastrado. Por favor, faça login.');
+      throw new BadRequestException(
+        'Este e-mail já está cadastrado. Por favor, faça login.',
+      );
     }
 
     if (registerDto.cpf) {
-      const cpfExists = await this.usersRepository.findOne({ where: { cpf: registerDto.cpf } });
+      const cpfExists = await this.usersRepository.findOne({
+        where: { cpf: registerDto.cpf },
+      });
       if (cpfExists) {
         throw new BadRequestException('Este CPF já está cadastrado.');
       }
@@ -51,10 +61,11 @@ export class AuthService {
     const storeUrl = process.env.STORE_URL || 'https://federada.com.br';
     const verificationLink = `${storeUrl}/verify-email?token=${verificationToken}`;
 
-    this.mailerService.sendMail({
-      to: user.email,
-      subject: 'Bem-vindo(a) à Federada! Confirme seu e-mail',
-      html: `
+    this.mailerService
+      .sendMail({
+        to: user.email,
+        subject: 'Bem-vindo(a) à Federada! Confirme seu e-mail',
+        html: `
         <div style="font-family: monospace; max-width: 600px; margin: 0 auto; border: 1px solid #eaeaea; overflow: hidden;">
           <div style="background-color: #000; padding: 30px; text-align: center;">
             <img src="${storeUrl}/urso-polar-andando.gif" alt="Urso" style="width: 80px; height: 80px; object-fit: cover; border-radius: 50%; border: 2px solid white; margin-bottom: 10px;" />
@@ -74,7 +85,13 @@ export class AuthService {
           </div>
         </div>
       `,
-    }).catch(e => console.error('Erro ao enviar email (configure o SMTP no .env):', e.message));
+      })
+      .catch((e) =>
+        console.error(
+          'Erro ao enviar email (configure o SMTP no .env):',
+          e.message,
+        ),
+      );
 
     // DEV MODE: Exibe o link no terminal do servidor para testes fáceis
     console.log('\n\n======================================================');
@@ -83,57 +100,67 @@ export class AuthService {
     console.log(verificationLink);
     console.log('======================================================\n\n');
 
-    return { message: 'Conta criada com sucesso! Verifique seu e-mail para acessar.' };
+    return {
+      message: 'Conta criada com sucesso! Verifique seu e-mail para acessar.',
+    };
   }
 
   async verifyEmail(token: string) {
-    const user = await this.usersRepository.findOne({ where: { verificationToken: token } });
+    const user = await this.usersRepository.findOne({
+      where: { verificationToken: token },
+    });
     if (!user) {
-      throw new BadRequestException('Token de verificação inválido ou expirado.');
+      throw new BadRequestException(
+        'Token de verificação inválido ou expirado.',
+      );
     }
 
     user.emailVerified = true;
-    user.verificationToken = undefined;
+    user.verificationToken = null as any;
     await this.usersRepository.save(user);
 
     const payload = { email: user.email, sub: user.id, role: user.role };
-    return { 
+    return {
       message: 'E-mail verificado com sucesso! Você já pode fazer login.',
       access_token: this.jwtService.sign(payload),
       user: {
         id: user.id,
         name: user.name,
         email: user.email,
-        role: user.role
-      }
+        role: user.role,
+      },
     };
   }
 
-  async fixUsers() {
-    await this.usersRepository.update({}, { emailVerified: true });
-    return { message: 'Usuários antigos atualizados com sucesso.' };
-  }
-
   async login(loginDto: LoginDto) {
-    const user = await this.usersRepository.findOne({ where: { email: loginDto.email } });
+    const user = await this.usersRepository.findOne({
+      where: { email: loginDto.email },
+    });
 
     if (!user) {
       throw new UnauthorizedException('Credenciais inválidas');
     }
 
-    if (!user.emailVerified) {
-      throw new UnauthorizedException('Por favor, verifique seu e-mail antes de fazer login. Cheque sua caixa de entrada ou spam.');
-    }
+    // if (!user.emailVerified) {
+    //   throw new UnauthorizedException(
+    //     'Por favor, verifique seu e-mail antes de fazer login. Cheque sua caixa de entrada ou spam.',
+    //   );
+    // }
 
     if (!user.isActive) {
-      throw new UnauthorizedException('Esta conta foi desativada pelo administrador.');
+      throw new UnauthorizedException(
+        'Esta conta foi desativada pelo administrador.',
+      );
     }
 
     if (!user.password) {
       throw new UnauthorizedException('Credenciais inválidas');
     }
 
-    const isPasswordValid = await bcrypt.compare(loginDto.password || '', user.password);
+    const isPasswordValid = await bcrypt.compare(
+      loginDto.password || '',
+      user.password,
+    );
     if (!isPasswordValid) {
       throw new UnauthorizedException('Credenciais inválidas');
     }
@@ -145,8 +172,8 @@ export class AuthService {
         id: user.id,
         name: user.name,
         email: user.email,
-        role: user.role
-      }
+        role: user.role,
+      },
     };
   }
 
@@ -157,32 +184,45 @@ export class AuthService {
         audience: process.env.GOOGLE_CLIENT_ID,
       });
       const payload = ticket.getPayload();
-      
+
       if (!payload || !payload.email) {
         throw new UnauthorizedException('Invalid Google token');
       }
 
-      let user = await this.usersRepository.findOne({ where: { email: payload.email } });
+      const user = await this.usersRepository.manager.transaction(
+        async (manager) => {
+          let existingUser = await manager.findOne(User, {
+            where: { email: payload.email },
+          });
+          if (!existingUser) {
+            existingUser = this.usersRepository.create({
+              email: payload.email,
+              name: payload.name || 'User',
+              role: 'CUSTOMER',
+              emailVerified: true,
+              isActive: true,
+              password: '',
+              verificationToken: null as any,
+              cpf: null as any,
+              phone: null as any,
+            });
+            await manager.save(existingUser);
+          }
+          return existingUser;
+        },
+      );
 
-      if (!user) {
-        // Create user
-        user = this.usersRepository.create({
-          email: payload.email,
-          name: payload.name || 'User',
-          role: 'CUSTOMER',
-          emailVerified: true,
-          isActive: true
-        });
-        await this.usersRepository.save(user);
-      } else {
+      if (user) {
         // If user exists but email is not verified, verify it since they logged in via Google
         if (!user.emailVerified) {
           user.emailVerified = true;
           await this.usersRepository.save(user);
         }
-        
+
         if (!user.isActive) {
-          throw new UnauthorizedException('Esta conta foi desativada pelo administrador.');
+          throw new UnauthorizedException(
+            'Esta conta foi desativada pelo administrador.',
+          );
         }
       }
 
@@ -193,8 +233,8 @@ export class AuthService {
           id: user.id,
           name: user.name,
           email: user.email,
-          role: user.role
-        }
+          role: user.role,
+        },
       };
     } catch (error) {
       console.error('Google login error:', error);
@@ -204,8 +244,19 @@ export class AuthService {
 
   async findAllUsers() {
     return this.usersRepository.find({
-      select: ['id', 'name', 'email', 'cpf', 'phone', 'role', 'userType', 'period', 'isActive', 'createdAt'],
-      order: { createdAt: 'DESC' }
+      select: [
+        'id',
+        'name',
+        'email',
+        'cpf',
+        'phone',
+        'role',
+        'userType',
+        'period',
+        'isActive',
+        'createdAt',
+      ],
+      order: { createdAt: 'DESC' },
     });
   }
 
@@ -216,43 +267,62 @@ export class AuthService {
     }
     user.role = 'ADMIN';
     await this.usersRepository.save(user);
-    return { message: 'User promoted to ADMIN successfully', user: { id: user.id, name: user.name, role: user.role } };
+    return {
+      message: 'User promoted to ADMIN successfully',
+      user: { id: user.id, name: user.name, role: user.role },
+    };
   }
 
   async createAdminUser(registerDto: any) {
-    if (!registerDto.cpf || registerDto.cpf.trim() === '') {
+    const validRoles = ['ADMIN', 'STORE_ADMIN', 'SPORTS_ADMIN', 'CUSTOMER'];
+    const assignedRole = registerDto.role || 'CUSTOMER';
+    if (!validRoles.includes(assignedRole)) {
+      throw new BadRequestException(
+        `Role inválida. Valores permitidos: ${validRoles.join(', ')}`,
+      );
+    }
+
+    if (!registerDto.cpf || registerDto.cpf?.trim() === '') {
       registerDto.cpf = null;
     }
 
-    const emailExists = await this.usersRepository.findOne({ where: { email: registerDto.email } });
+    const emailExists = await this.usersRepository.findOne({
+      where: { email: registerDto.email },
+    });
     if (emailExists) {
       throw new BadRequestException('Este e-mail já está cadastrado.');
     }
 
     if (registerDto.cpf) {
-      const cpfExists = await this.usersRepository.findOne({ where: { cpf: registerDto.cpf } });
+      const cpfExists = await this.usersRepository.findOne({
+        where: { cpf: registerDto.cpf },
+      });
       if (cpfExists) {
         throw new BadRequestException('Este CPF já está cadastrado.');
       }
     }
 
-    const hashedPassword = await bcrypt.hash(registerDto.password || 'change_me_immediately', 10);
+    const hashedPassword = await bcrypt.hash(
+      registerDto.password || 'change_me_immediately',
+      10,
+    );
 
     const user = this.usersRepository.create({
       ...registerDto,
       password: hashedPassword,
-      role: registerDto.role || 'CUSTOMER',
+      role: assignedRole,
       emailVerified: true,
     }) as any;
 
     await this.usersRepository.save(user);
-    
+
     const storeUrl = process.env.STORE_URL || 'https://federada.com.br';
-    
-    this.mailerService.sendMail({
-      to: user.email,
-      subject: 'Sua conta de acesso foi criada!',
-      html: `
+
+    this.mailerService
+      .sendMail({
+        to: user.email,
+        subject: 'Sua conta de acesso foi criada!',
+        html: `
         <div style="font-family: monospace; max-width: 600px; margin: 0 auto; border: 1px solid #eaeaea; overflow: hidden;">
           <div style="background-color: #000; padding: 30px; text-align: center;">
             <img src="${storeUrl}/urso-polar-andando.gif" alt="Urso" style="width: 80px; height: 80px; object-fit: cover; border-radius: 50%; border: 2px solid white; margin-bottom: 10px;" />
@@ -270,17 +340,34 @@ export class AuthService {
           </div>
         </div>
       `,
-    }).catch(e => console.error('Erro ao enviar email:', e));
-    
-    return { message: 'Usuário criado', user: { id: user.id, name: user.name, email: user.email, role: user.role } };
+      })
+      .catch((e) => console.error('Erro ao enviar email:', e));
+
+    return {
+      message: 'Usuário criado',
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+      },
+    };
   }
 
-  async changePassword(userId: string, currentPassword: string, newPassword: string) {
+  async changePassword(
+    userId: string,
+    currentPassword: string,
+    newPassword: string,
+  ) {
     const user = await this.usersRepository.findOne({ where: { id: userId } });
     if (!user) throw new BadRequestException('User not found');
 
-    const isPasswordValid = await bcrypt.compare(currentPassword, user.password || '');
-    if (!isPasswordValid) throw new BadRequestException('Senha atual incorreta');
+    const isPasswordValid = await bcrypt.compare(
+      currentPassword,
+      user.password || '',
+    );
+    if (!isPasswordValid)
+      throw new BadRequestException('Senha atual incorreta');
 
     user.password = await bcrypt.hash(newPassword, 10);
     await this.usersRepository.save(user);
@@ -298,7 +385,10 @@ export class AuthService {
     if (updateDto.period !== undefined) user.period = updateDto.period;
 
     await this.usersRepository.save(user);
-    return { message: 'Perfil atualizado', user: { id: user.id, name: user.name, role: user.role } };
+    return {
+      message: 'Perfil atualizado',
+      user: { id: user.id, name: user.name, role: user.role },
+    };
   }
 
   async updateUserByAdmin(id: string, updateDto: any) {
@@ -306,16 +396,24 @@ export class AuthService {
     if (!user) throw new BadRequestException('User not found');
 
     if (updateDto.email && updateDto.email !== user.email) {
-      const existingEmail = await this.usersRepository.findOne({ where: { email: updateDto.email } });
+      const existingEmail = await this.usersRepository.findOne({
+        where: { email: updateDto.email },
+      });
       if (existingEmail) throw new BadRequestException('E-mail já está em uso');
       user.email = updateDto.email;
     }
 
-    if (updateDto.cpf && updateDto.cpf.trim() !== '' && updateDto.cpf !== user.cpf) {
-      const existingCpf = await this.usersRepository.findOne({ where: { cpf: updateDto.cpf } });
+    if (
+      updateDto.cpf &&
+      updateDto.cpf?.trim() !== '' &&
+      updateDto.cpf !== user.cpf
+    ) {
+      const existingCpf = await this.usersRepository.findOne({
+        where: { cpf: updateDto.cpf },
+      });
       if (existingCpf) throw new BadRequestException('CPF já está em uso');
       user.cpf = updateDto.cpf;
-    } else if (updateDto.cpf !== undefined && updateDto.cpf.trim() === '') {
+    } else if (updateDto.cpf !== undefined && updateDto.cpf?.trim() === '') {
       user.cpf = null as any;
     }
 

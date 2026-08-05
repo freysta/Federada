@@ -1,27 +1,129 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
+import type { IChampionship, IAthleteProfile, ISubscription } from '../types';
 import { API_URL } from '../config';
+import { apiClient } from '../utils/apiClient';
 import { useAuth } from '../contexts/AuthContext';
-import { Loader2, Trophy, Users, Shield, Check, Plus, Copy, CheckCircle2, X, Info, ArrowLeft, Calendar, MapPin, AlertCircle, Clock, Search, Filter } from 'lucide-react';
+import { Loader2, Trophy, Shield, CheckCircle2, Info, ArrowLeft, Calendar, MapPin, AlertCircle, Clock, Search, Filter } from 'lucide-react';
 import toast from 'react-hot-toast';
 import Navbar from '../components/Navbar';
-import SubscriptionStepper from '../components/championships/SubscriptionStepper';
+
+function QuickProfileEditModal({ 
+  isOpen, 
+  onClose, 
+  profile, 
+  onSuccess 
+}: { 
+  isOpen: boolean, 
+  onClose: () => void, 
+  profile: any, 
+  onSuccess: (updatedProfile: any) => void 
+}) {
+  const [gender, setGender] = useState(profile?.gender || '');
+  const [cpf, setCpf] = useState(profile?.cpf || '');
+  const [loading, setLoading] = useState(false);
+
+  if (!isOpen) return null;
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!gender) {
+      toast.error('Gênero é obrigatório para continuar.');
+      return;
+    }
+    setLoading(true);
+    try {
+      const { data } = await apiClient.put(`/teams/my/profile`, {
+        gender,
+        cpf: cpf || undefined
+      });
+      toast.success('Perfil atualizado!');
+      onSuccess(data);
+      onClose();
+    } catch (err: any) {
+      toast.error(err.message || 'Erro ao atualizar perfil');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+      <div className="bg-white rounded-2xl w-full max-w-md overflow-hidden shadow-2xl animate-in zoom-in-95 duration-200">
+        <div className="bg-orange-50 p-4 border-b border-orange-100 flex items-start gap-3">
+          <AlertCircle className="text-orange-500 shrink-0 mt-0.5" size={24} />
+          <div>
+            <h3 className="font-bold text-orange-800">Informação Faltante</h3>
+            <p className="text-sm text-orange-700 mt-1">Para continuar com a inscrição, precisamos que você complete alguns dados do seu perfil.</p>
+          </div>
+        </div>
+        <form onSubmit={handleSubmit} className="p-6 space-y-4">
+          <div>
+            <label className="block text-sm font-bold text-slate-700 mb-1">Gênero <span className="text-red-500">*</span></label>
+            <select 
+              value={gender} 
+              onChange={e => setGender(e.target.value)} 
+              className="w-full border border-slate-300 rounded-lg p-2.5 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+              required
+            >
+              <option value="">Selecione o gênero...</option>
+              <option value="MASCULINO">Masculino</option>
+              <option value="FEMININO">Feminino</option>
+            </select>
+          </div>
+          <div>
+            <label className="block text-sm font-bold text-slate-700 mb-1">CPF <span className="text-slate-400 font-normal">(Opcional)</span></label>
+            <input 
+              type="text" 
+              value={cpf} 
+              onChange={e => setCpf(e.target.value)} 
+              placeholder="000.000.000-00"
+              className="w-full border border-slate-300 rounded-lg p-2.5 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+            />
+          </div>
+          <div className="flex justify-end gap-3 pt-4 mt-6 border-t border-slate-100">
+            <button type="button" onClick={onClose} className="px-4 py-2 font-bold text-slate-600 hover:bg-slate-100 rounded-lg transition-colors">
+              Cancelar
+            </button>
+            <button type="submit" disabled={loading} className="px-6 py-2 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors">
+              {loading ? 'Salvando...' : 'Salvar e Continuar'}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
+
 import ConfirmSubscriptionModal from '../components/championships/ConfirmSubscriptionModal';
+import RosterModal from '../components/championships/RosterModal';
+import ModalityCard from '../components/championships/ModalityCard';
 
 export default function ChampionshipDetailPage() {
   const { id } = useParams();
-  const { token, user } = useAuth();
+  const { user, token } = useAuth();
   
-  const [champ, setChamp] = useState<any>(null);
+  const [isAvailable, setIsAvailable] = useState(false);
+  const [loadingAvailability, setLoadingAvailability] = useState(false);
+
+  const toggleAvailability = async () => {
+    setLoadingAvailability(true);
+    setTimeout(() => {
+      setIsAvailable(!isAvailable);
+      setLoadingAvailability(false);
+    }, 500);
+  };
+  
+  const [champ, setChamp] = useState<IChampionship | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const [athleteProfile, setAthleteProfile] = useState<any>(null);
-  const [mySubscriptions, setMySubscriptions] = useState<any[]>([]);
-  const [teamMembers, setTeamMembers] = useState<any[]>([]);
+  const [athleteProfile, setAthleteProfile] = useState<IAthleteProfile | null>(null);
+  const [mySubscriptions, setMySubscriptions] = useState<ISubscription[]>([]);
+  const [teamMembers, setTeamMembers] = useState<IAthleteProfile[]>([]);
   const [loadingMembers, setLoadingMembers] = useState(false);
+  
+  const [showQuickProfile, setShowQuickProfile] = useState(false);
   const [selectedModalities, setSelectedModalities] = useState<string[]>([]);
-  const [isAvailable, setIsAvailable] = useState<boolean>(false);
-  const [loadingAvailability, setLoadingAvailability] = useState(false);
   const [teamAvailabilities, setTeamAvailabilities] = useState<any[]>([]);
   
   // Bulk Registration State
@@ -39,8 +141,7 @@ export default function ChampionshipDetailPage() {
 
   const fetchChampionship = () => {
     setLoading(true);
-    fetch(`${API_URL}/championships/${id}`)
-      .then(res => res.json())
+    apiClient.get<IChampionship>(`/championships/${id}`)
       .then(data => {
         setChamp(data);
         setLoading(false);
@@ -53,34 +154,22 @@ export default function ChampionshipDetailPage() {
 
   const fetchProfile = () => {
     if (!token) return;
-    fetch(`${API_URL}/teams/my/profile`, {
-      headers: { 'Authorization': `Bearer ${token}` }
-    })
-    .then(res => res.json())
+    apiClient.get<IAthleteProfile>('/teams/my/profile')
     .then(data => {
       setAthleteProfile(data || null);
       if (data?.team?.id) {
-        fetchAvailabilities(data.team.id, data.id);
+        fetchAvailabilities(data.team.id);
       }
     })
     .catch(err => console.error('Erro ao buscar perfil', err));
   };
 
-  const fetchAvailabilities = (teamId: string, profileId: string) => {
+  const fetchAvailabilities = (teamId: string) => {
     if (!token || !id) return;
-    fetch(`${API_URL}/teams/${teamId}/availability/${id}`, {
-      headers: { 'Authorization': `Bearer ${token}` }
-    })
-    .then(res => res.json())
+    apiClient.get<any[]>(`/teams/${teamId}/availability/${id}`)
     .then(data => {
       if (Array.isArray(data)) {
         setTeamAvailabilities(data);
-        const myAvail = data.find((a: any) => a.athleteProfile?.id === profileId);
-        if (myAvail && myAvail.status === 'AVAILABLE') {
-          setIsAvailable(true);
-        } else {
-          setIsAvailable(false);
-        }
       }
     })
     .catch(err => console.error('Erro ao buscar disponibilidade', err));
@@ -88,10 +177,7 @@ export default function ChampionshipDetailPage() {
 
   const fetchMySubscriptions = () => {
     if (!token) return;
-    fetch(`${API_URL}/championships/my-subscriptions`, {
-      headers: { 'Authorization': `Bearer ${token}` }
-    })
-    .then(res => res.json())
+    apiClient.get<ISubscription[]>('/championships/my-subscriptions')
     .then(data => {
       setMySubscriptions(data || []);
     })
@@ -100,10 +186,7 @@ export default function ChampionshipDetailPage() {
 
   const fetchTeamMembers = (teamId: string) => {
     setLoadingMembers(true);
-    fetch(`${API_URL}/teams/${teamId}/members`, {
-      headers: { 'Authorization': `Bearer ${token}` }
-    })
-    .then(res => res.json())
+    apiClient.get<IAthleteProfile[]>(`/teams/${teamId}/members`)
     .then(data => {
       setTeamMembers(data);
       setLoadingMembers(false);
@@ -118,35 +201,12 @@ export default function ChampionshipDetailPage() {
     fetchChampionship();
     fetchProfile();
     fetchMySubscriptions();
-  }, [id, token]);
+  }, [id]);
 
   const toggleModality = (modId: string) => {
     setSelectedModalities(prev => 
       prev.includes(modId) ? prev.filter(mId => mId !== modId) : [...prev, modId]
     );
-  };
-
-  const toggleAvailability = async () => {
-    if (!user || !athleteProfile?.team) return;
-    setLoadingAvailability(true);
-    try {
-      const newStatus = !isAvailable;
-      const res = await fetch(`${API_URL}/teams/availability/${id}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({ isAvailable: newStatus })
-      });
-      if (!res.ok) throw new Error('Erro ao alterar disponibilidade');
-      setIsAvailable(newStatus);
-      toast.success(newStatus ? 'Sua disponibilidade foi confirmada!' : 'Você marcou como indisponível.');
-    } catch (err: any) {
-      toast.error(err.message);
-    } finally {
-      setLoadingAvailability(false);
-    }
   };
 
   const handleBulkSubscribe = async () => {
@@ -156,6 +216,10 @@ export default function ChampionshipDetailPage() {
     }
     if (!athleteProfile?.team) {
       toast.error('Você precisa estar vinculado a uma equipe para se inscrever.');
+      return;
+    }
+    if (!athleteProfile.gender) {
+      setShowQuickProfile(true);
       return;
     }
     if (selectedModalities.length === 0) return;
@@ -168,19 +232,10 @@ export default function ChampionshipDetailPage() {
 
     for (const modId of selectedModalities) {
       try {
-        const res = await fetch(`${API_URL}/championships/${modId}/enroll`, {
-          method: 'POST',
-          headers: { 'Authorization': `Bearer ${token}` }
-        });
-        const data = await res.json();
-        
-        if (!res.ok) {
-          errors.push(data.message || `Erro na modalidade ${modId}`);
-        } else {
-          successCount++;
-        }
+        await apiClient.post(`/championships/${modId}/enroll`, {});
+        successCount++;
       } catch (err: any) {
-        errors.push(err.message);
+        errors.push(err.message || `Erro na modalidade ${modId}`);
       }
     }
 
@@ -199,12 +254,7 @@ export default function ChampionshipDetailPage() {
   const handleUnsubscribe = async (modId: string) => {
     const toastId = toast.loading('Cancelando inscrição...');
     try {
-      const res = await fetch(`${API_URL}/championships/${modId}/unenroll`, {
-        method: 'POST',
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message || 'Erro ao cancelar inscrição.');
+      await apiClient.post(`/championships/${modId}/unenroll`, {});
       
       toast.success('Inscrição cancelada!', { id: toastId });
       fetchMySubscriptions();
@@ -216,12 +266,7 @@ export default function ChampionshipDetailPage() {
   const handleAddToRoster = async (subId: string, athleteId: string) => {
     const toastId = toast.loading('Adicionando ao elenco...');
     try {
-      const res = await fetch(`${API_URL}/championships/subscription/${subId}/roster/${athleteId}`, {
-        method: 'POST',
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message || 'Erro ao adicionar atleta.');
+      const data = await apiClient.post<any>(`/championships/subscription/${subId}/roster/${athleteId}`, {});
       
       toast.success('Atleta adicionado!', { id: toastId });
       setSelectedSubscription(data);
@@ -234,12 +279,7 @@ export default function ChampionshipDetailPage() {
   const handleRemoveFromRoster = async (subId: string, athleteId: string) => {
     const toastId = toast.loading('Removendo do elenco...');
     try {
-      const res = await fetch(`${API_URL}/championships/subscription/${subId}/roster/${athleteId}`, {
-        method: 'DELETE',
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message || 'Erro ao remover atleta.');
+      const data = await apiClient.delete<any>(`/championships/subscription/${subId}/roster/${athleteId}`);
       
       toast.success('Atleta removido!', { id: toastId });
       setSelectedSubscription(data);
@@ -280,7 +320,7 @@ export default function ChampionshipDetailPage() {
       <div className="min-h-screen bg-slate-50 pb-24 font-inter text-slate-800 pt-20">
         
         {/* HERO HEADER */}
-        <div className="relative pt-32 pb-20 overflow-hidden">
+        <div className="relative pt-10 pb-10 overflow-hidden">
           {champ.bannerUrl ? (
             <>
               <div 
@@ -297,7 +337,7 @@ export default function ChampionshipDetailPage() {
           <div className="max-w-6xl mx-auto px-6 relative z-10 text-white">
             <Link 
               to="/campeonatos" 
-              className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/20 rounded-full text-white transition-all mb-8 text-sm font-bold tracking-wide"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/20 rounded-full text-white transition-all mb-4 text-sm font-bold tracking-wide"
             >
               <ArrowLeft size={16} /> Voltar
             </Link>
@@ -317,18 +357,18 @@ export default function ChampionshipDetailPage() {
                   )}
                 </div>
                 
-                <h1 className="text-4xl md:text-5xl font-mono font-bold uppercase tracking-tighter mb-4 text-white drop-shadow-md">
+                <h1 className="text-3xl md:text-4xl font-mono font-bold uppercase tracking-tighter mb-3 text-white drop-shadow-md">
                   {champ.name}
                 </h1>
                 
-                <p className="text-slate-300 text-lg max-w-2xl leading-relaxed">
+                <p className="text-slate-300 text-base max-w-2xl leading-relaxed">
                   {champ.description || 'Nenhuma descrição fornecida para este campeonato.'}
                 </p>
               </div>
             </div>
             
             {/* Metadata Bar */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mt-10 border-t border-slate-700/50 pt-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mt-6 border-t border-slate-700/50 pt-6">
               <div className="flex items-start gap-3">
                 <Calendar className="text-blue-400 mt-1 shrink-0" size={20} />
                 <div>
@@ -518,99 +558,25 @@ export default function ChampionshipDetailPage() {
               return (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {filteredModalities.map((mod: any) => {
-                  const subscription = mySubscriptions.find(s => s.modality?.id === mod.id);
-                  const isSubscribed = !!subscription;
+                  const subscription = mySubscriptions?.find(s => s.modality?.id === mod.id);
                   const isSelected = selectedModalities.includes(mod.id);
                   
-                  if (isSubscribed) {
-                    return (
-                      <div key={mod.id} className="relative bg-white rounded-2xl border-2 border-green-500 shadow-sm overflow-hidden flex flex-col">
-                        <div className="absolute top-0 right-0 bg-green-500 text-white text-xs font-bold px-4 py-1.5 rounded-bl-xl flex items-center gap-1 shadow-sm">
-                          <CheckCircle2 size={14} /> INSCRITO
-                        </div>
-                        <div className="p-6 pb-4 border-b border-slate-100">
-                          <div className="flex gap-2 mb-2">
-                            <span className="text-[10px] font-bold bg-slate-100 text-slate-600 px-2 py-1 rounded uppercase tracking-wider">{mod.type}</span>
-                            <span className="text-[10px] font-bold bg-slate-100 text-slate-600 px-2 py-1 rounded uppercase tracking-wider">{mod.gender || 'MISTO'}</span>
-                          </div>
-                          <h4 className="font-bold text-slate-800 text-xl leading-tight mb-2">{mod.name}</h4>
-                        </div>
-                        
-                        <div className="p-6 pt-4 bg-green-50/30 flex-1 flex flex-col">
-                          <SubscriptionStepper status={subscription.status} />
-                          
-                          <div className="mt-4 flex justify-between items-center gap-4">
-                            <button 
-                              onClick={() => handleUnsubscribe(mod.id)}
-                              className="text-xs font-bold text-red-500 hover:text-red-700 hover:underline px-2"
-                            >
-                              Cancelar
-                            </button>
-                            
-                            {mod.type === 'COLETIVO' && athleteProfile?.teamRole === 'PRESIDENT' && (
-                              <button 
-                                onClick={() => { 
-                                  setSelectedSubscription(subscription); 
-                                  fetchTeamMembers(athleteProfile.team.id);
-                                  setShowRosterModal(true); 
-                                }}
-                                className="bg-green-600 text-white text-sm font-bold px-4 py-2 rounded-xl hover:bg-green-700 shadow-sm flex-1 text-center transition-colors"
-                              >
-                                Elenco
-                              </button>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  }
-
                   return (
-                    <div 
-                      key={mod.id} 
-                      onClick={() => isEnrollmentOpen && toggleModality(mod.id)}
-                      className={`relative bg-white rounded-2xl border-2 transition-all flex flex-col overflow-hidden ${
-                        !isEnrollmentOpen ? 'opacity-60 cursor-not-allowed border-slate-200' :
-                        isSelected ? 'border-blue-500 shadow-md shadow-blue-500/10 cursor-pointer scale-[1.02] transform' : 'border-slate-200 hover:border-blue-300 hover:shadow-md cursor-pointer'
-                      }`}
-                    >
-                      <div className={`absolute top-5 right-5 w-6 h-6 rounded-full border-2 flex items-center justify-center transition-colors z-10 ${
-                        isSelected ? 'border-blue-500 bg-blue-600 text-white' : 'border-slate-300 bg-white'
-                      }`}>
-                        {isSelected && <Check size={14} strokeWidth={3} />}
-                      </div>
-                      
-                      <div className="p-6 pb-4 border-b border-slate-100">
-                        <div className="flex gap-2 mb-2 pr-8">
-                          <span className={`text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wider ${mod.type === 'COLETIVO' ? 'bg-indigo-100 text-indigo-700' : 'bg-teal-100 text-teal-700'}`}>
-                            {mod.type}
-                          </span>
-                          <span className="text-[10px] font-bold bg-slate-100 text-slate-600 px-2 py-1 rounded uppercase tracking-wider">
-                            {mod.gender || 'MISTO'}
-                          </span>
-                        </div>
-                        <h4 className="font-bold text-slate-800 text-xl leading-tight mb-2">{mod.name}</h4>
-                        <div className="flex flex-wrap gap-x-4 gap-y-2 mt-3 text-xs text-slate-500 font-medium">
-                          {mod.type === 'COLETIVO' && (
-                            <div className="flex items-center gap-1">
-                              <Users size={14} /> {mod.minAthletes} a {mod.maxAthletes} atletas
-                            </div>
-                          )}
-                          <div className="flex items-center gap-1">
-                            <span className="font-mono">{mod.minAge || 0} - {mod.maxAge || 99} anos</span>
-                          </div>
-                        </div>
-                      </div>
-                      
-                      <div className={`p-6 pt-4 flex-1 flex flex-col justify-end ${isSelected ? 'bg-blue-50/50' : 'bg-slate-50/50'}`}>
-                        <div className="flex items-center justify-between">
-                          <span className="text-xs text-slate-500 font-semibold uppercase tracking-wider">Taxa de Inscrição</span>
-                          <span className="font-extrabold text-slate-800 text-lg">
-                            {Number(mod.price) === 0 ? 'Grátis' : `R$ ${Number(mod.price).toFixed(2).replace('.', ',')}`}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
+                    <ModalityCard 
+                      key={mod.id}
+                      mod={mod}
+                      subscription={subscription}
+                      isSelected={isSelected}
+                      isEnrollmentOpen={isEnrollmentOpen}
+                      athleteProfile={athleteProfile}
+                      onToggle={toggleModality}
+                      onUnsubscribe={handleUnsubscribe}
+                      onShowRoster={(sub) => {
+                        setSelectedSubscription(sub); 
+                        if(athleteProfile?.team?.id) fetchTeamMembers(athleteProfile.team.id);
+                        setShowRosterModal(true); 
+                      }}
+                    />
                   );
                 })}
               </div>
@@ -631,7 +597,7 @@ export default function ChampionshipDetailPage() {
               <div className="flex-1">
                 <p className="font-bold text-slate-800 leading-tight">Modalidades selecionadas</p>
                 <p className="text-xs text-slate-500 line-clamp-1">
-                  {selectedModalities.map(id => champ.modalities.find((m: any) => m.id === id)?.name).join(', ')}
+                  {selectedModalities.map(id => champ.modalities?.find((m: any) => m.id === id)?.name).join(', ')}
                 </p>
               </div>
             </div>
@@ -647,105 +613,16 @@ export default function ChampionshipDetailPage() {
       )}
 
       {/* ROSTER MODAL */}
-      {showRosterModal && selectedSubscription && (
-        <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => setShowRosterModal(false)}></div>
-          <div className="relative bg-white w-full max-w-4xl rounded-3xl shadow-2xl flex flex-col max-h-[90vh] overflow-hidden animate-in zoom-in-95 duration-200">
-            <div className="bg-gradient-to-r from-blue-700 to-indigo-800 text-white px-8 py-6 flex justify-between items-center shrink-0">
-              <div>
-                <h3 className="font-bold text-2xl">{selectedSubscription.modality.name}</h3>
-                <p className="text-blue-200 text-sm">{selectedSubscription.modality.championship?.name}</p>
-              </div>
-              <button onClick={() => setShowRosterModal(false)} className="text-blue-200 hover:text-white transition-colors">
-                <X size={24} />
-              </button>
-            </div>
-            
-            <div className="p-8 overflow-y-auto bg-white flex-1 grid grid-cols-1 md:grid-cols-2 gap-8">
-              {/* Left Side: Available Team Members */}
-              <div>
-                <h4 className="font-bold text-lg text-slate-800 mb-4 border-b border-slate-100 pb-2">Seu Plantel</h4>
-                {loadingMembers ? (
-                  <div className="flex justify-center py-4"><Loader2 className="animate-spin text-blue-600" /></div>
-                ) : (
-                  <div className="space-y-2 max-h-[500px] overflow-y-auto pr-2 custom-scrollbar">
-                    {[...teamMembers].sort((a, b) => {
-                      const availA = teamAvailabilities.some(av => av.athleteProfile?.id === a.id && av.status === 'AVAILABLE');
-                      const availB = teamAvailabilities.some(av => av.athleteProfile?.id === b.id && av.status === 'AVAILABLE');
-                      if (availA && !availB) return -1;
-                      if (!availA && availB) return 1;
-                      return 0;
-                    }).map((member: any) => {
-                      const isInRoster = selectedSubscription.athletes?.some((a: any) => a.id === member.id);
-                      if (isInRoster) return null; // already in roster
-
-                      const isMemberAvailable = teamAvailabilities.some(av => av.athleteProfile?.id === member.id && av.status === 'AVAILABLE');
-
-                      return (
-                        <div key={member.id} className="bg-slate-50 border border-slate-200 p-3 rounded-xl flex justify-between items-center hover:bg-white hover:border-slate-300 transition-colors">
-                          <div>
-                            <div className="flex items-center gap-2">
-                              <p className="font-bold text-slate-800 text-sm">{member.user?.name}</p>
-                              {isMemberAvailable && (
-                                <span className="bg-green-100 text-green-700 text-[9px] font-bold px-1.5 py-0.5 rounded uppercase flex items-center gap-1">
-                                  <CheckCircle2 size={10} /> Disponível
-                                </span>
-                              )}
-                            </div>
-                            <p className="text-[10px] text-slate-500 font-mono mt-1">{member.cpf} | {member.gender || 'N/A'}</p>
-                          </div>
-                          <button 
-                            onClick={() => handleAddToRoster(selectedSubscription.id, member.id)}
-                            className="bg-blue-100 text-blue-700 hover:bg-blue-200 hover:text-blue-800 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors shrink-0"
-                          >
-                            Add
-                          </button>
-                        </div>
-                      );
-                    })}
-                    {teamMembers.filter(m => !selectedSubscription.athletes?.some((a: any) => a.id === m.id)).length === 0 && (
-                      <p className="text-sm text-slate-500 italic text-center py-4">Nenhum atleta disponível para adicionar.</p>
-                    )}
-                  </div>
-                )}
-              </div>
-
-              {/* Right Side: Modality Roster */}
-              <div className="bg-slate-50 rounded-2xl p-6 border border-slate-200 flex flex-col">
-                <h4 className="font-bold text-lg text-slate-800 mb-1 border-b border-slate-200 pb-2 flex justify-between items-center">
-                  <span>Elenco Inscrito</span>
-                  <span className={`text-sm px-2 py-0.5 rounded-full ${
-                    selectedSubscription.athletes?.length >= selectedSubscription.modality.minAthletes ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
-                  }`}>
-                    {selectedSubscription.athletes?.length || 0} / {selectedSubscription.modality.maxAthletes || '∞'}
-                  </span>
-                </h4>
-                
-                <div className="space-y-2 mt-4 flex-1 overflow-y-auto pr-2 custom-scrollbar">
-                  {selectedSubscription.athletes?.map((athlete: any) => (
-                    <div key={athlete.id} className="bg-white border border-slate-200 p-3 rounded-xl flex justify-between items-center shadow-sm">
-                      <div>
-                        <p className="font-bold text-slate-800 text-sm">{athlete.user?.name}</p>
-                        <p className="text-[10px] text-slate-500 font-mono">{athlete.cpf}</p>
-                      </div>
-                      <button 
-                        onClick={() => handleRemoveFromRoster(selectedSubscription.id, athlete.id)}
-                        className="text-red-500 hover:text-red-700 bg-red-50 hover:bg-red-100 p-2 rounded-lg transition-colors"
-                        title="Remover do Elenco"
-                      >
-                        <X size={16} />
-                      </button>
-                    </div>
-                  ))}
-                  {(!selectedSubscription.athletes || selectedSubscription.athletes.length === 0) && (
-                    <p className="text-sm text-slate-500 italic text-center py-8">Nenhum atleta no elenco ainda.</p>
-                  )}
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      <RosterModal
+        isOpen={showRosterModal}
+        onClose={() => setShowRosterModal(false)}
+        selectedSubscription={selectedSubscription}
+        teamMembers={teamMembers}
+        teamAvailabilities={teamAvailabilities}
+        loadingMembers={loadingMembers}
+        onAddToRoster={handleAddToRoster}
+        onRemoveFromRoster={handleRemoveFromRoster}
+      />
 
       {/* MODAL DE CONFIRMAÇÃO DE INSCRIÇÃO */}
       <ConfirmSubscriptionModal 
@@ -755,6 +632,18 @@ export default function ChampionshipDetailPage() {
         selectedModalities={champ?.modalities?.filter((m: any) => selectedModalities.includes(m.id)) || []}
         championshipSettings={champ?.settings}
         isSubscribing={isSubscribing}
+      />
+
+      {/* Quick Profile Edit Modal */}
+      <QuickProfileEditModal 
+        isOpen={showQuickProfile} 
+        onClose={() => setShowQuickProfile(false)} 
+        profile={athleteProfile} 
+        onSuccess={(updated) => {
+          setAthleteProfile(updated);
+          // Auto continue
+          handleBulkSubscribe();
+        }}
       />
     </>
   );

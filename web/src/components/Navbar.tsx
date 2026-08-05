@@ -116,10 +116,10 @@ export default function Navbar() {
 					{/* Action Buttons */}
 					<div className="flex items-center gap-4">
 						{user ? (
-							<button onClick={() => setIsDashboardOpen(true)} className="bg-black text-white px-4 py-2 flex items-center gap-2 hover:bg-neutral-800 transition-colors">
+							<Link to="/perfil" className="bg-black text-white px-4 py-2 flex items-center gap-2 hover:bg-neutral-800 transition-colors">
 								<UserIcon size={16} />
 								<span className="font-sans font-bold tracking-wide uppercase">{user.name.split(' ')[0]}</span>
-							</button>
+							</Link>
 						) : (
 							<button onClick={() => setIsLoginOpen(true)} className="bg-white border border-black text-black px-4 py-2 flex items-center gap-2 hover:bg-gray-100 transition-colors">
 								<UserIcon size={16} />
@@ -195,10 +195,10 @@ export default function Navbar() {
 					
 					<div className="pt-2 flex flex-col gap-3">
 						{user ? (
-							<button onClick={() => { setIsOpen(false); setIsDashboardOpen(true); }} className="w-full bg-black text-white px-4 py-3 flex justify-center items-center gap-2 hover:bg-neutral-800 transition-colors">
+							<Link to="/perfil" onClick={() => setIsOpen(false)} className="w-full bg-black text-white px-4 py-3 flex justify-center items-center gap-2 hover:bg-neutral-800 transition-colors">
 								<UserIcon size={16} />
 								<span className="font-sans font-bold tracking-wide uppercase">MINHA CONTA</span>
-							</button>
+							</Link>
 						) : (
 							<button onClick={() => { setIsOpen(false); setIsLoginOpen(true); }} className="w-full bg-white border border-black text-black px-4 py-3 flex justify-center items-center gap-2 hover:bg-gray-100 transition-colors">
 								<UserIcon size={16} />

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
-import { API_URL } from "../config";
+import { apiClient } from "../utils/apiClient";
 import { Calendar, MessageSquare, ChevronRight, User, Terminal } from "lucide-react";
 import FadeIn from "../components/FadeIn";
 
@@ -13,11 +13,7 @@ export default function Forum() {
     // Scroll to top on mount
     window.scrollTo(0, 0);
     
-    fetch(`${API_URL}/cms/news`)
-      .then(res => {
-        if (!res.ok) throw new Error('Falha');
-        return res.json();
-      })
+    apiClient.get<any[]>('/cms/news')
       .then(data => {
         setNews(data);
         setLoading(false);

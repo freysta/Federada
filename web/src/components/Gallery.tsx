@@ -2,15 +2,14 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import FadeIn from './FadeIn';
 import DecryptText from './DecryptText';
-import { API_URL } from '../config';
+import { apiClient } from '../utils/apiClient';
 
 export default function Gallery() {
   const [posts, setPosts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch(`${API_URL}/cms/instagram`)
-      .then(res => res.json())
+    apiClient.get<any[]>('/cms/instagram')
       .then(data => {
         setPosts(data.slice(0, 2)); // Mostra apenas os 2 últimos
         setLoading(false);

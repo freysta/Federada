@@ -1,13 +1,10 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../../contexts/AuthContext';
-import { API_URL } from '../../config';
-import { Loader2, ArrowRight, ArrowLeft, Trophy, Users, Settings, CheckCircle } from 'lucide-react';
+import { apiClient } from '../../../utils/apiClient';
+import { Loader2, ArrowLeft, ArrowRight, CheckCircle } from 'lucide-react';
 import toast from 'react-hot-toast';
-import Navbar from '../../components/Navbar';
 
-export default function ChampionshipWizardPage() {
-  const { token } = useAuth();
+export default function AdminChampionshipCreatePage() {
   const navigate = useNavigate();
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
@@ -29,7 +26,7 @@ export default function ChampionshipWizardPage() {
 
   const [modalities, setModalities] = useState<any[]>([]);
   const [modalityData, setModalityData] = useState({
-    name: '', type: 'INDIVIDUAL', price: 0, minAthletes: 1, maxAthletes: 99, minAge: 0, maxAge: 99, gender: 'MISTO'
+    name: '', type: 'INDIVIDUAL', price: 0, minAthletes: 1, maxAthletes: 99, minAge: 0, maxAge: 99, gender: 'MISTO', maxSpots: 10
   });
 
   const handleCreateDraft = async () => {
@@ -39,16 +36,7 @@ export default function ChampionshipWizardPage() {
     }
     setLoading(true);
     try {
-      const res = await fetch(`${API_URL}/championships`, {
-        method: 'POST',
-        headers: { 
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(formData)
-      });
-      if (!res.ok) throw new Error('Erro ao criar rascunho.');
-      const data = await res.json();
+      const data = await apiClient.post<any>('/championships', formData);
       setChampId(data.id);
       setStep(2);
     } catch (err: any) {
@@ -63,18 +51,9 @@ export default function ChampionshipWizardPage() {
     if (!champId) return;
     setLoading(true);
     try {
-      const res = await fetch(`${API_URL}/championships/${champId}/modalities`, {
-        method: 'POST',
-        headers: { 
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(modalityData)
-      });
-      if (!res.ok) throw new Error('Erro ao adicionar modalidade.');
-      const data = await res.json();
+      const data = await apiClient.post<any>(`/championships/${champId}/modalities`, modalityData);
       setModalities([...modalities, data]);
-      setModalityData({ name: '', type: 'INDIVIDUAL', price: 0, minAthletes: 1, maxAthletes: 99, minAge: 0, maxAge: 99, gender: 'MISTO' });
+      setModalityData({ name: '', type: 'INDIVIDUAL', price: 0, minAthletes: 1, maxAthletes: 99, minAge: 0, maxAge: 99, gender: 'MISTO', maxSpots: 10 });
       toast.success('Modalidade adicionada!');
     } catch (err: any) {
       toast.error(err.message);
@@ -98,23 +77,10 @@ export default function ChampionshipWizardPage() {
           locations: settings.locations.split(',').map(s => s.trim()).filter(s => s)
         }
       };
-      await fetch(`${API_URL}/championships/${champId}`, {
-        method: 'PATCH',
-        headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
-        body: JSON.stringify(settingsPayload)
-      });
+      await apiClient.patch(`/championships/${champId}`, settingsPayload);
 
       // 2. Publicar (Mudar status para PUBLISHED)
-      const res = await fetch(`${API_URL}/championships/${champId}/status`, {
-        method: 'PATCH',
-        headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status: 'PUBLISHED' })
-      });
-      
-      if (!res.ok) {
-        const errorData = await res.json();
-        throw new Error(errorData.message || 'Erro ao publicar campeonato.');
-      }
+      await apiClient.patch(`/championships/${champId}/status`, { status: 'PUBLISHED' });
 
       toast.success('Campeonato publicado com sucesso!');
       navigate('/campeonatos');
@@ -126,13 +92,18 @@ export default function ChampionshipWizardPage() {
   };
 
   return (
-    <div className="bg-slate-50 min-h-screen">
-      <Navbar />
-      <div className="max-w-4xl mx-auto space-y-6 pb-20 pt-28 px-4 sm:px-6">
-        <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold font-mono tracking-tight uppercase text-slate-800">Criar Campeonato</h1>
-          <button onClick={() => navigate('/campeonatos')} className="text-gray-500 hover:text-black">Cancelar</button>
-        </div>
+    <div className="flex-1 flex flex-col bg-slate-50 min-h-screen">
+      
+      {/* Header Modal/Wizard Style */}
+      <div className="bg-white px-8 py-6 border-b border-slate-200">
+        <button onClick={() => navigate('/admin/championships')} className="flex items-center gap-2 text-slate-500 hover:text-slate-800 font-semibold mb-4 transition-colors">
+          <ArrowLeft size={16} /> Voltar para Campeonatos
+        </button>
+        <h1 className="text-3xl font-extrabold text-slate-800 tracking-tight">Criar Novo Campeonato</h1>
+        <p className="text-slate-500 mt-1">Siga os passos abaixo para configurar seu evento esportivo.</p>
+      </div>
+
+      <div className="max-w-4xl mx-auto w-full space-y-6 pb-20 pt-8 px-4 sm:px-6">
 
       {/* Stepper Header Modernized */}
       <div className="relative flex items-center justify-between mb-12">
@@ -225,6 +196,10 @@ export default function ChampionshipWizardPage() {
               <div>
                 <label className="block font-mono text-[10px] uppercase tracking-wide font-bold text-gray-500 mb-1">Preço (R$)</label>
                 <input type="number" required value={modalityData.price} onChange={e => setModalityData({...modalityData, price: Number(e.target.value)})} className="w-full font-sans bg-white border border-gray-200 rounded-lg p-3 outline-none focus:border-blue-500" />
+              </div>
+              <div>
+                <label className="block font-mono text-[10px] uppercase tracking-wide font-bold text-gray-500 mb-1">Vagas (Max)</label>
+                <input type="number" value={modalityData.maxSpots || ''} onChange={e => setModalityData({...modalityData, maxSpots: Number(e.target.value)})} className="w-full font-sans bg-white border border-gray-200 rounded-lg p-3 outline-none focus:border-blue-500" placeholder="Sem limite" />
               </div>
             </div>
             <button type="submit" disabled={loading} className="mt-4 bg-blue-600 text-white px-4 py-2 rounded font-bold text-sm hover:bg-blue-700">

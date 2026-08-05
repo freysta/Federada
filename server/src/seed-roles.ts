@@ -13,15 +13,25 @@ async function bootstrap() {
 
   const usersToSeed = [
     { email: 'superadmin@federada.com', role: 'ADMIN', name: 'Super Admin' },
-    { email: 'loja@federada.com', role: 'STORE_ADMIN', name: 'Gerente da Loja' },
-    { email: 'esportes@federada.com', role: 'SPORTS_ADMIN', name: 'Organizador Esportivo' },
+    {
+      email: 'loja@federada.com',
+      role: 'STORE_ADMIN',
+      name: 'Gerente da Loja',
+    },
+    {
+      email: 'esportes@federada.com',
+      role: 'SPORTS_ADMIN',
+      name: 'Organizador Esportivo',
+    },
     { email: 'atleta@federada.com', role: 'CUSTOMER', name: 'Atleta Teste' },
   ];
 
   const hashedPassword = await bcrypt.hash('123456', 10);
 
   for (const u of usersToSeed) {
-    const existing = await userRepository.findOne({ where: { email: u.email } });
+    const existing = await userRepository.findOne({
+      where: { email: u.email },
+    });
     if (!existing) {
       const user = userRepository.create({
         ...u,

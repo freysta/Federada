@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { Terminal as TerminalIcon, X, Maximize2, Minimize2 } from 'lucide-react';
-import { API_URL } from '../config';
+import { apiClient } from '../utils/apiClient';
 
 export default function TerminalWidget() {
   const [isOpen, setIsOpen] = useState(false);
@@ -35,14 +35,7 @@ export default function TerminalWidget() {
           const orderId = args[0];
           setHistory(prev => [...prev, `> ${cmd}`, 'FETCHING_ORDER_DATA...']);
           try {
-            const token = localStorage.getItem('@federada:token');
-            const res = await fetch(`${API_URL}/orders/${orderId}`, {
-              headers: {
-                'Authorization': `Bearer ${token}`
-              }
-            });
-            if (!res.ok) throw new Error();
-            const order = await res.json();
+            const order = await apiClient.get<any>(`/orders/${orderId}`);
             
             setHistory(prev => [...prev, 
               `--- PEDIDO: ${order.id.slice(0,8)}... ---`,

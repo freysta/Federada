@@ -1,4 +1,14 @@
-import { IsString, IsOptional, IsDateString, IsEnum, ValidateNested, IsBoolean, IsArray } from 'class-validator';
+import {
+  IsString,
+  IsNotEmpty,
+  IsOptional,
+  IsDateString,
+  IsEnum,
+  ValidateNested,
+  IsBoolean,
+  IsArray,
+  MaxLength,
+} from 'class-validator';
 import { Type } from 'class-transformer';
 import { ChampionshipStatus } from '../entities/championship.entity';
 
@@ -24,10 +34,13 @@ class ChampionshipSettingsDto {
 
 export class CreateChampionshipDto {
   @IsString()
+  @IsNotEmpty()
+  @MaxLength(150)
   name: string;
 
   @IsOptional()
   @IsString()
+  @MaxLength(1000)
   description?: string;
 
   @IsOptional()
@@ -45,10 +58,6 @@ export class CreateChampionshipDto {
   @IsOptional()
   @IsDateString()
   documentsDeadline?: string;
-
-  @IsOptional()
-  @IsEnum(ChampionshipStatus)
-  status?: ChampionshipStatus;
 
   @IsOptional()
   @IsString()

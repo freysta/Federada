@@ -1,4 +1,12 @@
-import { IsEmail, IsNotEmpty, IsString, MinLength, MaxLength, IsOptional, IsBoolean } from 'class-validator';
+import {
+  IsEmail,
+  IsNotEmpty,
+  IsString,
+  MinLength,
+  MaxLength,
+  IsOptional,
+  IsBoolean,
+} from 'class-validator';
 
 export class RegisterDto {
   @IsString()
@@ -50,38 +58,36 @@ export class LoginDto {
 export class ChangePasswordDto {
   @IsString()
   @IsNotEmpty()
+  @MaxLength(100)
   currentPassword: string;
 
   @IsString()
   @IsNotEmpty()
-  @MinLength(6)
+  @MinLength(8, { message: 'A nova senha deve ter no mínimo 8 caracteres.' })
+  @MaxLength(100)
   newPassword: string;
 }
 
 export class UpdateUserDto {
   @IsString()
   @IsOptional()
+  @MaxLength(100)
   name?: string;
 
   @IsEmail()
   @IsOptional()
+  @MaxLength(100)
   email?: string;
 
   @IsString()
   @IsOptional()
+  @MaxLength(14)
   cpf?: string;
 
   @IsString()
   @IsOptional()
+  @MaxLength(20)
   phone?: string;
-
-  @IsString()
-  @IsOptional()
-  role?: string;
-
-  @IsString()
-  @IsOptional()
-  userType?: string;
 
   @IsString()
   @IsOptional()

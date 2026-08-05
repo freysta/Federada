@@ -1,12 +1,10 @@
 import { useState, useEffect } from 'react';
-import { useAuth } from '../../contexts/AuthContext';
-import { API_URL } from '../../config';
+import { apiClient } from '../../utils/apiClient';
 import { Loader2, Plus, Edit, Trash2, Search } from 'lucide-react';
 import toast from 'react-hot-toast';
 import Pagination from '../../components/admin/Pagination';
 
 export default function AdminNews() {
-  const { token } = useAuth();
   const [news, setNews] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
@@ -30,9 +28,7 @@ export default function AdminNews() {
   const fetchNews = async () => {
     setLoading(true);
     try {
-      const res = await fetch(`${API_URL}/cms/news`);
-      if (!res.ok) throw new Error('Falha ao carregar noticias');
-      const data = await res.json();
+      const data = await apiClient.get<any[]>('/cms/news');
       if (Array.isArray(data)) setNews(data);
       else setNews([]);
     } catch (err) {
@@ -49,14 +45,12 @@ export default function AdminNews() {
   const uploadImage = async (file: File): Promise<string> => {
     const formData = new FormData();
     formData.append('file', file);
-    const res = await fetch(`${API_URL}/upload`, { 
-      method: 'POST', 
-      body: formData,
-      headers: { 'Authorization': `Bearer ${token}` }
-    });
-    if (!res.ok) throw new Error('Falha no upload');
-    const data = await res.json();
-    return data.url;
+    try {
+      const data = await apiClient.post<any>('/upload', formData);
+      return data.url;
+    } catch (err) {
+      throw new Error('Falha no upload');
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -66,16 +60,13 @@ export default function AdminNews() {
       if (selectedFile) imageUrl = await uploadImage(selectedFile);
 
       const payload = { ...formData, imageUrl };
-      const url = editingId ? `${API_URL}/cms/news/${editingId}` : `${API_URL}/cms/news`;
-      const method = editingId ? 'PUT' : 'POST';
+      
+      if (editingId) {
+        await apiClient.put(`/cms/news/${editingId}`, payload);
+      } else {
+        await apiClient.post('/cms/news', payload);
+      }
 
-      const res = await fetch(url, {
-        method,
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-        body: JSON.stringify(payload)
-      });
-
-      if (!res.ok) throw new Error('Erro ao salvar');
       toast.success('Salvo com sucesso!');
       setIsModalOpen(false);
       fetchNews();
@@ -87,11 +78,7 @@ export default function AdminNews() {
   const handleDelete = async (id: string) => {
     if (!window.confirm('Excluir esta notícia?')) return;
     try {
-      const res = await fetch(`${API_URL}/cms/news/${id}`, {
-        method: 'DELETE',
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-      if (!res.ok) throw new Error('Erro ao excluir');
+      await apiClient.delete(`/cms/news/${id}`);
       toast.success('Excluído');
       fetchNews();
     } catch (err: any) {

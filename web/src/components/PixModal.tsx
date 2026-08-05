@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { X, Copy, Check, CheckCircle, Loader2, Timer } from 'lucide-react';
-import { API_URL } from '../config';
-import { useAuth } from '../contexts/AuthContext';
+import { apiClient } from '../utils/apiClient';
 import { createPortal } from 'react-dom';
 import toast from 'react-hot-toast';
 
@@ -20,25 +19,16 @@ export default function PixModal({ isOpen, onClose, amount, pixData }: PixModalP
   const [copied, setCopied] = useState(false);
   const [status, setStatus] = useState<'PENDING' | 'PAID' | 'CANCELLED'>('PENDING');
   const [timeLeft, setTimeLeft] = useState(15 * 60);
-  const { token } = useAuth();
-
   useEffect(() => {
     const interval = setInterval(async () => {
       try {
-        const res = await fetch(`${API_URL}/orders/${pixData.orderId}`, {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        });
-        if (res.ok) {
-          const data = await res.json();
-          if (data.status === 'PAID') {
-            setStatus('PAID');
-            clearInterval(interval);
-          } else if (data.status === 'CANCELLED') {
-            setStatus('CANCELLED');
-            clearInterval(interval);
-          }
+        const data = await apiClient.get<any>(`/orders/${pixData.orderId}`);
+        if (data.status === 'PAID') {
+          setStatus('PAID');
+          clearInterval(interval);
+        } else if (data.status === 'CANCELLED') {
+          setStatus('CANCELLED');
+          clearInterval(interval);
         }
       } catch (err) {
         console.error("Erro ao checar status do PIX:", err);
@@ -53,7 +43,7 @@ export default function PixModal({ isOpen, onClose, amount, pixData }: PixModalP
       clearInterval(interval);
       clearTimeout(timeout);
     };
-  }, [pixData.orderId, token]);
+  }, [pixData.orderId]);
 
   useEffect(() => {
     if (status !== 'PAID' && timeLeft > 0) {

@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, In } from 'typeorm';
 import { Product } from './entities/product.entity';
 
 @Injectable()
@@ -10,11 +10,22 @@ export class ProductsService {
     private productsRepository: Repository<Product>,
   ) {}
 
-  findAll() {
-    return this.productsRepository.find({ 
+  async findAll(page: number = 1, limit: number = 10) {
+    const skip = (page - 1) * limit;
+    const [data, total] = await this.productsRepository.findAndCount({
       where: { isActive: true },
-      order: { createdAt: 'DESC' }
+      order: { createdAt: 'DESC' },
+      skip,
+      take: limit,
     });
+
+    return {
+      data,
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit),
+    };
   }
 
   async findOne(id: string) {
@@ -23,6 +34,12 @@ export class ProductsService {
       throw new NotFoundException(`Product #${id} not found`);
     }
     return product;
+  }
+
+  async findByIds(ids: string[]) {
+    return this.productsRepository.find({
+      where: { id: In(ids), isActive: true },
+    });
   }
 
   async create(productData: any) {

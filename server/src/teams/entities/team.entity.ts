@@ -1,4 +1,12 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, OneToMany, ManyToOne } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+  OneToMany,
+  ManyToOne,
+} from 'typeorm';
 import { User } from '../../orders/entities/user.entity';
 import { AthleteProfile } from './athlete-profile.entity';
 
@@ -16,13 +24,25 @@ export class Team {
   @Column({ nullable: true })
   logoUrl: string;
 
+  @Column({ nullable: true })
+  cnpj: string;
+
+  @Column({ nullable: true })
+  city: string;
+
+  @Column({ nullable: true })
+  state: string;
+
+  @Column({ nullable: true })
+  instagram: string;
+
   @Column({ unique: true })
   inviteCode: string; // Ex: FEDERADA-2026
 
   @ManyToOne(() => User, { onDelete: 'SET NULL', nullable: true })
   owner: User;
 
-  @OneToMany(() => AthleteProfile, profile => profile.team)
+  @OneToMany(() => AthleteProfile, (profile) => profile.team)
   athletes: AthleteProfile[];
 
   @CreateDateColumn()

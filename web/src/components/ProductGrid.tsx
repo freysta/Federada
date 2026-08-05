@@ -2,6 +2,7 @@ import { Loader2 } from "lucide-react";
 import { useState, useEffect } from "react";
 import FadeIn from "./FadeIn";
 import { API_URL } from "../config";
+import { apiClient } from "../utils/apiClient";
 
 interface Product {
   id: string;
@@ -26,14 +27,9 @@ export default function ProductGrid({ limit }: { limit?: number }) {
 	const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
 	useEffect(() => {
-		fetch(`${API_URL}/products`)
-			.then(res => {
-				if (!res.ok) throw new Error('Falha');
-				return res.json();
-			})
-			.then(data => {
-				if (Array.isArray(data)) setProducts(data);
-				else setProducts([]);
+		apiClient.get<any>('/products')
+			.then(result => {
+				setProducts(result.data || []);
 				setLoading(false);
 			})
 			.catch(err => {

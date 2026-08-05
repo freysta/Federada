@@ -12,10 +12,13 @@ export class FileStorageService {
     }
   }
 
-  async uploadFile(file: Express.Multer.File, folder: string = ''): Promise<string> {
-    const filename = `${Date.now()}-${Math.round(Math.random() * 1E9)}-${file.originalname.replace(/[^a-zA-Z0-9.-]/g, '_')}`;
+  uploadFile(
+    file: Express.Multer.File,
+    folder: string = '',
+  ): string {
+    const filename = `${Date.now()}-${Math.round(Math.random() * 1e9)}-${file.originalname.replace(/[^a-zA-Z0-9.-]/g, '_')}`;
     const targetDir = path.join(this.uploadDir, folder);
-    
+
     if (!fs.existsSync(targetDir)) {
       fs.mkdirSync(targetDir, { recursive: true });
     }

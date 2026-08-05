@@ -1,12 +1,10 @@
 import { useState, useEffect } from 'react';
-import { useAuth } from '../../contexts/AuthContext';
-import { API_URL } from '../../config';
+import { apiClient } from '../../utils/apiClient';
 import { Loader2, Search, Download, X, Truck, CheckCircle, Package } from 'lucide-react';
 import toast from 'react-hot-toast';
 import Pagination from '../../components/admin/Pagination';
 
 export default function AdminOrders() {
-  const { token } = useAuth();
   const [orders, setOrders] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   
@@ -26,15 +24,9 @@ export default function AdminOrders() {
   const [updating, setUpdating] = useState(false);
 
   const fetchOrders = () => {
-    fetch(`${API_URL}/orders`, {
-      headers: { Authorization: `Bearer ${token}` }
-    })
-      .then(res => {
-        if (!res.ok) throw new Error('Falha');
-        return res.json();
-      })
-      .then(data => {
-        setOrders(data);
+    apiClient.get<any>('/orders')
+      .then(result => {
+        setOrders(result.data || []);
         setLoading(false);
       })
       .catch(() => {
@@ -45,24 +37,15 @@ export default function AdminOrders() {
 
   useEffect(() => {
     fetchOrders();
-  }, [token]);
+  }, []);
 
   const handleUpdateOrder = async (orderId: string, newStatus: string) => {
     setUpdating(true);
     try {
-      const res = await fetch(`${API_URL}/orders/${orderId}`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`
-        },
-        body: JSON.stringify({
-          status: newStatus,
-          ...(trackingCode ? { trackingCode } : {})
-        })
+      await apiClient.patch(`/orders/${orderId}`, {
+        status: newStatus,
+        ...(trackingCode ? { trackingCode } : {})
       });
-      
-      if (!res.ok) throw new Error();
       
       toast.success('Pedido atualizado com sucesso!');
       setSelectedOrder(null);
@@ -351,11 +334,7 @@ export default function AdminOrders() {
                           if (!window.confirm('ATENÇÃO: O estorno pelo Mercado Pago é irreversível. Deseja devolver o dinheiro para o cliente e cancelar este pedido?')) return;
                           setUpdating(true);
                           try {
-                            const res = await fetch(`${API_URL}/orders/${selectedOrder.id}/refund`, {
-                              method: 'POST',
-                              headers: { Authorization: `Bearer ${token}` }
-                            });
-                            if (!res.ok) throw new Error();
+                            await apiClient.post(`/orders/${selectedOrder.id}/refund`, {});
                             toast.success('Pedido estornado com sucesso!');
                             setSelectedOrder(null);
                             fetchOrders();

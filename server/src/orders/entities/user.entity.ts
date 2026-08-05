@@ -1,4 +1,12 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  OneToMany,
+  CreateDateColumn,
+  UpdateDateColumn,
+} from 'typeorm';
+import { Exclude } from 'class-transformer';
 import { Order } from './order.entity';
 
 @Entity()
@@ -19,6 +27,7 @@ export class User {
   phone: string;
 
   @Column({ nullable: true })
+  @Exclude()
   password?: string;
 
   @Column({ default: 'CUSTOMER' })
@@ -37,6 +46,7 @@ export class User {
   emailVerified: boolean;
 
   @Column({ nullable: true })
+  @Exclude()
   verificationToken?: string;
 
   @CreateDateColumn()
