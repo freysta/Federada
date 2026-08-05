@@ -316,7 +316,7 @@ export default function ChampionshipDetailPage() {
 
   return (
     <>
-      <div className="min-h-screen bg-slate-50 pb-24 font-inter text-slate-800 pt-20">
+      <div className="min-h-screen bg-transparent pb-24 font-inter text-slate-200 pt-20">
         
         {/* HERO HEADER */}
         <div className="relative pt-10 pb-10 overflow-hidden">
@@ -413,32 +413,32 @@ export default function ChampionshipDetailPage() {
         </div>
 
         {/* TABS NAVIGATION */}
-        <div className="bg-white border-b border-slate-200 sticky top-20 z-30 shadow-sm">
+        <div className="bg-slate-900/80 backdrop-blur-md border-b border-slate-800 sticky top-20 z-30 shadow-sm">
           <div className="max-w-6xl mx-auto px-6 flex gap-8 overflow-x-auto no-scrollbar font-mono text-sm uppercase tracking-wider font-bold">
             <button 
               onClick={() => setActiveTab('overview')}
-              className={`py-4 border-b-2 whitespace-nowrap transition-colors ${activeTab === 'overview' ? 'border-blue-600 text-blue-600' : 'border-transparent text-slate-500 hover:text-slate-800 hover:border-slate-300'}`}
+              className={`py-4 border-b-2 whitespace-nowrap transition-colors ${activeTab === 'overview' ? 'border-blue-500 text-blue-400' : 'border-transparent text-slate-500 hover:text-slate-300 hover:border-slate-700'}`}
             >
               Visão Geral
             </button>
             <button 
               onClick={() => setActiveTab('modalities')}
-              className={`py-4 border-b-2 whitespace-nowrap transition-colors flex items-center gap-2 ${activeTab === 'modalities' ? 'border-blue-600 text-blue-600' : 'border-transparent text-slate-500 hover:text-slate-800 hover:border-slate-300'}`}
+              className={`py-4 border-b-2 whitespace-nowrap transition-colors flex items-center gap-2 ${activeTab === 'modalities' ? 'border-blue-500 text-blue-400' : 'border-transparent text-slate-500 hover:text-slate-300 hover:border-slate-700'}`}
             >
               Modalidades
               {champ.modalities && champ.modalities.length > 0 && (
-                <span className="bg-slate-100 text-slate-600 py-0.5 px-2 rounded-full text-xs">{champ.modalities.length}</span>
+                <span className="bg-slate-800 text-slate-400 py-0.5 px-2 rounded-full text-xs border border-slate-700">{champ.modalities.length}</span>
               )}
             </button>
             <button 
               onClick={() => setActiveTab('teams')}
-              className={`py-4 border-b-2 whitespace-nowrap transition-colors ${activeTab === 'teams' ? 'border-blue-600 text-blue-600' : 'border-transparent text-slate-500 hover:text-slate-800 hover:border-slate-300'}`}
+              className={`py-4 border-b-2 whitespace-nowrap transition-colors ${activeTab === 'teams' ? 'border-blue-500 text-blue-400' : 'border-transparent text-slate-500 hover:text-slate-300 hover:border-slate-700'}`}
             >
               Equipes Inscritas
             </button>
             <button 
               onClick={() => setActiveTab('brackets')}
-              className={`py-4 border-b-2 whitespace-nowrap transition-colors ${activeTab === 'brackets' ? 'border-blue-600 text-blue-600' : 'border-transparent text-slate-500 hover:text-slate-800 hover:border-slate-300'}`}
+              className={`py-4 border-b-2 whitespace-nowrap transition-colors ${activeTab === 'brackets' ? 'border-blue-500 text-blue-400' : 'border-transparent text-slate-500 hover:text-slate-300 hover:border-slate-700'}`}
             >
               Chaveamentos & Resultados
             </button>
@@ -449,33 +449,33 @@ export default function ChampionshipDetailPage() {
           
           {activeTab === 'overview' && (
             <div className="animate-in fade-in duration-500 space-y-10">
-              <div className="bg-white rounded-2xl p-8 border border-slate-200 shadow-sm">
-                <h3 className="text-xl font-bold text-slate-800 mb-4 font-mono uppercase tracking-wider">Sobre o Evento</h3>
-                <p className="text-slate-600 whitespace-pre-wrap">{champ.description || 'Nenhuma descrição detalhada fornecida para este campeonato.'}</p>
+              <div className="bg-slate-800/50 rounded-2xl p-8 border border-slate-700 shadow-sm backdrop-blur-sm">
+                <h3 className="text-xl font-bold text-white mb-4 font-mono uppercase tracking-wider">Sobre o Evento</h3>
+                <p className="text-slate-300 whitespace-pre-wrap">{champ.description || 'Nenhuma descrição detalhada fornecida para este campeonato.'}</p>
               </div>
               
-              <div className="bg-white rounded-2xl p-8 border border-slate-200 shadow-sm">
-                <h3 className="text-xl font-bold text-slate-800 mb-4 font-mono uppercase tracking-wider">Regulamento Geral</h3>
-                <div className="bg-slate-50 rounded-xl p-6 border border-slate-100 text-center">
-                  <Info className="mx-auto text-slate-400 mb-2" size={32} />
-                  <p className="text-slate-500">O regulamento ainda não foi anexado pela organização.</p>
+              <div className="bg-slate-800/50 rounded-2xl p-8 border border-slate-700 shadow-sm backdrop-blur-sm">
+                <h3 className="text-xl font-bold text-white mb-4 font-mono uppercase tracking-wider">Regulamento Geral</h3>
+                <div className="bg-slate-900/50 rounded-xl p-6 border border-slate-800 text-center">
+                  <Info className="mx-auto text-slate-500 mb-2" size={32} />
+                  <p className="text-slate-400">O regulamento ainda não foi anexado pela organização.</p>
                 </div>
               </div>
             </div>
           )}
 
           {activeTab === 'teams' && (
-            <div className="animate-in fade-in duration-500 text-center py-20 bg-white rounded-2xl border border-slate-200 shadow-sm">
-              <Shield className="mx-auto text-slate-300 mb-4" size={48} />
-              <h3 className="text-xl font-bold text-slate-600">Equipes Inscritas</h3>
+            <div className="animate-in fade-in duration-500 text-center py-20 bg-slate-800/30 rounded-2xl border border-dashed border-slate-700 shadow-sm backdrop-blur-sm">
+              <Shield className="mx-auto text-slate-600 mb-4" size={48} />
+              <h3 className="text-xl font-bold text-slate-300">Equipes Inscritas</h3>
               <p className="text-slate-500 mt-2">As equipes inscritas aparecerão aqui em breve.</p>
             </div>
           )}
 
           {activeTab === 'brackets' && (
-            <div className="animate-in fade-in duration-500 text-center py-20 bg-white rounded-2xl border border-slate-200 shadow-sm">
-              <Trophy className="mx-auto text-slate-300 mb-4" size={48} />
-              <h3 className="text-xl font-bold text-slate-600">Chaveamentos em Construção</h3>
+            <div className="animate-in fade-in duration-500 text-center py-20 bg-slate-800/30 rounded-2xl border border-dashed border-slate-700 shadow-sm backdrop-blur-sm">
+              <Trophy className="mx-auto text-slate-600 mb-4" size={48} />
+              <h3 className="text-xl font-bold text-slate-300">Chaveamentos em Construção</h3>
               <p className="text-slate-500 mt-2">A tabela de confrontos será gerada após o encerramento das inscrições.</p>
             </div>
           )}
@@ -483,34 +483,34 @@ export default function ChampionshipDetailPage() {
           {activeTab === 'modalities' && (
             <div className="animate-in fade-in duration-500 space-y-10">
               {!user && (
-            <div className="bg-blue-50 border border-blue-200 rounded-2xl p-6 flex flex-col sm:flex-row items-center justify-between gap-6 shadow-sm">
+            <div className="bg-blue-900/20 border border-blue-500/30 rounded-2xl p-6 flex flex-col sm:flex-row items-center justify-between gap-6 shadow-[0_0_15px_rgba(59,130,246,0.1)] backdrop-blur-sm">
               <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 shrink-0">
+                <div className="w-12 h-12 bg-blue-900/50 rounded-full flex items-center justify-center text-blue-400 shrink-0 border border-blue-500/30">
                   <Info size={24} />
                 </div>
                 <div>
-                   <h3 className="font-mono font-bold uppercase tracking-wider text-lg text-slate-800">Quer participar?</h3>
-                   <p className="text-slate-600 text-sm mt-1">Faça login e vincule-se a uma atlética para se inscrever nas modalidades.</p>
+                   <h3 className="font-mono font-bold uppercase tracking-wider text-lg text-white">Quer participar?</h3>
+                   <p className="text-slate-300 text-sm mt-1">Faça login e vincule-se a uma atlética para se inscrever nas modalidades.</p>
                  </div>
               </div>
-              <Link to="/" className="bg-blue-600 text-white font-bold py-2.5 px-6 rounded-xl hover:bg-blue-700 transition-colors whitespace-nowrap shadow-sm">
+              <Link to="/" className="bg-blue-600 text-white font-bold py-2.5 px-6 rounded-xl hover:bg-blue-500 hover:shadow-[0_0_20px_rgba(59,130,246,0.4)] transition-all whitespace-nowrap border border-blue-400/50">
                 Fazer Login
               </Link>
             </div>
           )}
 
           {user && !athleteProfile?.team && (
-             <div className="bg-orange-50 border border-orange-200 rounded-2xl p-6 flex flex-col sm:flex-row items-center justify-between gap-6 shadow-sm">
+             <div className="bg-orange-900/20 border border-orange-500/30 rounded-2xl p-6 flex flex-col sm:flex-row items-center justify-between gap-6 shadow-[0_0_15px_rgba(249,115,22,0.1)] backdrop-blur-sm">
                <div className="flex items-center gap-4">
-                 <div className="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center text-orange-600 shrink-0">
+                 <div className="w-12 h-12 bg-orange-900/50 rounded-full flex items-center justify-center text-orange-400 shrink-0 border border-orange-500/30">
                    <Shield size={24} />
                  </div>
                  <div>
-                   <h3 className="font-mono font-bold uppercase tracking-wider text-lg text-slate-800">Quase lá!</h3>
-                   <p className="text-slate-600 text-sm mt-1">Você precisa estar vinculado a uma atlética para poder se inscrever.</p>
+                   <h3 className="font-mono font-bold uppercase tracking-wider text-lg text-white">Quase lá!</h3>
+                   <p className="text-slate-300 text-sm mt-1">Você precisa estar vinculado a uma atlética para poder se inscrever.</p>
                  </div>
                </div>
-               <Link to="/perfil" className="bg-orange-600 text-white font-bold py-2.5 px-6 rounded-xl hover:bg-orange-700 transition-colors whitespace-nowrap shadow-sm">
+               <Link to="/perfil" className="bg-orange-600 text-white font-bold py-2.5 px-6 rounded-xl hover:bg-orange-500 hover:shadow-[0_0_20px_rgba(249,115,22,0.4)] transition-all whitespace-nowrap border border-orange-400/50">
                  Vincular-se a uma Atlética
                </Link>
              </div>
@@ -518,14 +518,14 @@ export default function ChampionshipDetailPage() {
 
           {/* Painel de Disponibilidade do Atleta */}
           {user && athleteProfile?.team && athleteProfile.teamRole !== 'PRESIDENT' && isEnrollmentOpen && (
-            <div className={`border rounded-2xl p-6 flex flex-col sm:flex-row items-center justify-between gap-6 shadow-sm transition-colors duration-300 ${isAvailable ? 'bg-green-50 border-green-200' : 'bg-white border-slate-200'}`}>
+            <div className={`border rounded-2xl p-6 flex flex-col sm:flex-row items-center justify-between gap-6 shadow-sm transition-colors duration-300 backdrop-blur-sm ${isAvailable ? 'bg-green-900/20 border-green-500/30' : 'bg-slate-800/50 border-slate-700'}`}>
               <div className="flex items-center gap-4">
-                <div className={`w-12 h-12 rounded-full flex items-center justify-center shrink-0 ${isAvailable ? 'bg-green-100 text-green-600' : 'bg-slate-100 text-slate-500'}`}>
+                <div className={`w-12 h-12 rounded-full flex items-center justify-center shrink-0 border ${isAvailable ? 'bg-green-900/50 text-green-400 border-green-500/30' : 'bg-slate-900/50 text-slate-400 border-slate-700'}`}>
                   {isAvailable ? <CheckCircle2 size={24} /> : <Info size={24} />}
                 </div>
                 <div>
-                  <h3 className="font-mono font-bold uppercase tracking-wider text-lg text-slate-800">Sua Disponibilidade</h3>
-                  <p className="text-slate-600 text-sm mt-1">
+                  <h3 className="font-mono font-bold uppercase tracking-wider text-lg text-white">Sua Disponibilidade</h3>
+                  <p className="text-slate-300 text-sm mt-1">
                     {isAvailable 
                       ? "Você está marcado como DISPONÍVEL para jogar este campeonato. Seu presidente será notificado!"
                       : "Confirme sua disponibilidade para sinalizar ao presidente da sua equipe que você quer ser convocado."}
@@ -535,7 +535,7 @@ export default function ChampionshipDetailPage() {
               <button 
                 onClick={toggleAvailability}
                 disabled={loadingAvailability}
-                className={`font-bold py-2.5 px-6 rounded-xl transition-all whitespace-nowrap shadow-sm disabled:opacity-50 ${isAvailable ? 'bg-white text-green-700 border border-green-300 hover:bg-green-50' : 'bg-green-600 text-white hover:bg-green-700'}`}
+                className={`font-bold py-2.5 px-6 rounded-xl transition-all whitespace-nowrap shadow-sm disabled:opacity-50 border ${isAvailable ? 'bg-transparent text-green-400 border-green-500/50 hover:bg-green-900/40' : 'bg-green-600/20 text-green-400 border-green-500/30 hover:bg-green-600/30 hover:shadow-[0_0_15px_rgba(34,197,94,0.2)]'}`}
               >
                 {loadingAvailability ? 'Atualizando...' : (isAvailable ? 'Remover Disponibilidade' : 'Estou Disponível!')}
               </button>
@@ -545,8 +545,8 @@ export default function ChampionshipDetailPage() {
           {/* Modalities Section */}
           <div>
             <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-4 mb-6">
-              <h2 className="text-2xl font-bold font-mono uppercase tracking-wider text-slate-800 flex items-center gap-3">
-                <CheckCircle2 className="text-blue-600" /> 
+              <h2 className="text-2xl font-bold font-mono uppercase tracking-wider text-white flex items-center gap-3">
+                <CheckCircle2 className="text-blue-500" /> 
                 Modalidades
               </h2>
               
@@ -558,14 +558,14 @@ export default function ChampionshipDetailPage() {
                     <input 
                       type="text" 
                       placeholder="Buscar por nome..." 
-                      className="w-full sm:w-64 pl-9 pr-4 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all shadow-sm"
+                      className="w-full sm:w-64 pl-9 pr-4 py-2 bg-slate-800 border border-slate-700 rounded-xl text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all shadow-sm"
                       value={filterText}
                       onChange={(e) => setFilterText(e.target.value)}
                     />
                   </div>
                   <div className="flex gap-2">
                     <select 
-                      className="px-4 py-2 bg-white border border-slate-200 rounded-xl text-sm font-medium text-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 shadow-sm cursor-pointer"
+                      className="px-4 py-2 bg-slate-800 border border-slate-700 rounded-xl text-sm font-medium text-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 shadow-sm cursor-pointer"
                       value={filterType}
                       onChange={(e) => setFilterType(e.target.value)}
                     >
@@ -574,7 +574,7 @@ export default function ChampionshipDetailPage() {
                       <option value="COLETIVO">Coletivo</option>
                     </select>
                     <select 
-                      className="px-4 py-2 bg-white border border-slate-200 rounded-xl text-sm font-medium text-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 shadow-sm cursor-pointer"
+                      className="px-4 py-2 bg-slate-800 border border-slate-700 rounded-xl text-sm font-medium text-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 shadow-sm cursor-pointer"
                       value={filterGender}
                       onChange={(e) => setFilterGender(e.target.value)}
                     >
@@ -598,9 +598,9 @@ export default function ChampionshipDetailPage() {
 
               if (!champ.modalities || champ.modalities.length === 0) {
                 return (
-                  <div className="text-center py-16 bg-white rounded-3xl border border-slate-200 shadow-sm">
-                    <Trophy size={48} className="mx-auto text-slate-300 mb-4" />
-                    <h3 className="text-xl font-bold text-slate-600">Nenhuma modalidade disponível</h3>
+                  <div className="text-center py-16 bg-slate-800/30 rounded-3xl border border-slate-700 shadow-sm backdrop-blur-sm">
+                    <Trophy size={48} className="mx-auto text-slate-600 mb-4" />
+                    <h3 className="text-xl font-bold text-slate-300">Nenhuma modalidade disponível</h3>
                     <p className="text-slate-500 mt-2">A organização ainda não cadastrou modalidades para este campeonato.</p>
                   </div>
                 );
@@ -608,13 +608,13 @@ export default function ChampionshipDetailPage() {
 
               if (filteredModalities.length === 0) {
                 return (
-                  <div className="text-center py-12 bg-white rounded-3xl border border-dashed border-slate-300">
-                    <Filter size={32} className="mx-auto text-slate-400 mb-3" />
-                    <h3 className="font-bold text-slate-600">Nenhuma modalidade encontrada</h3>
+                  <div className="text-center py-12 bg-slate-800/30 rounded-3xl border border-dashed border-slate-700 backdrop-blur-sm">
+                    <Filter size={32} className="mx-auto text-slate-600 mb-3" />
+                    <h3 className="font-bold text-slate-300">Nenhuma modalidade encontrada</h3>
                     <p className="text-slate-500 text-sm mt-1">Tente ajustar os filtros de busca para encontrar outras modalidades.</p>
                     <button 
                       onClick={() => { setFilterText(''); setFilterType('ALL'); setFilterGender('ALL'); }}
-                      className="mt-4 px-4 py-2 text-sm font-bold text-blue-600 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors"
+                      className="mt-4 px-4 py-2 text-sm font-bold text-blue-400 bg-blue-900/50 border border-blue-500/30 rounded-lg hover:bg-blue-800/50 transition-colors"
                     >
                       Limpar Filtros
                     </button>
@@ -657,15 +657,15 @@ export default function ChampionshipDetailPage() {
 
       {/* FLOATING ACTION BAR FOR BULK SUBSCRIPTION */}
       {selectedModalities.length > 0 && user && athleteProfile?.team && (
-        <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 shadow-[0_-10px_40px_-10px_rgba(0,0,0,0.1)] p-4 px-6 z-40 transform transition-transform animate-in slide-in-from-bottom-10">
+        <div className="fixed bottom-0 left-0 right-0 bg-slate-900/90 backdrop-blur-md border-t border-slate-800 shadow-[0_-10px_40px_-10px_rgba(0,0,0,0.5)] p-4 px-6 z-40 transform transition-transform animate-in slide-in-from-bottom-10">
           <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-3 w-full sm:w-auto">
-              <div className="w-10 h-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold text-lg shrink-0">
+              <div className="w-10 h-10 rounded-full bg-blue-900/50 border border-blue-500/50 text-blue-400 flex items-center justify-center font-bold text-lg shrink-0">
                 {selectedModalities.length}
               </div>
               <div className="flex-1">
-                <p className="font-bold text-slate-800 leading-tight">Modalidades selecionadas</p>
-                <p className="text-xs text-slate-500 line-clamp-1">
+                <p className="font-bold text-white leading-tight">Modalidades selecionadas</p>
+                <p className="text-xs text-slate-400 line-clamp-1">
                   {selectedModalities.map(id => champ.modalities?.find((m: any) => m.id === id)?.name).join(', ')}
                 </p>
               </div>

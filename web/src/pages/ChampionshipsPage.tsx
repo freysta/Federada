@@ -101,14 +101,14 @@ export default function ChampionshipsPage() {
                         placeholder="Buscar campeonatos por nome..." 
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        className="w-full pl-12 pr-4 py-3 bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all shadow-sm"
+                        className="w-full pl-12 pr-4 py-3 bg-slate-800 border border-slate-700 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all shadow-sm placeholder:text-slate-400"
                       />
                     </div>
                     <div className="flex gap-2">
                       <select 
                         value={statusFilter}
                         onChange={(e) => setStatusFilter(e.target.value)}
-                        className="px-4 py-3 bg-white border border-slate-200 rounded-xl font-medium text-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 shadow-sm cursor-pointer"
+                        className="px-4 py-3 bg-slate-800 border border-slate-700 rounded-xl font-medium text-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 shadow-sm cursor-pointer"
                       >
                         <option value="ALL">Todos os Status</option>
                         <option value="OPEN">Inscrições Abertas</option>
@@ -137,23 +137,23 @@ export default function ChampionshipsPage() {
 
                     if (championships.length === 0) {
                       return (
-                        <div className="text-center py-24 bg-white rounded-3xl shadow-sm border border-slate-200">
-                          <Trophy size={48} className="mx-auto text-slate-300 mb-4" />
-                          <h3 className="text-2xl font-bold text-slate-600">Nenhum campeonato cadastrado.</h3>
-                          <p className="text-slate-500 mt-2">A temporada está tranquila no momento. Volte em breve!</p>
+                        <div className="text-center py-24 bg-slate-800/50 rounded-3xl shadow-sm border border-slate-700 backdrop-blur-sm">
+                          <Trophy size={48} className="mx-auto text-slate-500 mb-4" />
+                          <h3 className="text-2xl font-bold text-slate-300">Nenhum campeonato cadastrado.</h3>
+                          <p className="text-slate-400 mt-2">A temporada está tranquila no momento. Volte em breve!</p>
                         </div>
                       );
                     }
 
                     if (filtered.length === 0) {
                       return (
-                        <div className="text-center py-24 bg-white rounded-3xl shadow-sm border border-dashed border-slate-300">
-                          <Filter size={48} className="mx-auto text-slate-300 mb-4" />
-                          <h3 className="text-2xl font-bold text-slate-600">Nenhum resultado encontrado</h3>
-                          <p className="text-slate-500 mt-2">Tente ajustar os filtros de busca para encontrar outros campeonatos.</p>
+                        <div className="text-center py-24 bg-slate-800/30 rounded-3xl shadow-sm border border-dashed border-slate-700 backdrop-blur-sm">
+                          <Filter size={48} className="mx-auto text-slate-500 mb-4" />
+                          <h3 className="text-2xl font-bold text-slate-300">Nenhum resultado encontrado</h3>
+                          <p className="text-slate-400 mt-2">Tente ajustar os filtros de busca para encontrar outros campeonatos.</p>
                           <button 
                             onClick={() => { setSearchTerm(''); setStatusFilter('ALL'); }}
-                            className="mt-6 px-6 py-2 bg-blue-50 text-blue-600 font-bold rounded-xl hover:bg-blue-100 transition-colors"
+                            className="mt-6 px-6 py-2 bg-blue-900/50 text-blue-400 font-bold rounded-xl hover:bg-blue-800/50 transition-colors border border-blue-500/30"
                           >
                             Limpar Filtros
                           </button>
@@ -196,7 +196,7 @@ export default function ChampionshipsPage() {
                           }
                           
                           return (
-                            <Link key={champ.id} to={`/campeonatos/${champ.id}`} className="group bg-white rounded-3xl shadow-sm hover:shadow-xl border border-slate-200 transition-all overflow-hidden flex flex-col transform hover:-translate-y-1">
+                            <Link key={champ.id} to={`/campeonatos/${champ.id}`} className="group bg-slate-800 rounded-3xl shadow-sm hover:shadow-[0_0_20px_rgba(59,130,246,0.3)] border border-slate-700 hover:border-blue-500/50 transition-all overflow-hidden flex flex-col transform hover:-translate-y-1">
                               <div className="h-48 relative w-full overflow-hidden">
                                 {champ.bannerUrl ? (
                                   <img 
@@ -207,29 +207,29 @@ export default function ChampionshipsPage() {
                                 ) : (
                                   <div className="absolute inset-0 bg-gradient-to-tr from-blue-700 via-blue-600 to-indigo-800" />
                                 )}
-                                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
+                              <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/50 to-transparent" />
                                 <div className={`absolute top-4 right-4 px-3 py-1 text-[10px] font-bold rounded-full uppercase tracking-wider ${badgeColor}`}>
                                   {badgeText}
                                 </div>
                               </div>
                               
-                              <div className="p-6 flex-1 flex flex-col">
-                                <h2 className="text-xl font-bold text-slate-800 mb-2 group-hover:text-blue-600 transition-colors line-clamp-2">{champ.name}</h2>
-                                <p className="text-slate-500 text-sm mb-6 line-clamp-2 flex-1">{champ.description}</p>
+                              <div className="p-6 flex-1 flex flex-col relative z-10">
+                                <h2 className="text-xl font-bold text-white mb-2 group-hover:text-blue-400 transition-colors line-clamp-2">{champ.name}</h2>
+                                <p className="text-slate-400 text-sm mb-6 line-clamp-2 flex-1">{champ.description}</p>
                                 
                                 <div className="space-y-2 mt-auto">
-                                  <div className="flex items-center gap-2 text-xs text-slate-500 font-medium bg-slate-50 px-3 py-2 rounded-lg">
-                                    <Calendar size={14} className="text-blue-500" />
+                                  <div className="flex items-center gap-2 text-xs text-slate-300 font-medium bg-slate-700/50 px-3 py-2 rounded-lg">
+                                    <Calendar size={14} className="text-blue-400" />
                                     {champ.startDate ? new Date(champ.startDate).toLocaleDateString() : 'A definir'}
                                   </div>
-                                  <div className="flex items-center gap-2 text-xs text-slate-500 font-medium bg-slate-50 px-3 py-2 rounded-lg">
-                                    <Activity size={14} className="text-orange-500" />
+                                  <div className="flex items-center gap-2 text-xs text-slate-300 font-medium bg-slate-700/50 px-3 py-2 rounded-lg">
+                                    <Activity size={14} className="text-orange-400" />
                                     {champ.modalities?.length || 0} modalidades
                                   </div>
                                 </div>
                               </div>
                               
-                              <div className="px-6 py-4 border-t border-slate-100 bg-slate-50/50 flex justify-between items-center text-sm font-bold text-blue-600 group-hover:bg-blue-50 transition-colors">
+                              <div className="px-6 py-4 border-t border-slate-700 bg-slate-800/80 flex justify-between items-center text-sm font-bold text-blue-400 group-hover:bg-blue-900/40 group-hover:text-blue-300 transition-colors">
                                 Ver Detalhes
                                 <ArrowRight size={16} className="transform group-hover:translate-x-1 transition-transform" />
                               </div>

@@ -11,7 +11,7 @@ export default function ChampionshipNavbar() {
 	const navigate = useNavigate();
 
 	return (
-		<nav className="fixed w-full z-50 bg-slate-900 text-white backdrop-blur border-b border-slate-800">
+		<nav className="fixed w-full z-50 bg-slate-900/80 text-white backdrop-blur-md border-b border-slate-800/50 shadow-sm">
 			<div className="max-w-7xl mx-auto px-6 h-20 flex justify-between items-center">
 				{/* Brand */}
 				<Link to="/campeonatos" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="flex items-center gap-3 cursor-pointer">
