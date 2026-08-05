@@ -12,6 +12,9 @@ import ChampionshipsPage from "./pages/ChampionshipsPage";
 import AthleteDashboardPage from "./pages/championships/AthleteDashboardPage";
 import ChampionshipDetailPage from "./pages/ChampionshipDetailPage";
 import PublicResultsPage from "./pages/PublicResultsPage";
+import MatchesView from "./pages/championships/MatchesView";
+import TeamsView from "./pages/championships/TeamsView";
+import RankingView from "./pages/championships/RankingView";
 import AdminLayout from "./pages/admin/AdminLayout";
 import PrivateRoute from "./components/PrivateRoute";
 import AdminOverview from "./pages/admin/AdminOverview";
@@ -59,14 +62,18 @@ function App() {
             <Route path="*" element={<NotFound />} />
           </Route>
 
-          {/* 2. CHAMPIONSHIP LAYOUT (Módulo Esportivo) */}
+          {/* 2. CHAMPIONSHIP LAYOUT (Módulo Esportivo - Workspace) */}
           <Route path="/campeonatos" element={<ChampionshipLayout />}>
             <Route index element={<ChampionshipsPage />} />
+            <Route path="jogos" element={<MatchesView />} />
+            <Route path="times" element={<TeamsView />} />
+            <Route path="ranking" element={<RankingView />} />
+            <Route path="minha-equipe" element={<PrivateRoute><AthleteDashboardPage /></PrivateRoute>} />
+            {/* Mantido painel para compatibilidade temporária */}
             <Route path="painel" element={<PrivateRoute><AthleteDashboardPage /></PrivateRoute>} />
             <Route path=":id" element={<ChampionshipDetailPage />} />
             <Route path=":id/resultados" element={<PublicResultsPage />} />
           </Route>
-
           {/* 3. ADMIN LAYOUT */}
           <Route path="/admin" element={<AdminLayout />}>
             <Route index element={<AdminOverview />} />
