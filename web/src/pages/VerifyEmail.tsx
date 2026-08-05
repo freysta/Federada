@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { useSearchParams, Link } from "react-router-dom";
-import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import { apiClient } from "../utils/apiClient";
 import { CheckCircle, XCircle, Loader2 } from "lucide-react";
@@ -37,7 +36,6 @@ export default function VerifyEmail() {
 
   return (
     <div className="bg-neutral-50 min-h-screen flex flex-col">
-      <Navbar />
       
       <main className="flex-1 pt-32 pb-24 flex items-center justify-center">
         <div className="max-w-md w-full mx-auto px-6">

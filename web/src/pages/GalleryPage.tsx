@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import FadeIn from "../components/FadeIn";
 import { X, ZoomIn, Instagram, Share2, Camera } from "lucide-react";
@@ -51,7 +50,6 @@ export default function GalleryPage() {
 
   return (
     <div className="bg-neutral-50 min-h-screen flex flex-col">
-      <Navbar />
       
       <main className="flex-1 pt-32 pb-24">
         <div className="max-w-7xl mx-auto px-6">

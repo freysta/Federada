@@ -5,7 +5,6 @@ import { apiClient } from '../utils/apiClient';
 import { useAuth } from '../contexts/AuthContext';
 import { Loader2, Trophy, ArrowRight, Calendar, Activity, Settings, Shield, Search, Filter } from 'lucide-react';
 import toast from 'react-hot-toast';
-import Navbar from '../components/Navbar';
 import AthleteDashboard from '../components/championships/AthleteDashboard';
 import AthleteOnboarding from '../components/championships/AthleteOnboarding';
 
@@ -70,7 +69,6 @@ export default function ChampionshipsPage() {
 
   return (
     <>
-      <Navbar />
       <div className="min-h-screen bg-slate-50 pb-24 font-inter text-slate-800 pt-20">
         
         {/* HERO HEADER */}

@@ -4,7 +4,6 @@ import { apiClient } from '../../utils/apiClient';
 import { Loader2, Plus, Edit, Trash2, Search } from 'lucide-react';
 import toast from 'react-hot-toast';
 import Pagination from '../../components/admin/Pagination';
-import Navbar from '../../components/Navbar';
 
 export default function TeamPage() {
   const [team, setTeam] = useState<any[]>([]);
@@ -98,7 +97,6 @@ export default function TeamPage() {
 
   return (
     <>
-      <Navbar />
       <div className="min-h-screen bg-slate-50 pt-24 pb-12">
         <div className="max-w-7xl mx-auto px-6 space-y-6">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">

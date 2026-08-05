@@ -3,7 +3,6 @@ import { useAuth } from '../../contexts/AuthContext';
 import { apiClient } from '../../utils/apiClient';
 import toast from 'react-hot-toast';
 import { KeyRound, ShieldCheck, Package, Loader2, LogOut } from 'lucide-react';
-import Navbar from '../../components/Navbar';
 import { useNavigate } from 'react-router-dom';
 
 interface OrderItem {
@@ -113,7 +112,6 @@ export default function AthleteProfilePage() {
 
   return (
     <>
-      <Navbar />
       <div className="min-h-screen bg-slate-50 pt-24 pb-12">
         <div className="max-w-5xl mx-auto px-6 space-y-6">
           <div className="flex justify-between items-end">

@@ -6,7 +6,6 @@ import { apiClient } from '../utils/apiClient';
 import { useAuth } from '../contexts/AuthContext';
 import { Loader2, Trophy, Shield, CheckCircle2, Info, ArrowLeft, Calendar, MapPin, AlertCircle, Clock, Search, Filter } from 'lucide-react';
 import toast from 'react-hot-toast';
-import Navbar from '../components/Navbar';
 
 function QuickProfileEditModal({ 
   isOpen, 
@@ -292,7 +291,6 @@ export default function ChampionshipDetailPage() {
   if (loading) {
     return (
       <>
-        <Navbar />
         <div className="min-h-screen bg-slate-50 flex items-center justify-center pt-20">
           <Loader2 className="animate-spin text-blue-600" size={48} />
         </div>
@@ -303,7 +301,6 @@ export default function ChampionshipDetailPage() {
   if (!champ) {
     return (
       <>
-        <Navbar />
         <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center pt-20">
           <h2 className="text-2xl font-bold text-slate-800 mb-4">Campeonato não encontrado</h2>
           <Link to="/campeonatos" className="text-blue-600 hover:underline">Voltar para a lista</Link>
@@ -316,7 +313,6 @@ export default function ChampionshipDetailPage() {
 
   return (
     <>
-      <Navbar />
       <div className="min-h-screen bg-slate-50 pb-24 font-inter text-slate-800 pt-20">
         
         {/* HERO HEADER */}

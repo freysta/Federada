@@ -34,6 +34,9 @@ import InvitePage from './pages/teams/InvitePage';
 import NotFound from "./components/NotFound";
 import CartSidebar from "./components/CartSidebar";
 
+import MainLayout from "./layouts/MainLayout";
+import ChampionshipLayout from "./layouts/ChampionshipLayout";
+
 function App() {
   return (
     <CartProvider>
@@ -41,24 +44,28 @@ function App() {
         <Toaster position="top-center" toastOptions={{ style: { borderRadius: '0', border: '1px solid black', background: '#fff', color: '#000', fontFamily: 'monospace' } }} />
         
         <Routes>
-          {/* Rota Principal da Loja */}
-          <Route path="/" element={<StoreFront />} />
-          <Route path="/loja" element={<Store />} />
-          <Route path="/forum" element={<Forum />} />
-          <Route path="/gallery" element={<GalleryPage />} />
-          <Route path="/caads" element={<CaadsPage />} />
-          <Route path="/campeonatos" element={<ChampionshipsPage />} />
-          <Route path="/campeonatos/:id" element={<ChampionshipDetailPage />} />
-          <Route path="/campeonatos/:id/resultados" element={<PublicResultsPage />} />
-          <Route path="/verify-email" element={<VerifyEmail />} />
+          {/* 1. MAIN LAYOUT (E-commerce / Institucional) */}
+          <Route element={<MainLayout />}>
+            <Route path="/" element={<StoreFront />} />
+            <Route path="/loja" element={<Store />} />
+            <Route path="/forum" element={<Forum />} />
+            <Route path="/gallery" element={<GalleryPage />} />
+            <Route path="/caads" element={<CaadsPage />} />
+            <Route path="/verify-email" element={<VerifyEmail />} />
+            <Route path="/perfil" element={<PrivateRoute><AthleteProfilePage /></PrivateRoute>} />
+            <Route path="/equipe" element={<PrivateRoute><TeamPage /></PrivateRoute>} />
+            <Route path="/invite/:code" element={<InvitePage />} />
+            <Route path="*" element={<NotFound />} />
+          </Route>
 
-          {/* Rotas do Atleta / Equipe (Fase 3) */}
-          <Route path="/perfil" element={<PrivateRoute><AthleteProfilePage /></PrivateRoute>} />
-          <Route path="/invite/:code" element={<InvitePage />} />
-          <Route path="/equipe" element={<PrivateRoute><TeamPage /></PrivateRoute>} />
+          {/* 2. CHAMPIONSHIP LAYOUT (Módulo Esportivo) */}
+          <Route path="/campeonatos" element={<ChampionshipLayout />}>
+            <Route index element={<ChampionshipsPage />} />
+            <Route path=":id" element={<ChampionshipDetailPage />} />
+            <Route path=":id/resultados" element={<PublicResultsPage />} />
+          </Route>
 
-
-          {/* Rotas do Painel Administrativo */}
+          {/* 3. ADMIN LAYOUT */}
           <Route path="/admin" element={<AdminLayout />}>
             <Route index element={<AdminOverview />} />
             <Route path="products" element={<AdminProducts />} />
@@ -69,7 +76,6 @@ function App() {
             <Route path="news" element={<AdminNews />} />
             <Route path="documents" element={<AdminDocuments />} />
 
-            {/* Módulo de Campeonatos */}
             <Route path="championships">
               <Route index element={<AdminChampionshipListPage />} />
               <Route path="new" element={<AdminChampionshipCreatePage />} />
@@ -82,9 +88,6 @@ function App() {
               </Route>
             </Route>
           </Route>
-
-          {/* Fallback 404 Route */}
-          <Route path="*" element={<NotFound />} />
         </Routes>
         <CartSidebar />
       </div>

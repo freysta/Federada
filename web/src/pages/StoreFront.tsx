@@ -1,4 +1,3 @@
-import Navbar from "../components/Navbar";
 import { Link } from "react-router-dom";
 import Hero from "../components/Hero";
 import SectionSeparator from "../components/SectionSeparator";
@@ -14,7 +13,6 @@ import TerminalWidget from "../components/TerminalWidget";
 export default function StoreFront() {
   return (
     <>
-      <Navbar />
       <main>
         <Hero />
         <SectionSeparator />

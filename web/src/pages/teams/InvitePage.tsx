@@ -3,7 +3,6 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { API_URL } from '../../config';
 import { apiClient } from '../../utils/apiClient';
-import Navbar from '../../components/Navbar';
 import toast from 'react-hot-toast';
 import { Shield, CheckCircle } from 'lucide-react';
 
@@ -68,7 +67,6 @@ export default function InvitePage() {
 
   return (
     <>
-      <Navbar />
       <div className="min-h-screen bg-slate-50 pt-24 pb-12 px-6 flex items-center justify-center">
         <div className="max-w-md w-full bg-white rounded-2xl shadow-sm border border-slate-200 p-8">
           <div className="text-center mb-6">

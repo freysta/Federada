@@ -3,7 +3,6 @@ import { useParams, Link } from 'react-router-dom';
 import { apiClient } from '../utils/apiClient';
 import type { IChampionship, IMatch } from '../types';
 import { Loader2, Trophy, Medal, Flag, ArrowLeft } from 'lucide-react';
-import Navbar from '../components/Navbar';
 
 export default function PublicResultsPage() {
   const { id } = useParams();
@@ -63,7 +62,6 @@ export default function PublicResultsPage() {
   if (loading) {
     return (
       <>
-        <Navbar />
         <div className="min-h-screen bg-slate-50 flex items-center justify-center pt-20">
           <Loader2 className="animate-spin text-blue-600" size={48} />
         </div>
@@ -74,7 +72,6 @@ export default function PublicResultsPage() {
   if (!champ) {
     return (
       <>
-        <Navbar />
         <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center pt-20">
           <h2 className="text-2xl font-bold text-slate-800 mb-4">Campeonato não encontrado</h2>
           <Link to="/campeonatos" className="text-blue-600 hover:underline">Voltar para a lista</Link>
@@ -85,7 +82,6 @@ export default function PublicResultsPage() {
 
   return (
     <>
-      <Navbar />
       <div className="min-h-screen bg-slate-50 pb-24 text-slate-800 pt-20">
         
         {/* Header */}

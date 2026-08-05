@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import { apiClient } from "../utils/apiClient";
 import { Calendar, MessageSquare, ChevronRight, User, Terminal } from "lucide-react";
@@ -26,7 +25,6 @@ export default function Forum() {
 
   return (
     <div className="bg-neutral-50 min-h-screen flex flex-col">
-      <Navbar />
       
       <main className="flex-1 pt-32 pb-24">
         <div className="max-w-4xl mx-auto px-6">
