@@ -466,68 +466,68 @@ export default function ChampionshipDetailPage() {
           
           {activeTab === 'overview' && (
             <div className="animate-in fade-in duration-500 space-y-8">
-              <div className="bg-neutral-900 rounded-none p-8 border-2 border-neutral-800">
-                <h3 className="text-2xl font-bold text-[#00f0ff] mb-4 font-mono uppercase tracking-widest">Sobre o Evento</h3>
-                <p className="text-white font-sans whitespace-pre-wrap">{champ.description || 'Nenhuma descrição detalhada fornecida para este campeonato.'}</p>
+              <div className="bg-white rounded-3xl p-8 border border-gray-200 shadow-sm">
+                <h3 className="text-xl font-bold text-slate-900 mb-4">Sobre o Evento</h3>
+                <p className="text-slate-600 font-sans whitespace-pre-wrap">{champ.description || 'Nenhuma descrição detalhada fornecida para este campeonato.'}</p>
               </div>
               
-              <div className="bg-neutral-900 rounded-none p-8 border-2 border-neutral-800">
-                <h3 className="text-2xl font-bold text-[#00f0ff] mb-4 font-mono uppercase tracking-widest">Regulamento</h3>
-                <div className="bg-black rounded-none p-6 border-2 border-dashed border-neutral-800 text-center">
-                  <Info className="mx-auto text-neutral-600 mb-2" size={32} />
-                  <p className="text-neutral-500 font-mono text-sm uppercase tracking-wider">Documento pendente.</p>
+              <div className="bg-white rounded-3xl p-8 border border-gray-200 shadow-sm">
+                <h3 className="text-xl font-bold text-slate-900 mb-4">Regulamento</h3>
+                <div className="bg-gray-50 rounded-2xl p-6 border border-dashed border-gray-300 text-center">
+                  <Info className="mx-auto text-gray-400 mb-2" size={32} />
+                  <p className="text-gray-500 text-sm">Documento pendente.</p>
                 </div>
               </div>
             </div>
           )}
 
           {activeTab === 'teams' && (
-            <div className="animate-in fade-in duration-500 text-center py-20 bg-neutral-900 rounded-none border-2 border-dashed border-neutral-800">
-              <Shield className="mx-auto text-neutral-700 mb-4" size={48} />
-              <h3 className="text-2xl font-bold text-white font-mono uppercase tracking-wider">Equipes Inscritas</h3>
-              <p className="text-neutral-500 mt-2 font-mono text-sm uppercase tracking-wider">Disponível em breve.</p>
+            <div className="animate-in fade-in duration-500 text-center py-20 bg-white rounded-3xl border border-dashed border-gray-300 shadow-sm">
+              <Shield className="mx-auto text-gray-400 mb-4" size={48} />
+              <h3 className="text-xl font-bold text-slate-800">Equipes Inscritas</h3>
+              <p className="text-gray-500 mt-2 text-sm">Disponível em breve.</p>
             </div>
           )}
 
           {activeTab === 'brackets' && (
-            <div className="animate-in fade-in duration-500 text-center py-20 bg-neutral-900 rounded-none border-2 border-dashed border-neutral-800">
-              <Trophy className="mx-auto text-neutral-700 mb-4" size={48} />
-              <h3 className="text-2xl font-bold text-white font-mono uppercase tracking-wider">Tabela de Jogos</h3>
-              <p className="text-neutral-500 mt-2 font-mono text-sm uppercase tracking-wider">Será gerada após encerramento.</p>
+            <div className="animate-in fade-in duration-500 text-center py-20 bg-white rounded-3xl border border-dashed border-gray-300 shadow-sm">
+              <Trophy className="mx-auto text-gray-400 mb-4" size={48} />
+              <h3 className="text-xl font-bold text-slate-800">Tabela de Jogos</h3>
+              <p className="text-gray-500 mt-2 text-sm">Será gerada após encerramento.</p>
             </div>
           )}
 
           {activeTab === 'modalities' && (
             <div className="animate-in fade-in duration-500 space-y-10">
               {!user && (
-            <div className="bg-black border-2 border-neutral-800 rounded-none p-6 flex flex-col sm:flex-row items-center justify-between gap-6 shadow-[4px_4px_0_0_#00f0ff]">
+            <div className="bg-blue-50 border border-blue-200 rounded-2xl p-6 flex flex-col sm:flex-row items-center justify-between gap-6 shadow-sm">
               <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-neutral-900 flex items-center justify-center text-[#00f0ff] shrink-0 border-2 border-neutral-800">
+                <div className="w-12 h-12 bg-blue-100 flex items-center justify-center text-blue-600 rounded-full shrink-0">
                   <Info size={24} />
                 </div>
                 <div>
-                   <h3 className="font-mono font-bold uppercase tracking-widest text-xl text-white">Quer participar?</h3>
-                   <p className="text-neutral-400 text-sm mt-1 font-sans">Faça login e vincule-se a uma atlética para se inscrever nas modalidades.</p>
+                   <h3 className="font-bold text-lg text-slate-900">Quer participar?</h3>
+                   <p className="text-slate-600 text-sm mt-1">Faça login e vincule-se a uma atlética para se inscrever nas modalidades.</p>
                  </div>
               </div>
-              <Link to="/" className="bg-[#00f0ff] text-black border-2 border-black font-mono font-bold py-3 px-8 hover:bg-white transition-all whitespace-nowrap uppercase tracking-widest">
+              <Link to="/" className="bg-blue-600 text-white font-bold py-2.5 px-6 rounded-xl hover:bg-blue-700 transition-colors whitespace-nowrap shadow-sm">
                 Fazer Login
               </Link>
             </div>
           )}
 
           {user && !athleteProfile?.team && (
-             <div className="bg-yellow-400 border-2 border-black p-6 flex flex-col sm:flex-row items-center justify-between gap-6 shadow-[6px_6px_0_0_#000]">
+             <div className="bg-orange-50 border border-orange-200 rounded-2xl p-6 flex flex-col sm:flex-row items-center justify-between gap-6 shadow-sm">
                <div className="flex items-center gap-4">
-                 <div className="w-12 h-12 bg-black flex items-center justify-center text-yellow-400 shrink-0 border-2 border-yellow-400">
+                 <div className="w-12 h-12 bg-orange-100 flex items-center justify-center text-orange-600 rounded-full shrink-0">
                    <Shield size={24} />
                  </div>
                  <div>
-                   <h3 className="font-mono font-bold uppercase tracking-widest text-xl text-black">Quase lá!</h3>
-                   <p className="text-black/80 font-bold text-sm mt-1 font-sans">Você precisa estar vinculado a uma atlética para poder se inscrever.</p>
+                   <h3 className="font-bold text-lg text-slate-900">Quase lá!</h3>
+                   <p className="text-slate-600 text-sm mt-1">Você precisa estar vinculado a uma atlética para poder se inscrever.</p>
                  </div>
                </div>
-               <Link to="/perfil" className="bg-black text-white font-mono font-bold py-3 px-8 hover:bg-neutral-800 transition-all whitespace-nowrap uppercase tracking-widest border-2 border-transparent">
+               <Link to="/perfil" className="bg-orange-600 text-white font-bold py-2.5 px-6 rounded-xl hover:bg-orange-700 transition-colors whitespace-nowrap shadow-sm">
                  Vincular-se a uma Atlética
                </Link>
              </div>
@@ -535,14 +535,14 @@ export default function ChampionshipDetailPage() {
 
           {/* Painel de Disponibilidade do Atleta */}
           {user && athleteProfile?.team && athleteProfile.teamRole !== 'PRESIDENT' && isEnrollmentOpen && (
-            <div className={`p-6 flex flex-col sm:flex-row items-center justify-between gap-6 transition-colors duration-300 border-2 border-black ${isAvailable ? 'bg-[#00f0ff] text-black shadow-[6px_6px_0_0_#000]' : 'bg-neutral-900 border-neutral-800 text-white'}`}>
+            <div className={`p-6 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-6 transition-colors duration-300 border shadow-sm ${isAvailable ? 'bg-green-50 border-green-200' : 'bg-gray-50 border-gray-200'}`}>
               <div className="flex items-center gap-4">
-                <div className={`w-12 h-12 flex items-center justify-center shrink-0 border-2 ${isAvailable ? 'bg-black text-[#00f0ff] border-black' : 'bg-black text-neutral-500 border-neutral-800'}`}>
+                <div className={`w-12 h-12 rounded-full flex items-center justify-center shrink-0 ${isAvailable ? 'bg-green-100 text-green-600' : 'bg-gray-200 text-gray-500'}`}>
                   {isAvailable ? <CheckCircle2 size={24} /> : <Info size={24} />}
                 </div>
                 <div>
-                  <h3 className="font-mono font-bold uppercase tracking-widest text-xl">Sua Disponibilidade</h3>
-                  <p className={`text-sm mt-1 font-sans font-bold ${isAvailable ? 'text-black/80' : 'text-neutral-400'}`}>
+                  <h3 className="font-bold text-lg text-slate-900">Sua Disponibilidade</h3>
+                  <p className={`text-sm mt-1 ${isAvailable ? 'text-green-800' : 'text-gray-600'}`}>
                     {isAvailable 
                       ? "Você está marcado como DISPONÍVEL para jogar. Seu presidente será notificado!"
                       : "Confirme sua disponibilidade para sinalizar ao seu presidente que você quer ser convocado."}
@@ -552,7 +552,7 @@ export default function ChampionshipDetailPage() {
               <button 
                 onClick={toggleAvailability}
                 disabled={loadingAvailability}
-                className={`font-mono font-bold py-3 px-8 transition-all whitespace-nowrap disabled:opacity-50 border-2 uppercase tracking-widest ${isAvailable ? 'bg-black text-white border-black hover:bg-neutral-800' : 'bg-[#00f0ff] text-black border-black hover:bg-white'}`}
+                className={`font-bold py-2.5 px-6 rounded-xl transition-all whitespace-nowrap disabled:opacity-50 shadow-sm ${isAvailable ? 'bg-white text-green-700 border border-green-200 hover:bg-green-50' : 'bg-green-600 text-white hover:bg-green-700'}`}
               >
                 {loadingAvailability ? 'Atualizando...' : (isAvailable ? 'Remover Disponibilidade' : 'Estou Disponível!')}
               </button>
@@ -562,7 +562,7 @@ export default function ChampionshipDetailPage() {
           {/* Modalities Section */}
           <div>
             <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-4 mb-6">
-              <h2 className="text-2xl font-bold font-mono uppercase tracking-wider text-white flex items-center gap-3">
+              <h2 className="text-2xl font-bold text-slate-900 flex items-center gap-3">
                 <CheckCircle2 className="text-blue-500" /> 
                 Modalidades
               </h2>
@@ -571,33 +571,33 @@ export default function ChampionshipDetailPage() {
               {champ.modalities && champ.modalities.length > 0 && (
                 <div className="flex flex-col sm:flex-row gap-3">
                   <div className="relative">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400" size={16} />
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
                     <input 
                       type="text" 
-                      placeholder="BUSCAR MODALIDADE..." 
-                      className="w-full sm:w-64 pl-9 pr-4 py-2 bg-black border-2 border-neutral-800 rounded-none text-sm text-white placeholder:text-neutral-500 focus:outline-none focus:border-[#00f0ff] transition-colors shadow-none font-mono font-bold uppercase tracking-wider"
+                      placeholder="Buscar modalidade..." 
+                      className="w-full sm:w-64 pl-9 pr-4 py-2 bg-white border border-gray-300 rounded-xl text-sm text-slate-900 placeholder:text-gray-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors shadow-sm"
                       value={filterText}
                       onChange={(e) => setFilterText(e.target.value)}
                     />
                   </div>
-                  <div className="flex gap-2 font-mono font-bold uppercase tracking-widest text-sm">
+                  <div className="flex gap-2">
                     <select 
-                      className="px-4 py-2 bg-black border-2 border-neutral-800 rounded-none text-neutral-300 focus:outline-none focus:border-[#00f0ff] shadow-none cursor-pointer"
+                      className="px-4 py-2 bg-white border border-gray-300 rounded-xl font-medium text-sm text-slate-700 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 shadow-sm cursor-pointer"
                       value={filterType}
                       onChange={(e) => setFilterType(e.target.value)}
                     >
-                      <option value="ALL">TODOS OS TIPOS</option>
-                      <option value="INDIVIDUAL">INDIVIDUAL</option>
-                      <option value="COLETIVO">COLETIVO</option>
+                      <option value="ALL">Todos os Tipos</option>
+                      <option value="INDIVIDUAL">Individual</option>
+                      <option value="COLETIVO">Coletivo</option>
                     </select>
                     <select 
-                      className="px-4 py-2 bg-black border-2 border-neutral-800 rounded-none text-neutral-300 focus:outline-none focus:border-[#00f0ff] shadow-none cursor-pointer"
+                      className="px-4 py-2 bg-white border border-gray-300 rounded-xl font-medium text-sm text-slate-700 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 shadow-sm cursor-pointer"
                       value={filterGender}
                       onChange={(e) => setFilterGender(e.target.value)}
                     >
-                      <option value="ALL">TODOS OS GÊNEROS</option>
-                      <option value="MASCULINO">MASCULINO</option>
-                      <option value="FEMININO">FEMININO</option>
+                      <option value="ALL">Todos os Gêneros</option>
+                      <option value="MASCULINO">Masculino</option>
+                      <option value="FEMININO">Feminino</option>
                       <option value="MISTO">Misto</option>
                     </select>
                   </div>
@@ -615,23 +615,23 @@ export default function ChampionshipDetailPage() {
 
               if (!champ.modalities || champ.modalities.length === 0) {
                 return (
-                  <div className="text-center py-16 bg-slate-800/30 rounded-3xl border border-slate-700 shadow-sm backdrop-blur-sm">
-                    <Trophy size={48} className="mx-auto text-slate-600 mb-4" />
-                    <h3 className="text-xl font-bold text-slate-300">Nenhuma modalidade disponível</h3>
-                    <p className="text-slate-500 mt-2">A organização ainda não cadastrou modalidades para este campeonato.</p>
+                  <div className="text-center py-16 bg-white rounded-3xl border border-gray-200 shadow-sm">
+                    <Trophy size={48} className="mx-auto text-gray-400 mb-4" />
+                    <h3 className="text-xl font-bold text-slate-800">Nenhuma modalidade disponível</h3>
+                    <p className="text-gray-500 mt-2">A organização ainda não cadastrou modalidades para este campeonato.</p>
                   </div>
                 );
               }
 
               if (filteredModalities.length === 0) {
                 return (
-                  <div className="text-center py-12 bg-slate-800/30 rounded-3xl border border-dashed border-slate-700 backdrop-blur-sm">
-                    <Filter size={32} className="mx-auto text-slate-600 mb-3" />
-                    <h3 className="font-bold text-slate-300">Nenhuma modalidade encontrada</h3>
-                    <p className="text-slate-500 text-sm mt-1">Tente ajustar os filtros de busca para encontrar outras modalidades.</p>
+                  <div className="text-center py-12 bg-white rounded-3xl border border-dashed border-gray-300">
+                    <Filter size={32} className="mx-auto text-gray-400 mb-3" />
+                    <h3 className="font-bold text-slate-800">Nenhuma modalidade encontrada</h3>
+                    <p className="text-gray-500 text-sm mt-1">Tente ajustar os filtros de busca para encontrar outras modalidades.</p>
                     <button 
                       onClick={() => { setFilterText(''); setFilterType('ALL'); setFilterGender('ALL'); }}
-                      className="mt-4 px-4 py-2 text-sm font-bold text-blue-400 bg-blue-900/50 border border-blue-500/30 rounded-lg hover:bg-blue-800/50 transition-colors"
+                      className="mt-4 px-4 py-2 text-sm font-bold text-slate-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
                     >
                       Limpar Filtros
                     </button>

@@ -5,7 +5,7 @@ export default function ChampionshipLayout() {
   return (
     <>
       <ChampionshipNavbar />
-      <div className="pt-20 min-h-screen bg-black text-white selection:bg-[#00f0ff] selection:text-black">
+      <div className="pt-20 min-h-screen bg-neutral-50 text-slate-900">
         <Outlet />
       </div>
     </>

@@ -27,25 +27,25 @@ export default function ModalityCard({
 
   if (isSubscribed) {
     return (
-      <div className="relative bg-black rounded-none border-2 border-[#00f0ff] shadow-[4px_4px_0_0_#00f0ff] overflow-hidden flex flex-col">
-        <div className="absolute top-0 right-0 bg-[#00f0ff] text-black text-xs font-mono font-bold px-4 py-1.5 flex items-center gap-1 border-b-2 border-l-2 border-black">
+      <div className="relative bg-white rounded-2xl border border-green-200 shadow-sm overflow-hidden flex flex-col">
+        <div className="absolute top-0 right-0 bg-green-500 text-white text-xs font-bold px-4 py-1.5 rounded-bl-xl flex items-center gap-1 shadow-sm">
           <CheckCircle2 size={14} /> INSCRITO
         </div>
-        <div className="p-6 pb-4 border-b-2 border-neutral-800">
+        <div className="p-6 pb-4 border-b border-gray-100">
           <div className="flex gap-2 mb-2">
-            <span className="text-[10px] font-bold bg-neutral-900 border border-neutral-700 text-neutral-300 px-2 py-1 uppercase tracking-widest font-mono">{mod.type}</span>
-            <span className="text-[10px] font-bold bg-neutral-900 border border-neutral-700 text-neutral-300 px-2 py-1 uppercase tracking-widest font-mono">{mod.gender || 'MISTO'}</span>
+            <span className="text-[10px] font-bold bg-gray-100 text-gray-600 px-2 py-1 rounded uppercase tracking-wider">{mod.type}</span>
+            <span className="text-[10px] font-bold bg-gray-100 text-gray-600 px-2 py-1 rounded uppercase tracking-wider">{mod.gender || 'MISTO'}</span>
           </div>
-          <h4 className="font-mono font-bold text-white text-2xl leading-none mb-2 uppercase tracking-tighter">{mod.name}</h4>
+          <h4 className="font-bold text-slate-900 text-xl leading-tight mb-2">{mod.name}</h4>
         </div>
         
-        <div className="p-6 pt-4 bg-black flex-1 flex flex-col">
+        <div className="p-6 pt-4 bg-green-50/50 flex-1 flex flex-col">
           <SubscriptionStepper status={subscription.status} />
           
           <div className="mt-4 flex justify-between items-center gap-4">
             <button 
               onClick={() => onUnsubscribe(mod.id)}
-              className="text-xs font-mono font-bold text-red-500 hover:text-red-400 uppercase tracking-widest px-2"
+              className="text-xs font-bold text-red-500 hover:text-red-600 px-2"
             >
               Cancelar
             </button>
@@ -53,7 +53,7 @@ export default function ModalityCard({
             {mod.type === 'COLETIVO' && athleteProfile?.teamRole === 'PRESIDENT' && (
               <button 
                 onClick={() => onShowRoster(subscription)}
-                className="bg-[#00f0ff] text-black border-2 border-black font-mono font-bold uppercase tracking-widest px-4 py-2 hover:bg-white shadow-[4px_4px_0_0_#000] flex-1 text-center transition-colors"
+                className="bg-white text-green-700 border border-green-200 font-bold px-4 py-2 rounded-xl hover:bg-green-50 shadow-sm flex-1 text-center transition-colors"
               >
                 Elenco
               </button>
@@ -67,35 +67,35 @@ export default function ModalityCard({
   return (
     <div 
       onClick={() => isEnrollmentOpen && onToggle(mod.id)}
-      className={`relative bg-black rounded-none border-2 transition-all flex flex-col overflow-hidden ${
-        !isEnrollmentOpen ? 'opacity-60 cursor-not-allowed border-neutral-800' :
-        isSelected ? 'border-[#00f0ff] shadow-[4px_4px_0_0_#00f0ff] cursor-pointer scale-[1.02] transform' : 'border-neutral-800 hover:border-neutral-600 hover:shadow-[4px_4px_0_0_#555] cursor-pointer'
+      className={`relative bg-white rounded-2xl border transition-all flex flex-col overflow-hidden ${
+        !isEnrollmentOpen ? 'opacity-60 cursor-not-allowed border-gray-200' :
+        isSelected ? 'border-blue-500 shadow-md cursor-pointer scale-[1.02] transform' : 'border-gray-200 hover:border-blue-300 hover:shadow-sm cursor-pointer'
       }`}
     >
-      <div className={`absolute top-5 right-5 w-6 h-6 rounded-none border-2 flex items-center justify-center transition-colors z-10 ${
-        isSelected ? 'border-black bg-[#00f0ff] text-black' : 'border-neutral-700 bg-neutral-900'
+      <div className={`absolute top-5 right-5 w-6 h-6 rounded-full border-2 flex items-center justify-center transition-colors z-10 ${
+        isSelected ? 'border-blue-500 bg-blue-500 text-white' : 'border-gray-300 bg-gray-50'
       }`}>
-        {isSelected && <Check size={14} strokeWidth={4} />}
+        {isSelected && <Check size={14} strokeWidth={3} />}
       </div>
       
-      <div className="p-6 pb-4 border-b-2 border-neutral-800">
+      <div className="p-6 pb-4 border-b border-gray-100">
         <div className="flex gap-2 mb-2 pr-8">
-          <span className={`text-[10px] font-bold px-2 py-1 font-mono uppercase tracking-widest border border-neutral-700 bg-neutral-900 text-neutral-300`}>
+          <span className={`text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wider ${mod.type === 'COLETIVO' ? 'bg-indigo-50 text-indigo-600 border border-indigo-100' : 'bg-teal-50 text-teal-600 border border-teal-100'}`}>
             {mod.type}
           </span>
-          <span className="text-[10px] font-bold px-2 py-1 font-mono uppercase tracking-widest border border-neutral-700 bg-neutral-900 text-neutral-300">
+          <span className="text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wider bg-gray-100 text-gray-600 border border-gray-200">
             {mod.gender || 'MISTO'}
           </span>
         </div>
-        <h4 className="font-mono font-bold text-white text-2xl leading-none mb-2 uppercase tracking-tighter">{mod.name}</h4>
-        <div className="flex flex-wrap gap-x-4 gap-y-2 mt-3 text-xs text-slate-400 font-medium">
+        <h4 className="font-bold text-slate-900 text-xl leading-tight mb-2">{mod.name}</h4>
+        <div className="flex flex-wrap gap-x-4 gap-y-2 mt-3 text-xs text-gray-500 font-medium">
           {mod.type === 'COLETIVO' && (
             <div className="flex items-center gap-1">
-              <Users size={14} className="text-slate-500" /> {mod.minAthletes} a {mod.maxAthletes} atletas
+              <Users size={14} className="text-gray-400" /> {mod.minAthletes} a {mod.maxAthletes} atletas
             </div>
           )}
           <div className="flex items-center gap-1">
-            <span className="font-mono text-slate-300">{mod.minAge || 0} - {mod.maxAge || 99} anos</span>
+            <span className="font-mono text-gray-500">{mod.minAge || 0} - {mod.maxAge || 99} anos</span>
           </div>
         </div>
       </div>
