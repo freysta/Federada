@@ -336,74 +336,91 @@ export default function ChampionshipDetailPage() {
           <div className="max-w-6xl mx-auto px-6 relative z-10 text-white">
             <Link 
               to="/campeonatos" 
-              className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/20 rounded-full text-white transition-all mb-4 text-sm font-bold tracking-wide"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-neutral-900 border-2 border-neutral-800 hover:border-[#00f0ff] transition-all mb-8 text-sm font-bold tracking-widest uppercase font-mono"
             >
               <ArrowLeft size={16} /> Voltar
             </Link>
-            
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
-              <div>
-                <div className="flex items-center gap-3 mb-4">
-                  <span className={`px-3 py-1 text-xs font-bold rounded-full uppercase tracking-wider ${
-                    isEnrollmentOpen ? 'bg-green-500/20 text-green-400 border border-green-500/30' : 'bg-red-500/20 text-red-400 border border-red-500/30'
-                  }`}>
-                    {isEnrollmentOpen ? 'Inscrições Abertas' : 'Inscrições Encerradas'}
+
+            <div className="flex flex-col md:flex-row gap-8 items-start">
+              
+              <div className="w-full md:w-1/3 max-w-sm mx-auto md:mx-0 shrink-0">
+                <div className="aspect-[4/5] bg-neutral-900 rounded-none shadow-[6px_6px_0_0_#00f0ff] border-2 border-neutral-800 overflow-hidden relative group">
+                  {champ.bannerUrl ? (
+                    <img 
+                      src={`${API_URL}${champ.bannerUrl}`} 
+                      alt={champ.name} 
+                      className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex flex-col items-center justify-center text-neutral-700 bg-neutral-950 p-6 text-center" style={{ backgroundImage: 'radial-gradient(#333 1px, transparent 1px)', backgroundSize: '10px 10px' }}>
+                      <Trophy size={64} className="mb-4 opacity-50" />
+                      <span className="font-mono font-bold tracking-widest uppercase">Sem Imagem</span>
+                    </div>
+                  )}
+                  <div className="absolute inset-0 border-4 border-black/10 pointer-events-none"></div>
+                </div>
+              </div>
+              
+              <div className="flex-1 w-full pt-4">
+                <div className="flex items-center gap-3 mb-6">
+                  <span className={`px-3 py-1 text-xs font-mono font-bold tracking-widest uppercase border-2 border-black ${isEnrollmentOpen ? 'bg-[#00f0ff] text-black' : 'bg-red-500 text-white'}`}>
+                    {isEnrollmentOpen ? 'INSCRIÇÕES ABERTAS' : 'INSCRIÇÕES ENCERRADAS'}
                   </span>
                   {champ.settings?.requireRg && (
-                    <span className="px-3 py-1 text-xs font-bold rounded-full uppercase tracking-wider bg-orange-500/20 text-orange-400 border border-orange-500/30 flex items-center gap-1">
-                      <AlertCircle size={12} /> Exige Documentação
+                    <span className="px-3 py-1 text-xs font-mono font-bold uppercase tracking-widest bg-yellow-400 text-black border-2 border-black flex items-center gap-1">
+                      <AlertCircle size={12} /> EXIGE DOC
                     </span>
                   )}
                 </div>
                 
-                <h1 className="text-3xl md:text-4xl font-mono font-bold uppercase tracking-tighter mb-3 text-white drop-shadow-md">
+                <h1 className="text-3xl md:text-5xl font-mono font-bold uppercase tracking-tighter mb-4 text-white">
                   {champ.name}
                 </h1>
                 
-                <p className="text-slate-300 text-base max-w-2xl leading-relaxed">
+                <p className="text-neutral-400 text-base max-w-2xl leading-relaxed font-sans">
                   {champ.description || 'Nenhuma descrição fornecida para este campeonato.'}
                 </p>
               </div>
             </div>
             
             {/* Metadata Bar */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mt-6 border-t border-slate-700/50 pt-6">
-              <div className="flex items-start gap-3">
-                <Calendar className="text-blue-400 mt-1 shrink-0" size={20} />
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mt-8 border-t-2 border-neutral-800 pt-8 font-mono">
+              <div className="flex items-start gap-3 p-4 bg-neutral-900 border-2 border-neutral-800">
+                <Calendar className="text-[#00f0ff] mt-0.5 shrink-0" size={20} />
                 <div>
-                  <p className="text-xs text-slate-400 font-semibold uppercase tracking-wider mb-1">Período</p>
-                  <p className="font-medium text-slate-200">
+                  <p className="text-[10px] text-neutral-500 font-bold uppercase tracking-widest mb-1">Período</p>
+                  <p className="font-bold text-white text-sm">
                     {champ.startDate ? new Date(champ.startDate).toLocaleDateString() : 'A definir'}
                     {champ.endDate ? ` até ${new Date(champ.endDate).toLocaleDateString()}` : ''}
                   </p>
                 </div>
               </div>
               
-              <div className="flex items-start gap-3">
-                <Clock className="text-orange-400 mt-1 shrink-0" size={20} />
+              <div className="flex items-start gap-3 p-4 bg-neutral-900 border-2 border-neutral-800">
+                <Clock className="text-[#00f0ff] mt-0.5 shrink-0" size={20} />
                 <div>
-                  <p className="text-xs text-slate-400 font-semibold uppercase tracking-wider mb-1">Inscrições até</p>
-                  <p className="font-medium text-slate-200">
-                    {champ.enrollmentDeadline ? new Date(champ.enrollmentDeadline).toLocaleDateString() : 'Sem prazo definido'}
+                  <p className="text-[10px] text-neutral-500 font-bold uppercase tracking-widest mb-1">Prazo de Inscrição</p>
+                  <p className="font-bold text-white text-sm">
+                    {champ.enrollmentDeadline ? new Date(champ.enrollmentDeadline).toLocaleDateString() : 'Sem prazo'}
                   </p>
                 </div>
               </div>
               
-              <div className="flex items-start gap-3">
-                <MapPin className="text-green-400 mt-1 shrink-0" size={20} />
+              <div className="flex items-start gap-3 p-4 bg-neutral-900 border-2 border-neutral-800">
+                <MapPin className="text-[#00f0ff] mt-0.5 shrink-0" size={20} />
                 <div>
-                  <p className="text-xs text-slate-400 font-semibold uppercase tracking-wider mb-1">Local(is)</p>
-                  <p className="font-medium text-slate-200">
+                  <p className="text-[10px] text-neutral-500 font-bold uppercase tracking-widest mb-1">Local(is)</p>
+                  <p className="font-bold text-white text-sm">
                     {champ.settings?.locations?.join(', ') || 'A definir'}
                   </p>
                 </div>
               </div>
               
-              <div className="flex items-start gap-3">
-                <Trophy className="text-yellow-400 mt-1 shrink-0" size={20} />
+              <div className="flex items-start gap-3 p-4 bg-neutral-900 border-2 border-neutral-800">
+                <Trophy className="text-[#00f0ff] mt-0.5 shrink-0" size={20} />
                 <div>
-                  <p className="text-xs text-slate-400 font-semibold uppercase tracking-wider mb-1">Modalidades</p>
-                  <p className="font-medium text-slate-200">
+                  <p className="text-[10px] text-neutral-500 font-bold uppercase tracking-widest mb-1">Modalidades</p>
+                  <p className="font-bold text-white text-sm">
                     {champ.modalities?.length || 0} disputas
                   </p>
                 </div>
@@ -413,34 +430,34 @@ export default function ChampionshipDetailPage() {
         </div>
 
         {/* TABS NAVIGATION */}
-        <div className="bg-slate-900/80 backdrop-blur-md border-b border-slate-800 sticky top-20 z-30 shadow-sm">
-          <div className="max-w-6xl mx-auto px-6 flex gap-8 overflow-x-auto no-scrollbar font-mono text-sm uppercase tracking-wider font-bold">
+        <div className="bg-black border-b-2 border-neutral-800 sticky top-0 z-30">
+          <div className="max-w-6xl mx-auto px-6 flex gap-8 overflow-x-auto no-scrollbar font-mono text-sm uppercase tracking-widest font-bold">
             <button 
               onClick={() => setActiveTab('overview')}
-              className={`py-4 border-b-2 whitespace-nowrap transition-colors ${activeTab === 'overview' ? 'border-blue-500 text-blue-400' : 'border-transparent text-slate-500 hover:text-slate-300 hover:border-slate-700'}`}
+              className={`py-4 border-b-4 whitespace-nowrap transition-colors ${activeTab === 'overview' ? 'border-[#00f0ff] text-[#00f0ff]' : 'border-transparent text-neutral-500 hover:text-white hover:border-neutral-700'}`}
             >
               Visão Geral
             </button>
             <button 
               onClick={() => setActiveTab('modalities')}
-              className={`py-4 border-b-2 whitespace-nowrap transition-colors flex items-center gap-2 ${activeTab === 'modalities' ? 'border-blue-500 text-blue-400' : 'border-transparent text-slate-500 hover:text-slate-300 hover:border-slate-700'}`}
+              className={`py-4 border-b-4 whitespace-nowrap transition-colors flex items-center gap-2 ${activeTab === 'modalities' ? 'border-[#00f0ff] text-[#00f0ff]' : 'border-transparent text-neutral-500 hover:text-white hover:border-neutral-700'}`}
             >
               Modalidades
               {champ.modalities && champ.modalities.length > 0 && (
-                <span className="bg-slate-800 text-slate-400 py-0.5 px-2 rounded-full text-xs border border-slate-700">{champ.modalities.length}</span>
+                <span className="bg-neutral-800 text-white py-0.5 px-2 rounded-none text-xs border border-neutral-700">{champ.modalities.length}</span>
               )}
             </button>
             <button 
               onClick={() => setActiveTab('teams')}
-              className={`py-4 border-b-2 whitespace-nowrap transition-colors ${activeTab === 'teams' ? 'border-blue-500 text-blue-400' : 'border-transparent text-slate-500 hover:text-slate-300 hover:border-slate-700'}`}
+              className={`py-4 border-b-4 whitespace-nowrap transition-colors ${activeTab === 'teams' ? 'border-[#00f0ff] text-[#00f0ff]' : 'border-transparent text-neutral-500 hover:text-white hover:border-neutral-700'}`}
             >
-              Equipes Inscritas
+              Equipes
             </button>
             <button 
               onClick={() => setActiveTab('brackets')}
-              className={`py-4 border-b-2 whitespace-nowrap transition-colors ${activeTab === 'brackets' ? 'border-blue-500 text-blue-400' : 'border-transparent text-slate-500 hover:text-slate-300 hover:border-slate-700'}`}
+              className={`py-4 border-b-4 whitespace-nowrap transition-colors ${activeTab === 'brackets' ? 'border-[#00f0ff] text-[#00f0ff]' : 'border-transparent text-neutral-500 hover:text-white hover:border-neutral-700'}`}
             >
-              Chaveamentos & Resultados
+              Tabela
             </button>
           </div>
         </div>
@@ -448,69 +465,69 @@ export default function ChampionshipDetailPage() {
         <div className="max-w-6xl mx-auto px-6 py-10 space-y-10">
           
           {activeTab === 'overview' && (
-            <div className="animate-in fade-in duration-500 space-y-10">
-              <div className="bg-slate-800/50 rounded-2xl p-8 border border-slate-700 shadow-sm backdrop-blur-sm">
-                <h3 className="text-xl font-bold text-white mb-4 font-mono uppercase tracking-wider">Sobre o Evento</h3>
-                <p className="text-slate-300 whitespace-pre-wrap">{champ.description || 'Nenhuma descrição detalhada fornecida para este campeonato.'}</p>
+            <div className="animate-in fade-in duration-500 space-y-8">
+              <div className="bg-neutral-900 rounded-none p-8 border-2 border-neutral-800">
+                <h3 className="text-2xl font-bold text-[#00f0ff] mb-4 font-mono uppercase tracking-widest">Sobre o Evento</h3>
+                <p className="text-white font-sans whitespace-pre-wrap">{champ.description || 'Nenhuma descrição detalhada fornecida para este campeonato.'}</p>
               </div>
               
-              <div className="bg-slate-800/50 rounded-2xl p-8 border border-slate-700 shadow-sm backdrop-blur-sm">
-                <h3 className="text-xl font-bold text-white mb-4 font-mono uppercase tracking-wider">Regulamento Geral</h3>
-                <div className="bg-slate-900/50 rounded-xl p-6 border border-slate-800 text-center">
-                  <Info className="mx-auto text-slate-500 mb-2" size={32} />
-                  <p className="text-slate-400">O regulamento ainda não foi anexado pela organização.</p>
+              <div className="bg-neutral-900 rounded-none p-8 border-2 border-neutral-800">
+                <h3 className="text-2xl font-bold text-[#00f0ff] mb-4 font-mono uppercase tracking-widest">Regulamento</h3>
+                <div className="bg-black rounded-none p-6 border-2 border-dashed border-neutral-800 text-center">
+                  <Info className="mx-auto text-neutral-600 mb-2" size={32} />
+                  <p className="text-neutral-500 font-mono text-sm uppercase tracking-wider">Documento pendente.</p>
                 </div>
               </div>
             </div>
           )}
 
           {activeTab === 'teams' && (
-            <div className="animate-in fade-in duration-500 text-center py-20 bg-slate-800/30 rounded-2xl border border-dashed border-slate-700 shadow-sm backdrop-blur-sm">
-              <Shield className="mx-auto text-slate-600 mb-4" size={48} />
-              <h3 className="text-xl font-bold text-slate-300">Equipes Inscritas</h3>
-              <p className="text-slate-500 mt-2">As equipes inscritas aparecerão aqui em breve.</p>
+            <div className="animate-in fade-in duration-500 text-center py-20 bg-neutral-900 rounded-none border-2 border-dashed border-neutral-800">
+              <Shield className="mx-auto text-neutral-700 mb-4" size={48} />
+              <h3 className="text-2xl font-bold text-white font-mono uppercase tracking-wider">Equipes Inscritas</h3>
+              <p className="text-neutral-500 mt-2 font-mono text-sm uppercase tracking-wider">Disponível em breve.</p>
             </div>
           )}
 
           {activeTab === 'brackets' && (
-            <div className="animate-in fade-in duration-500 text-center py-20 bg-slate-800/30 rounded-2xl border border-dashed border-slate-700 shadow-sm backdrop-blur-sm">
-              <Trophy className="mx-auto text-slate-600 mb-4" size={48} />
-              <h3 className="text-xl font-bold text-slate-300">Chaveamentos em Construção</h3>
-              <p className="text-slate-500 mt-2">A tabela de confrontos será gerada após o encerramento das inscrições.</p>
+            <div className="animate-in fade-in duration-500 text-center py-20 bg-neutral-900 rounded-none border-2 border-dashed border-neutral-800">
+              <Trophy className="mx-auto text-neutral-700 mb-4" size={48} />
+              <h3 className="text-2xl font-bold text-white font-mono uppercase tracking-wider">Tabela de Jogos</h3>
+              <p className="text-neutral-500 mt-2 font-mono text-sm uppercase tracking-wider">Será gerada após encerramento.</p>
             </div>
           )}
 
           {activeTab === 'modalities' && (
             <div className="animate-in fade-in duration-500 space-y-10">
               {!user && (
-            <div className="bg-blue-900/20 border border-blue-500/30 rounded-2xl p-6 flex flex-col sm:flex-row items-center justify-between gap-6 shadow-[0_0_15px_rgba(59,130,246,0.1)] backdrop-blur-sm">
+            <div className="bg-black border-2 border-neutral-800 rounded-none p-6 flex flex-col sm:flex-row items-center justify-between gap-6 shadow-[4px_4px_0_0_#00f0ff]">
               <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-blue-900/50 rounded-full flex items-center justify-center text-blue-400 shrink-0 border border-blue-500/30">
+                <div className="w-12 h-12 bg-neutral-900 flex items-center justify-center text-[#00f0ff] shrink-0 border-2 border-neutral-800">
                   <Info size={24} />
                 </div>
                 <div>
-                   <h3 className="font-mono font-bold uppercase tracking-wider text-lg text-white">Quer participar?</h3>
-                   <p className="text-slate-300 text-sm mt-1">Faça login e vincule-se a uma atlética para se inscrever nas modalidades.</p>
+                   <h3 className="font-mono font-bold uppercase tracking-widest text-xl text-white">Quer participar?</h3>
+                   <p className="text-neutral-400 text-sm mt-1 font-sans">Faça login e vincule-se a uma atlética para se inscrever nas modalidades.</p>
                  </div>
               </div>
-              <Link to="/" className="bg-blue-600 text-white font-bold py-2.5 px-6 rounded-xl hover:bg-blue-500 hover:shadow-[0_0_20px_rgba(59,130,246,0.4)] transition-all whitespace-nowrap border border-blue-400/50">
+              <Link to="/" className="bg-[#00f0ff] text-black border-2 border-black font-mono font-bold py-3 px-8 hover:bg-white transition-all whitespace-nowrap uppercase tracking-widest">
                 Fazer Login
               </Link>
             </div>
           )}
 
           {user && !athleteProfile?.team && (
-             <div className="bg-orange-900/20 border border-orange-500/30 rounded-2xl p-6 flex flex-col sm:flex-row items-center justify-between gap-6 shadow-[0_0_15px_rgba(249,115,22,0.1)] backdrop-blur-sm">
+             <div className="bg-yellow-400 border-2 border-black p-6 flex flex-col sm:flex-row items-center justify-between gap-6 shadow-[6px_6px_0_0_#000]">
                <div className="flex items-center gap-4">
-                 <div className="w-12 h-12 bg-orange-900/50 rounded-full flex items-center justify-center text-orange-400 shrink-0 border border-orange-500/30">
+                 <div className="w-12 h-12 bg-black flex items-center justify-center text-yellow-400 shrink-0 border-2 border-yellow-400">
                    <Shield size={24} />
                  </div>
                  <div>
-                   <h3 className="font-mono font-bold uppercase tracking-wider text-lg text-white">Quase lá!</h3>
-                   <p className="text-slate-300 text-sm mt-1">Você precisa estar vinculado a uma atlética para poder se inscrever.</p>
+                   <h3 className="font-mono font-bold uppercase tracking-widest text-xl text-black">Quase lá!</h3>
+                   <p className="text-black/80 font-bold text-sm mt-1 font-sans">Você precisa estar vinculado a uma atlética para poder se inscrever.</p>
                  </div>
                </div>
-               <Link to="/perfil" className="bg-orange-600 text-white font-bold py-2.5 px-6 rounded-xl hover:bg-orange-500 hover:shadow-[0_0_20px_rgba(249,115,22,0.4)] transition-all whitespace-nowrap border border-orange-400/50">
+               <Link to="/perfil" className="bg-black text-white font-mono font-bold py-3 px-8 hover:bg-neutral-800 transition-all whitespace-nowrap uppercase tracking-widest border-2 border-transparent">
                  Vincular-se a uma Atlética
                </Link>
              </div>
@@ -518,24 +535,24 @@ export default function ChampionshipDetailPage() {
 
           {/* Painel de Disponibilidade do Atleta */}
           {user && athleteProfile?.team && athleteProfile.teamRole !== 'PRESIDENT' && isEnrollmentOpen && (
-            <div className={`border rounded-2xl p-6 flex flex-col sm:flex-row items-center justify-between gap-6 shadow-sm transition-colors duration-300 backdrop-blur-sm ${isAvailable ? 'bg-green-900/20 border-green-500/30' : 'bg-slate-800/50 border-slate-700'}`}>
+            <div className={`p-6 flex flex-col sm:flex-row items-center justify-between gap-6 transition-colors duration-300 border-2 border-black ${isAvailable ? 'bg-[#00f0ff] text-black shadow-[6px_6px_0_0_#000]' : 'bg-neutral-900 border-neutral-800 text-white'}`}>
               <div className="flex items-center gap-4">
-                <div className={`w-12 h-12 rounded-full flex items-center justify-center shrink-0 border ${isAvailable ? 'bg-green-900/50 text-green-400 border-green-500/30' : 'bg-slate-900/50 text-slate-400 border-slate-700'}`}>
+                <div className={`w-12 h-12 flex items-center justify-center shrink-0 border-2 ${isAvailable ? 'bg-black text-[#00f0ff] border-black' : 'bg-black text-neutral-500 border-neutral-800'}`}>
                   {isAvailable ? <CheckCircle2 size={24} /> : <Info size={24} />}
                 </div>
                 <div>
-                  <h3 className="font-mono font-bold uppercase tracking-wider text-lg text-white">Sua Disponibilidade</h3>
-                  <p className="text-slate-300 text-sm mt-1">
+                  <h3 className="font-mono font-bold uppercase tracking-widest text-xl">Sua Disponibilidade</h3>
+                  <p className={`text-sm mt-1 font-sans font-bold ${isAvailable ? 'text-black/80' : 'text-neutral-400'}`}>
                     {isAvailable 
-                      ? "Você está marcado como DISPONÍVEL para jogar este campeonato. Seu presidente será notificado!"
-                      : "Confirme sua disponibilidade para sinalizar ao presidente da sua equipe que você quer ser convocado."}
+                      ? "Você está marcado como DISPONÍVEL para jogar. Seu presidente será notificado!"
+                      : "Confirme sua disponibilidade para sinalizar ao seu presidente que você quer ser convocado."}
                   </p>
                 </div>
               </div>
               <button 
                 onClick={toggleAvailability}
                 disabled={loadingAvailability}
-                className={`font-bold py-2.5 px-6 rounded-xl transition-all whitespace-nowrap shadow-sm disabled:opacity-50 border ${isAvailable ? 'bg-transparent text-green-400 border-green-500/50 hover:bg-green-900/40' : 'bg-green-600/20 text-green-400 border-green-500/30 hover:bg-green-600/30 hover:shadow-[0_0_15px_rgba(34,197,94,0.2)]'}`}
+                className={`font-mono font-bold py-3 px-8 transition-all whitespace-nowrap disabled:opacity-50 border-2 uppercase tracking-widest ${isAvailable ? 'bg-black text-white border-black hover:bg-neutral-800' : 'bg-[#00f0ff] text-black border-black hover:bg-white'}`}
               >
                 {loadingAvailability ? 'Atualizando...' : (isAvailable ? 'Remover Disponibilidade' : 'Estou Disponível!')}
               </button>
@@ -554,33 +571,33 @@ export default function ChampionshipDetailPage() {
               {champ.modalities && champ.modalities.length > 0 && (
                 <div className="flex flex-col sm:flex-row gap-3">
                   <div className="relative">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400" size={16} />
                     <input 
                       type="text" 
-                      placeholder="Buscar por nome..." 
-                      className="w-full sm:w-64 pl-9 pr-4 py-2 bg-slate-800 border border-slate-700 rounded-xl text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all shadow-sm"
+                      placeholder="BUSCAR MODALIDADE..." 
+                      className="w-full sm:w-64 pl-9 pr-4 py-2 bg-black border-2 border-neutral-800 rounded-none text-sm text-white placeholder:text-neutral-500 focus:outline-none focus:border-[#00f0ff] transition-colors shadow-none font-mono font-bold uppercase tracking-wider"
                       value={filterText}
                       onChange={(e) => setFilterText(e.target.value)}
                     />
                   </div>
-                  <div className="flex gap-2">
+                  <div className="flex gap-2 font-mono font-bold uppercase tracking-widest text-sm">
                     <select 
-                      className="px-4 py-2 bg-slate-800 border border-slate-700 rounded-xl text-sm font-medium text-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 shadow-sm cursor-pointer"
+                      className="px-4 py-2 bg-black border-2 border-neutral-800 rounded-none text-neutral-300 focus:outline-none focus:border-[#00f0ff] shadow-none cursor-pointer"
                       value={filterType}
                       onChange={(e) => setFilterType(e.target.value)}
                     >
-                      <option value="ALL">Todos os Tipos</option>
-                      <option value="INDIVIDUAL">Individual</option>
-                      <option value="COLETIVO">Coletivo</option>
+                      <option value="ALL">TODOS OS TIPOS</option>
+                      <option value="INDIVIDUAL">INDIVIDUAL</option>
+                      <option value="COLETIVO">COLETIVO</option>
                     </select>
                     <select 
-                      className="px-4 py-2 bg-slate-800 border border-slate-700 rounded-xl text-sm font-medium text-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 shadow-sm cursor-pointer"
+                      className="px-4 py-2 bg-black border-2 border-neutral-800 rounded-none text-neutral-300 focus:outline-none focus:border-[#00f0ff] shadow-none cursor-pointer"
                       value={filterGender}
                       onChange={(e) => setFilterGender(e.target.value)}
                     >
-                      <option value="ALL">Todos os Gêneros</option>
-                      <option value="MASCULINO">Masculino</option>
-                      <option value="FEMININO">Feminino</option>
+                      <option value="ALL">TODOS OS GÊNEROS</option>
+                      <option value="MASCULINO">MASCULINO</option>
+                      <option value="FEMININO">FEMININO</option>
                       <option value="MISTO">Misto</option>
                     </select>
                   </div>
