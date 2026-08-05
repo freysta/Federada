@@ -1,5 +1,5 @@
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { User as UserIcon, ArrowLeft } from "lucide-react";
+import { User as UserIcon, ArrowLeft, ChevronDown, Trophy } from "lucide-react";
 import { useState } from "react";
 import federadaIcon from "../../assets/logos/logo-sem-nome.png";
 import { useAuth } from "../../contexts/AuthContext";
@@ -13,11 +13,47 @@ export default function ChampionshipNavbar() {
 	return (
 		<nav className="fixed w-full z-50 bg-slate-900/80 text-white backdrop-blur-md border-b border-slate-800/50 shadow-sm">
 			<div className="max-w-7xl mx-auto px-6 h-20 flex justify-between items-center">
-				{/* Brand */}
-				<Link to="/campeonatos" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="flex items-center gap-3 cursor-pointer">
-					<img src={federadaIcon} alt="Federada" className="h-10 hover:scale-105 transition-transform brightness-0 invert" />
-          <span className="font-mono font-bold tracking-tight text-xl hidden sm:block">TORNEIOS</span>
-				</Link>
+				{/* Context Switcher */}
+        <div className="relative group">
+          <button className="flex items-center gap-3 cursor-pointer p-2 -ml-2 rounded-xl hover:bg-slate-800 transition-colors">
+            <img src={federadaIcon} alt="Federada" className="h-8 brightness-0 invert" />
+            <div className="flex flex-col items-start text-left hidden sm:flex">
+              <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider leading-none mb-0.5">🏛 Federada</span>
+              <span className="font-mono font-bold tracking-tight text-sm leading-tight flex items-center gap-1">
+                ▼ Workspace Torneios
+              </span>
+            </div>
+            <ChevronDown size={16} className="text-slate-500 sm:hidden" />
+          </button>
+          
+          <div className="absolute top-full left-0 mt-1 w-64 bg-slate-800 border border-slate-700 rounded-2xl shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all transform origin-top-left -translate-y-2 group-hover:translate-y-0 z-50">
+            <div className="p-3">
+              <div className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2 px-3">Alternar Contexto</div>
+              
+              <Link to="/" className="flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-slate-700 transition-colors text-slate-300 hover:text-white">
+                <div className="w-8 h-8 rounded-lg bg-slate-700 flex items-center justify-center shrink-0">
+                  <ArrowLeft size={16} />
+                </div>
+                <div>
+                  <div className="font-bold text-sm leading-tight">Portal Principal</div>
+                  <div className="text-xs text-slate-500">Loja, Fórum e Galeria</div>
+                </div>
+              </Link>
+              
+              <div className="h-px bg-slate-700 my-2 mx-2"></div>
+              
+              <Link to="/campeonatos" className="flex items-center gap-3 px-3 py-3 rounded-xl bg-blue-900/20 border border-blue-500/30 text-white">
+                <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center shrink-0">
+                  <Trophy size={16} />
+                </div>
+                <div>
+                  <div className="font-bold text-sm leading-tight">Torneios</div>
+                  <div className="text-xs text-blue-400">Workspace Atual</div>
+                </div>
+              </Link>
+            </div>
+          </div>
+        </div>
 
 				{/* Desktop Menu */}
 				<div className="hidden lg:flex items-center gap-8 font-mono text-sm">
@@ -48,13 +84,8 @@ export default function ChampionshipNavbar() {
 
 					<div className="h-4 w-[1px] bg-slate-700 mx-2"></div>
 
-					{/* Voltar para o Portal */}
+					{/* Login (if not logged in) */}
 					<div className="flex items-center gap-4">
-            <Link to="/" className="text-slate-300 hover:text-white px-4 py-2 flex items-center gap-2 transition-colors group">
-              <ArrowLeft size={16} className="group-hover:-translate-x-1 transition-transform" />
-              <span className="font-sans font-bold tracking-wide text-xs uppercase">Portal</span>
-            </Link>
-
 						{!user && (
 							<button onClick={() => setIsLoginOpen(true)} className="bg-blue-600 text-white px-4 py-2 flex items-center gap-2 hover:bg-blue-500 transition-colors rounded-lg shadow-lg">
 								<UserIcon size={16} />
