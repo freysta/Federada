@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { apiClient } from '../../utils/apiClient';
-import { Loader2, Plus, Edit, Trash2, Search } from 'lucide-react';
+import { Loader2, Plus, Edit, Trash2, Search, MessageSquare, X } from 'lucide-react';
 import toast from 'react-hot-toast';
 import Pagination from '../../components/admin/Pagination';
 
@@ -109,102 +109,125 @@ export default function AdminNews() {
   if (loading) return <div className="flex justify-center p-10"><Loader2 className="animate-spin" size={32} /></div>;
 
   return (
-    <div>
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold font-mono">FÓRUM / NOTÍCIAS (CMS)</h1>
-        <button onClick={() => openModal()} className="bg-black text-white px-4 py-2 text-sm font-bold flex items-center gap-2">
-          <Plus size={16} /> NOVA POSTAGEM
+    <div className="space-y-6 font-sans">
+      {/* Standard Header */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-black text-slate-900 uppercase tracking-tight flex items-center gap-2">
+            <MessageSquare className="text-blue-600" size={28} /> Fórum & Notícias
+          </h1>
+          <p className="text-slate-500 text-sm mt-1">Publique notícias, comunicados e atualizações da plataforma.</p>
+        </div>
+        <button
+          onClick={() => openModal()}
+          className="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl font-bold text-sm transition-all shadow-md shadow-blue-600/20 active:scale-95"
+        >
+          <Plus size={18} /> Nova Postagem
         </button>
       </div>
 
-      <div className="bg-white border border-gray-300 rounded-xl shadow-md overflow-hidden">
-        <div className="p-4 border-b border-gray-200 flex gap-4">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
-            <input 
-              type="text" 
-              placeholder="Buscar notícias..." 
+      {/* Standard Card & Filter Bar */}
+      <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
+        <div className="p-4 border-b border-slate-200 bg-slate-50/50 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="relative flex-1 w-full sm:max-w-md">
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+            <input
+              type="text"
+              placeholder="Buscar notícias..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full border border-gray-300 rounded-lg pl-10 pr-4 py-2 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all bg-white"
+              className="w-full border border-slate-300 rounded-xl pl-10 pr-4 py-2.5 text-sm outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100 transition-all bg-white"
             />
+          </div>
+          <div className="text-xs font-mono font-bold text-slate-500">
+            Total: {filteredNews.length} postagens
           </div>
         </div>
         <div className="overflow-x-auto">
-          <table className="w-full text-left font-sans text-sm">
-            <thead className="bg-gray-50 text-gray-700 font-bold text-xs uppercase tracking-wider border-b border-gray-200">
+          <table className="w-full text-left text-sm border-collapse">
+            <thead className="bg-slate-100/70 text-slate-700 font-bold text-xs uppercase tracking-wider border-b border-slate-200">
               <tr>
-                <th className="px-4 py-3">DATA</th>
-                <th className="px-4 py-3">TÍTULO / PREVIEW</th>
-                <th className="px-4 py-3 text-right">AÇÕES</th>
+                <th className="px-6 py-4">DATA</th>
+                <th className="px-6 py-4">TÍTULO / PREVIEW</th>
+                <th className="px-6 py-4 text-right">AÇÕES</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-200">
-            {paginatedNews.length === 0 ? (
-              <tr>
-                <td colSpan={4} className="p-8 text-center text-gray-500 text-sm">Nenhuma notícia encontrada.</td>
-              </tr>
-            ) : (
-              paginatedNews.map(n => (
-              <tr key={n.id} className="hover:bg-gray-50 transition-colors cursor-pointer" onClick={() => openModal(n)}>
-                <td className="px-4 py-2">
-                  <div className="font-bold text-gray-800">{new Date(n.createdAt).toLocaleDateString('pt-BR')}</div>
-                  <div className="font-mono text-[10px] text-gray-500">{new Date(n.createdAt).toLocaleTimeString('pt-BR')}</div>
-                </td>
-                <td className="px-4 py-2">
-                  <div className="font-bold text-gray-800 leading-tight">{n.title}</div>
-                  <div className="text-[11px] text-gray-500 truncate max-w-md">{n.content}</div>
-                </td>
-                <td className="px-4 py-2 text-right">
-                  <button onClick={(e) => { e.stopPropagation(); openModal(n); }} className="p-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg mr-1 transition-colors"><Edit size={16} /></button>
-                  <button onClick={(e) => { e.stopPropagation(); handleDelete(n.id); }} className="p-1.5 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg transition-colors"><Trash2 size={16} /></button>
-                </td>
-              </tr>
-            )))}
-          </tbody>
-        </table>
+            <tbody className="divide-y divide-slate-200">
+              {paginatedNews.length === 0 ? (
+                <tr>
+                  <td colSpan={3} className="p-12 text-center text-slate-500 font-medium">Nenhuma notícia encontrada.</td>
+                </tr>
+              ) : (
+                paginatedNews.map(n => (
+                  <tr key={n.id} className="hover:bg-slate-50/80 transition-colors">
+                    <td className="px-6 py-4">
+                      <div className="font-bold text-slate-900">{new Date(n.createdAt).toLocaleDateString('pt-BR')}</div>
+                      <div className="font-mono text-[10px] text-slate-500">{new Date(n.createdAt).toLocaleTimeString('pt-BR')}</div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="font-bold text-slate-900 leading-tight">{n.title}</div>
+                      <div className="text-xs text-slate-500 truncate max-w-md">{n.content}</div>
+                    </td>
+                    <td className="px-6 py-4 text-right space-x-2">
+                      <button onClick={() => openModal(n)} className="p-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg transition-colors inline-flex items-center" title="Editar">
+                        <Edit size={16} />
+                      </button>
+                      <button onClick={() => handleDelete(n.id)} className="p-2 bg-rose-50 hover:bg-rose-100 text-rose-600 rounded-lg transition-colors inline-flex items-center" title="Excluir">
+                        <Trash2 size={16} />
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          totalItems={filteredNews.length}
+          itemsPerPage={itemsPerPage}
+          onPageChange={setCurrentPage}
+          onItemsPerPageChange={(items) => {
+            setItemsPerPage(items);
+            setCurrentPage(1);
+          }}
+        />
       </div>
-      <Pagination
-        currentPage={currentPage}
-        totalPages={totalPages}
-        totalItems={filteredNews.length}
-        itemsPerPage={itemsPerPage}
-        onPageChange={setCurrentPage}
-        onItemsPerPageChange={(items) => {
-          setItemsPerPage(items);
-          setCurrentPage(1);
-        }}
-      />
-    </div>
 
       {isModalOpen && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
-          <div className="bg-white w-full max-w-3xl p-6 rounded-xl shadow-2xl overflow-y-auto max-h-[90vh] custom-scrollbar">
-            <h2 className="text-2xl font-bold font-mono text-gray-800 mb-6 border-b pb-3">{editingId ? 'Editar Postagem' : 'Nova Postagem'}</h2>
-            <form onSubmit={handleSubmit} className="space-y-5">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                <div className="md:col-span-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Título</label>
-                  <input required type="text" value={formData.title} onChange={e => setFormData({...formData, title: e.target.value})} className="block w-full border border-gray-300 rounded-lg p-3 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all" />
+        <div className="fixed inset-0 bg-slate-900/60 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
+          <div className="bg-white w-full max-w-3xl rounded-3xl shadow-2xl overflow-hidden border border-slate-200">
+            <div className="bg-slate-900 text-white p-6 flex justify-between items-center">
+              <h2 className="font-black text-lg uppercase tracking-wide">{editingId ? 'Editar Postagem' : 'Nova Postagem'}</h2>
+              <button onClick={() => setIsModalOpen(false)} className="text-slate-400 hover:text-white transition-colors"><X size={20} /></button>
+            </div>
+            <div className="p-6 overflow-y-auto max-h-[75vh] custom-scrollbar">
+              <form onSubmit={handleSubmit} className="space-y-5">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                  <div className="md:col-span-2">
+                    <label className="block text-xs font-black uppercase text-slate-700 mb-1">Título</label>
+                    <input required type="text" value={formData.title} onChange={e => setFormData({...formData, title: e.target.value})} className="block w-full border border-slate-300 rounded-xl p-3 outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100 transition-all" />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-black uppercase text-slate-700 mb-1">Data e Hora de Publicação</label>
+                    <input required type="datetime-local" value={formData.dateLabel} onChange={e => setFormData({...formData, dateLabel: e.target.value})} className="block w-full border border-slate-300 rounded-xl p-3 outline-none focus:border-blue-600 transition-all" />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-black uppercase text-slate-700 mb-1">Imagem da Capa</label>
+                    <input type="file" accept="image/*" onChange={e => setSelectedFile(e.target.files?.[0] || null)} className="block w-full border border-slate-300 rounded-xl p-2.5 outline-none focus:border-blue-600 transition-all bg-white text-sm" />
+                  </div>
+                  <div className="md:col-span-2">
+                    <label className="block text-xs font-black uppercase text-slate-700 mb-1">Conteúdo</label>
+                    <textarea required rows={8} value={formData.content} onChange={(e) => setFormData({...formData, content: e.target.value})} className="block w-full border border-slate-300 rounded-xl p-3 outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100 transition-all bg-white font-mono text-sm" />
+                  </div>
                 </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Data e Hora de Publicação</label>
-                  <input required type="datetime-local" value={formData.dateLabel} onChange={e => setFormData({...formData, dateLabel: e.target.value})} className="block w-full border border-gray-300 rounded-lg p-3 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all" />
+                <div className="flex justify-end gap-3 pt-4 border-t border-slate-100">
+                  <button type="button" onClick={() => setIsModalOpen(false)} className="px-5 py-2.5 rounded-xl border border-slate-300 text-slate-700 font-bold text-sm hover:bg-slate-50 transition-colors">Cancelar</button>
+                  <button type="submit" className="px-5 py-2.5 rounded-xl bg-blue-600 text-white font-black text-sm hover:bg-blue-700 transition-colors shadow-md">Salvar Postagem</button>
                 </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Imagem da Capa</label>
-                  <input type="file" accept="image/*" onChange={e => setSelectedFile(e.target.files?.[0] || null)} className="block w-full border border-gray-300 rounded-lg p-2.5 outline-none focus:border-blue-500 transition-all bg-white file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" />
-                </div>
-                <div className="md:col-span-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Conteúdo</label>
-                  <textarea required rows={8} value={formData.content} onChange={(e) => setFormData({...formData, content: e.target.value})} className="block w-full border border-gray-300 rounded-lg p-3 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all bg-white font-mono text-sm" />
-                </div>
-              </div>
-              <div className="mt-6 flex justify-end gap-3 pt-2">
-                <button type="button" onClick={() => setIsModalOpen(false)} className="px-5 py-2.5 rounded-lg border border-gray-300 text-gray-700 font-medium hover:bg-gray-50 transition-colors">Cancelar</button>
-                <button type="submit" className="px-5 py-2.5 rounded-lg bg-blue-600 text-white font-bold hover:bg-blue-700 transition-colors shadow-md">Salvar Postagem</button>
-              </div>
-            </form>
+              </form>
+            </div>
           </div>
         </div>
       )}

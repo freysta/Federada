@@ -1,4 +1,4 @@
-import { X, ShieldCheck, AlertTriangle } from 'lucide-react';
+import { X, ShieldCheck, AlertTriangle, ArrowRight, CheckCircle2 } from 'lucide-react';
 import { useState } from 'react';
 
 interface ConfirmSubscriptionModalProps {
@@ -16,97 +16,135 @@ export default function ConfirmSubscriptionModal({
   onConfirm,
   selectedModalities,
   championshipSettings,
-  isSubscribing
+  isSubscribing,
 }: ConfirmSubscriptionModalProps) {
   const [agreed, setAgreed] = useState(false);
 
   if (!isOpen) return null;
 
-  const totalPrice = selectedModalities.reduce((sum, mod) => sum + Number(mod.price || 0), 0);
+  const totalPrice = selectedModalities.reduce(
+    (sum, mod) => sum + Number(mod.price || 0),
+    0
+  );
 
   return (
-    <div className="fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-[60] backdrop-blur-sm font-inter">
-      <div className="bg-white p-6 max-w-lg w-full rounded-2xl shadow-2xl overflow-y-auto max-h-[90vh]">
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-bold text-slate-800 flex items-center gap-2">
-            <ShieldCheck className="text-blue-600" />
-            Revisar Inscrições
-          </h2>
-          <button onClick={onClose} className="text-slate-400 hover:text-red-500 transition-colors p-2 rounded-full hover:bg-slate-100">
-            <X size={24} />
+    <div className="fixed inset-0 bg-slate-950/80 flex items-center justify-center p-4 z-[60] backdrop-blur-md font-inter animate-in fade-in duration-200">
+      <div className="bg-white p-6 sm:p-8 max-w-lg w-full rounded-3xl shadow-2xl overflow-y-auto max-h-[90vh] border border-slate-200 animate-in zoom-in-95 duration-200">
+        
+        {/* Modal Header */}
+        <div className="flex justify-between items-start mb-6">
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 rounded-2xl bg-orange-50 text-orange-600 border border-orange-200 flex items-center justify-center shrink-0 shadow-sm">
+              <ShieldCheck size={26} />
+            </div>
+            <div>
+              <h2 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
+                Revisar Inscrições
+              </h2>
+              <p className="text-xs text-slate-500 font-medium">
+                Confirme as modalidades selecionadas antes de finalizar
+              </p>
+            </div>
+          </div>
+
+          <button
+            onClick={onClose}
+            className="text-slate-400 hover:text-slate-700 transition-colors p-2 rounded-full hover:bg-slate-100"
+          >
+            <X size={20} />
           </button>
         </div>
 
-        <p className="text-slate-600 mb-6">
-          Você está prestes a confirmar a inscrição nas seguintes modalidades. Verifique se os dados estão corretos:
-        </p>
+        {/* Selected Modalities List */}
+        <div className="bg-slate-50 border border-slate-200/90 rounded-2xl overflow-hidden mb-6">
+          <div className="p-3 bg-slate-100/70 border-b border-slate-200 text-xs font-bold text-slate-500 uppercase tracking-wider flex justify-between">
+            <span>Modalidades ({selectedModalities.length})</span>
+            <span>Valor</span>
+          </div>
 
-        <div className="bg-slate-50 border border-slate-200 rounded-xl overflow-hidden mb-6">
-          <div className="max-h-48 overflow-y-auto divide-y divide-slate-200">
-            {selectedModalities.map(mod => (
-              <div key={mod.id} className="p-4 flex justify-between items-center">
+          <div className="max-h-52 overflow-y-auto divide-y divide-slate-200/60">
+            {selectedModalities.map((mod) => (
+              <div key={mod.id} className="p-4 flex justify-between items-center bg-white/50 hover:bg-white transition-colors">
                 <div>
-                  <h4 className="font-bold text-slate-800">{mod.name}</h4>
-                  <span className="text-xs font-bold bg-slate-200 text-slate-600 px-2 py-0.5 rounded uppercase">{mod.type} - {mod.gender || 'MISTO'}</span>
+                  <h4 className="font-extrabold text-slate-900 text-sm">{mod.name}</h4>
+                  <div className="flex items-center gap-2 mt-1">
+                    <span className="text-[10px] font-black bg-slate-200 text-slate-700 px-2 py-0.5 rounded uppercase">
+                      {mod.type}
+                    </span>
+                    <span className="text-[10px] font-black bg-orange-100 text-orange-800 px-2 py-0.5 rounded uppercase">
+                      {mod.gender || 'MISTO'}
+                    </span>
+                  </div>
                 </div>
-                <div className="font-bold text-green-700">
-                  {Number(mod.price) > 0 ? `R$ ${Number(mod.price).toFixed(2)}` : 'Grátis'}
+                <div className="font-extrabold text-slate-900 text-sm">
+                  {Number(mod.price) > 0 ? `R$ ${Number(mod.price).toFixed(2).replace('.', ',')}` : 'Grátis'}
                 </div>
               </div>
             ))}
           </div>
-          <div className="bg-slate-100 p-4 flex justify-between items-center border-t border-slate-200">
-            <span className="font-bold text-slate-600 uppercase text-sm tracking-wider">Total</span>
-            <span className="font-black text-xl text-slate-800">R$ {totalPrice.toFixed(2)}</span>
+
+          {/* Total Summary Footer */}
+          <div className="bg-slate-900 text-white p-4 flex justify-between items-center border-t border-slate-800">
+            <span className="font-bold uppercase text-xs tracking-wider text-slate-300">Total a Pagar</span>
+            <span className="font-black text-xl text-white">
+              {totalPrice === 0 ? 'GRÁTIS' : `R$ ${totalPrice.toFixed(2).replace('.', ',')}`}
+            </span>
           </div>
         </div>
 
+        {/* Requirements Notice */}
         {(championshipSettings?.requireRg || championshipSettings?.requireEnrollment) && (
-          <div className="bg-orange-50 border border-orange-200 p-4 rounded-xl flex gap-3 mb-6">
-            <AlertTriangle className="text-orange-500 shrink-0 mt-0.5" size={20} />
-            <div className="text-sm text-orange-800">
-              <strong className="block mb-1">Atenção aos Requisitos:</strong>
+          <div className="bg-amber-50/90 border border-amber-200/90 p-4 rounded-2xl flex gap-3 mb-6">
+            <AlertTriangle className="text-amber-600 shrink-0 mt-0.5" size={20} />
+            <div className="text-xs text-amber-900 leading-relaxed">
+              <strong className="block font-bold mb-0.5 text-amber-950">Atenção aos Requisitos:</strong>
               Este campeonato exige que os atletas do elenco tenham 
               {championshipSettings.requireRg && ' RG '}
               {championshipSettings.requireRg && championshipSettings.requireEnrollment && ' e '}
               {championshipSettings.requireEnrollment && ' Atestado de Matrícula '}
-              aprovados pela organização. A inscrição só será validada após a conferência dos documentos.
+              aprovados. A inscrição será validada após verificação.
             </div>
           </div>
         )}
 
-        <label className="flex items-start gap-3 cursor-pointer group mb-6 p-4 rounded-xl hover:bg-slate-50 transition-colors">
+        {/* Checkbox agreement */}
+        <label className="flex items-start gap-3 cursor-pointer group mb-6 p-3.5 rounded-2xl bg-slate-50 hover:bg-slate-100/80 border border-slate-200 transition-colors">
           <div className="relative flex items-center justify-center mt-0.5">
-            <input 
-              type="checkbox" 
-              checked={agreed} 
-              onChange={e => setAgreed(e.target.checked)} 
-              className="peer appearance-none w-5 h-5 border-2 border-slate-300 rounded-md checked:bg-blue-600 checked:border-blue-600 transition-all cursor-pointer" 
+            <input
+              type="checkbox"
+              checked={agreed}
+              onChange={(e) => setAgreed(e.target.checked)}
+              className="peer appearance-none w-5 h-5 border-2 border-slate-300 rounded-lg checked:bg-orange-600 checked:border-orange-600 transition-all cursor-pointer"
             />
-            <div className="absolute text-white opacity-0 peer-checked:opacity-100 pointer-events-none pb-0.5">&#10003;</div>
+            <CheckCircle2 size={14} className="absolute text-white opacity-0 peer-checked:opacity-100 pointer-events-none" />
           </div>
-          <span className="text-sm text-slate-700 font-medium leading-tight">
-            Li e concordo com o regulamento do campeonato e entendo que serei responsável por montar o elenco no prazo estabelecido.
+          <span className="text-xs text-slate-700 font-medium leading-normal">
+            Li e concordo com o regulamento do campeonato e declaro estarem corretos os dados da inscrição.
           </span>
         </label>
 
-        <div className="flex flex-col sm:flex-row justify-end gap-3 mt-2">
-          <button 
+        {/* Actions */}
+        <div className="flex flex-col sm:flex-row justify-end gap-3">
+          <button
             onClick={onClose}
-            className="w-full sm:w-auto px-5 py-2.5 text-sm font-bold text-slate-600 bg-white border border-slate-300 rounded-xl hover:bg-slate-50 transition-colors order-2 sm:order-1"
+            className="w-full sm:w-auto px-5 py-3 text-xs font-bold text-slate-600 bg-white border border-slate-300 rounded-xl hover:bg-slate-50 transition-colors order-2 sm:order-1"
           >
             Cancelar
           </button>
-          <button 
+          <button
             onClick={onConfirm}
             disabled={!agreed || isSubscribing}
-            className={`w-full sm:w-auto justify-center px-5 py-2.5 text-sm font-bold text-white rounded-xl transition-all shadow-md flex items-center gap-2 order-1 sm:order-2 ${
-              agreed && !isSubscribing ? 'bg-blue-600 hover:bg-blue-700 hover:shadow-lg' : 'bg-slate-300 cursor-not-allowed shadow-none'
+            className={`w-full sm:w-auto px-6 py-3 text-xs font-black uppercase tracking-wider text-white rounded-xl transition-all shadow-md flex items-center justify-center gap-2 order-1 sm:order-2 ${
+              agreed && !isSubscribing
+                ? 'bg-orange-600 hover:bg-orange-700 shadow-orange-600/30 active:scale-95'
+                : 'bg-slate-300 cursor-not-allowed shadow-none'
             }`}
           >
             {isSubscribing ? 'Processando...' : 'Confirmar Inscrições'}
+            <ArrowRight size={14} />
           </button>
         </div>
+
       </div>
     </div>
   );

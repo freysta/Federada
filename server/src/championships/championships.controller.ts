@@ -29,6 +29,7 @@ import {
 import { CreateChampionshipDto } from './dto/create-championship.dto';
 import { UpdateChampionshipDto } from './dto/update-championship.dto';
 import { CreateModalityDto } from './dto/create-modality.dto';
+import { UpdateModalityDto } from './dto/update-modality.dto';
 import { GenerateBracketDto } from './dto/generate-bracket.dto';
 import { UpdateMatchDto } from './dto/update-match.dto';
 import { ChampionshipStatus } from './entities/championship.entity';
@@ -73,6 +74,63 @@ export class ChampionshipsController {
     return this.championshipsService.createChampionship(body, req.user);
   }
 
+  @UseGuards(JwtAuthGuard)
+  @Post(':id/enroll-team')
+  enrollTeam(
+    @Param('id') id: string,
+    @Request() req: { user: RequestUser }
+  ) {
+    return this.championshipsService.enrollTeam(req.user.userId, id);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get(':id/my-team-enrollment')
+  getTeamEnrollment(
+    @Param('id') id: string,
+    @Request() req: { user: RequestUser }
+  ) {
+    return this.championshipsService.getTeamEnrollment(req.user.userId, id);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get(':id/athlete-document')
+  getAthleteDocument(
+    @Param('id') id: string,
+    @Request() req: { user: RequestUser }
+  ) {
+    return this.championshipsService.getAthleteDocument(req.user.userId, id);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post(':id/athlete-document')
+  saveAthleteDocument(
+    @Param('id') id: string,
+    @Body('type') type: 'rg' | 'enrollment',
+    @Body('url') url: string,
+    @Request() req: { user: RequestUser }
+  ) {
+    return this.championshipsService.saveAthleteDocument(req.user.userId, id, type, url);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get(':id/team-dashboard')
+  getTeamDashboard(
+    @Param('id') id: string,
+    @Request() req: { user: RequestUser }
+  ) {
+    return this.championshipsService.getTeamDashboard(req.user.userId, id);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post(':id/subscriptions/:subId/approve')
+  approveAthleteSubscription(
+    @Param('id') championshipId: string,
+    @Param('subId') subscriptionId: string,
+    @Request() req: { user: RequestUser }
+  ) {
+    return this.championshipsService.approveAthleteSubscription(req.user.userId, championshipId, subscriptionId);
+  }
+
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('ADMIN', 'SPORTS_ADMIN')
   @Patch(':id/status')
@@ -82,6 +140,28 @@ export class ChampionshipsController {
     @Request() req: { user: RequestUser },
   ) {
     return this.championshipsService.changeStatus(id, status, req.user);
+  }
+
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ADMIN', 'SPORTS_ADMIN')
+  @Get('admin/documents')
+  getAdminPendingDocuments() {
+    return this.championshipsService.getAdminPendingDocuments();
+  }
+
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ADMIN', 'SPORTS_ADMIN')
+  @Patch('admin/documents/:docId')
+  updateAdminDocumentStatus(
+    @Param('docId') docId: string,
+    @Body()
+    data: {
+      type: 'rg' | 'enrollment';
+      status: 'APPROVED' | 'REJECTED';
+      rejectionReason?: string;
+    },
+  ) {
+    return this.championshipsService.updateAdminDocumentStatus(docId, data);
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
@@ -144,6 +224,18 @@ export class ChampionshipsController {
     @Request() req: { user: RequestUser },
   ) {
     return this.championshipsService.addModality(id, body, req.user);
+  }
+
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ADMIN', 'SPORTS_ADMIN')
+  @Patch(':id/modalities/:modId')
+  updateModality(
+    @Param('id') id: string,
+    @Param('modId') modId: string,
+    @Body() body: UpdateModalityDto,
+    @Request() req: { user: RequestUser },
+  ) {
+    return this.championshipsService.updateModality(id, modId, body, req.user);
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)

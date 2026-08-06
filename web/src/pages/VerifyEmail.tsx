@@ -37,7 +37,7 @@ export default function VerifyEmail() {
   return (
     <div className="bg-neutral-50 min-h-screen flex flex-col">
       
-      <main className="flex-1 pt-32 pb-24 flex items-center justify-center">
+      <main className="flex-1 pt-8 pb-24 flex items-center justify-center">
         <div className="max-w-md w-full mx-auto px-6">
           <div className="bg-white border border-black shadow-[8px_8px_0_0_#000] p-8 text-center">
             

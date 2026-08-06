@@ -5,6 +5,8 @@ import { Modality } from './entities/modality.entity';
 import { Subscription } from './entities/subscription.entity';
 import { Match } from './entities/match.entity';
 import { ChampionshipDocument } from './entities/championship-document.entity';
+import { AthleteChampionshipDocument } from './entities/athlete-championship-document.entity';
+import { TeamChampionshipEnrollment } from './entities/team-championship-enrollment.entity';
 import { AthleteProfile } from '../teams/entities/athlete-profile.entity';
 import { Team } from '../teams/entities/team.entity';
 import { TeamsModule } from '../teams/teams.module';
@@ -26,6 +28,8 @@ import { BracketService } from './services/bracket.service';
       Subscription,
       Match,
       ChampionshipDocument,
+      AthleteChampionshipDocument,
+      TeamChampionshipEnrollment,
       AthleteProfile,
       Team,
     ]),

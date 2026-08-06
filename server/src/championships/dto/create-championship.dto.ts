@@ -10,7 +10,7 @@ import {
   MaxLength,
 } from 'class-validator';
 import { Type } from 'class-transformer';
-import { ChampionshipStatus } from '../entities/championship.entity';
+import { ChampionshipStatus, AudienceFocus } from '../entities/championship.entity';
 
 class ChampionshipSettingsDto {
   @IsOptional()
@@ -62,6 +62,15 @@ export class CreateChampionshipDto {
   @IsOptional()
   @IsString()
   bannerUrl?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(150)
+  organizer?: string;
+
+  @IsOptional()
+  @IsEnum(AudienceFocus)
+  audienceFocus?: AudienceFocus;
 
   @IsOptional()
   @ValidateNested()

@@ -10,6 +10,8 @@ import { AthleteProfile } from '../../teams/entities/athlete-profile.entity';
 import { Modality } from '../entities/modality.entity';
 import { SubscriptionStatus } from '../entities/subscription.entity';
 import { ChampionshipStatus } from '../entities/championship.entity';
+import { TeamChampionshipEnrollment } from '../entities/team-championship-enrollment.entity';
+import { AthleteChampionshipDocument } from '../entities/athlete-championship-document.entity';
 
 @Injectable()
 export class SubscriptionService {
@@ -20,6 +22,10 @@ export class SubscriptionService {
     private athleteProfileRepository: Repository<AthleteProfile>,
     @InjectRepository(Modality)
     private modalityRepository: Repository<Modality>,
+    @InjectRepository(TeamChampionshipEnrollment)
+    private teamEnrollmentRepository: Repository<TeamChampionshipEnrollment>,
+    @InjectRepository(AthleteChampionshipDocument)
+    private athleteDocumentRepository: Repository<AthleteChampionshipDocument>,
   ) {}
 
   async subscribeAthlete(userId: string, modalityId: string) {
@@ -69,6 +75,32 @@ export class SubscriptionService {
       }
     }
 
+    if (modality.championship.audienceFocus === 'UNIVERSITY') {
+      if (!profile.team) {
+        throw new BadRequestException(
+          'Para campeonatos universitários, você precisa solicitar vínculo a uma atlética antes de se inscrever.',
+        );
+      }
+      if (profile.teamJoinStatus !== 'APPROVED') {
+        throw new BadRequestException(
+          'Seu vínculo com a atlética ainda está pendente ou foi recusado. Aguarde a aprovação do presidente.',
+        );
+      }
+
+      const teamEnrollment = await this.teamEnrollmentRepository.findOne({
+        where: {
+          team: { id: profile.team.id },
+          championship: { id: modality.championship.id }
+        }
+      });
+
+      if (!teamEnrollment) {
+        throw new BadRequestException(
+          'Sua equipe precisa estar inscrita neste campeonato pelo presidente antes de você se inscrever em modalidades.',
+        );
+      }
+    }
+
     if (modality.type === 'COLETIVO') {
       if (profile.teamRole !== 'PRESIDENT')
         throw new BadRequestException(
@@ -102,45 +134,36 @@ export class SubscriptionService {
           'Você já está inscrito nesta modalidade.',
         );
 
-      if (profile.team) {
-        const teamInChamp = await this.subscriptionRepository
-          .createQueryBuilder('sub')
-          .innerJoin('sub.modality', 'mod')
-          .where('sub.teamId = :teamId AND mod.championshipId = :champId', {
-            teamId: profile.team.id,
-            champId: modality.championship.id,
-          })
-          .getOne();
-        if (!teamInChamp && profile.teamRole !== 'PRESIDENT') {
-          throw new BadRequestException(
-            'Sua equipe precisa estar inscrita neste campeonato pelo presidente antes de você se inscrever em modalidades individuais.',
-          );
-        }
-      }
-
       this.validateAthleteForModality(profile, modality);
 
       let needsDocs = false;
       const settings = modality.championship.settings;
-      if (settings) {
-        if (settings.requireRg && profile.documentRgStatus !== 'APPROVED')
+      if (settings && (settings.requireRg || settings.requireEnrollment)) {
+        const athleteDoc = await this.athleteDocumentRepository.findOne({
+          where: { athlete: { id: profile.id }, championship: { id: modality.championship.id } }
+        });
+
+        if (!athleteDoc) {
           needsDocs = true;
-        if (
-          settings.requireEnrollment &&
-          profile.documentEnrollmentStatus !== 'APPROVED'
-        )
-          needsDocs = true;
+        } else {
+          if (settings.requireRg && athleteDoc.rgStatus !== 'APPROVED') needsDocs = true;
+          if (settings.requireEnrollment && athleteDoc.enrollmentStatus !== 'APPROVED') needsDocs = true;
+        }
+      }
+
+      let initialStatus = SubscriptionStatus.PENDING_DOCS;
+      if (modality.championship.audienceFocus === 'UNIVERSITY') {
+        initialStatus = SubscriptionStatus.PENDING_TEAM_APPROVAL;
+      } else if (!needsDocs) {
+        initialStatus = modality.price > 0 ? SubscriptionStatus.PENDING_PAYMENT : SubscriptionStatus.CONFIRMED;
       }
 
       const sub = this.subscriptionRepository.create({
         athlete: profile,
-        team: profile.team || undefined,
         modality,
         paymentStatus: modality.price > 0 ? 'PENDING' : 'FREE',
-        status: needsDocs
-          ? SubscriptionStatus.PENDING_DOCS
-          : SubscriptionStatus.CONFIRMED,
-        athletes: [],
+        status: initialStatus,
+        team: profile.team, // Vincula a inscrição do atleta à equipe atual dele
       });
       return this.subscriptionRepository.save(sub);
     }

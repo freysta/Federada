@@ -4,7 +4,7 @@ import type { IChampionship, IAthleteProfile, ISubscription } from '../types';
 import { API_URL } from '../config';
 import { apiClient } from '../utils/apiClient';
 import { useAuth } from '../contexts/AuthContext';
-import { Loader2, Trophy, Shield, CheckCircle2, Info, ArrowLeft, Calendar, MapPin, AlertCircle, Clock, Search, Filter } from 'lucide-react';
+import { Loader2, Trophy, Shield, CheckCircle2, Info, ArrowLeft, Calendar, MapPin, AlertCircle, Clock, Search, Filter, FileText } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 function QuickProfileEditModal({ 
@@ -32,7 +32,7 @@ function QuickProfileEditModal({
     }
     setLoading(true);
     try {
-      const { data } = await apiClient.put(`/teams/my/profile`, {
+      const data = await apiClient.put<any>(`/teams/my/profile`, {
         gender,
         cpf: cpf || undefined
       });
@@ -139,7 +139,11 @@ export default function ChampionshipDetailPage() {
   const [filterGender, setFilterGender] = useState('ALL');
 
   // Tabs State
-  const [activeTab, setActiveTab] = useState<'overview' | 'modalities' | 'teams' | 'brackets'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'modalities' | 'teams' | 'brackets' | 'documentos' | 'painel-atletica'>('overview');
+
+  // Dashboard & Documents State
+  const [teamDashboard, setTeamDashboard] = useState<{subscriptions: any[], documents: any[]} | null>(null);
+  const [athleteDocument, setAthleteDocument] = useState<any>(null);
 
   const fetchChampionship = () => {
     setLoading(true);
@@ -199,11 +203,34 @@ export default function ChampionshipDetailPage() {
     });
   };
 
+  const fetchTeamDashboard = () => {
+    if (!token || !id) return;
+    apiClient.get(`/championships/${id}/team-dashboard`)
+      .then((data: any) => setTeamDashboard(data))
+      .catch((err) => console.error('Erro ao buscar dashboard da equipe', err));
+  };
+
+  const fetchAthleteDocument = () => {
+    if (!token || !id) return;
+    apiClient.get(`/championships/${id}/athlete-document`)
+      .then((data: any) => setAthleteDocument(data))
+      .catch((err) => console.error('Erro ao buscar documentos do atleta', err));
+  };
+
   useEffect(() => {
     fetchChampionship();
-    fetchProfile();
-    fetchMySubscriptions();
-  }, [id]);
+    if (token) {
+      fetchProfile();
+      fetchMySubscriptions();
+      fetchAthleteDocument();
+    }
+  }, [id, token]);
+
+  useEffect(() => {
+    if (athleteProfile?.teamRole === 'PRESIDENT') {
+      fetchTeamDashboard();
+    }
+  }, [athleteProfile?.teamRole]);
 
   const toggleModality = (modId: string) => {
     setSelectedModalities(prev => 
@@ -459,6 +486,22 @@ export default function ChampionshipDetailPage() {
             >
               Tabela
             </button>
+            {athleteProfile && champ.settings && (champ.settings.requireRg || champ.settings.requireEnrollment) && (
+              <button 
+                onClick={() => setActiveTab('documentos')}
+                className={`py-4 border-b-4 whitespace-nowrap transition-colors ${activeTab === 'documentos' ? 'border-[#00f0ff] text-[#00f0ff]' : 'border-transparent text-neutral-500 hover:text-white hover:border-neutral-700'}`}
+              >
+                Meus Documentos
+              </button>
+            )}
+            {athleteProfile?.teamRole === 'PRESIDENT' && teamDashboard && (
+              <button 
+                onClick={() => setActiveTab('painel-atletica')}
+                className={`py-4 border-b-4 whitespace-nowrap transition-colors ${activeTab === 'painel-atletica' ? 'border-[#00f0ff] text-[#00f0ff]' : 'border-transparent text-neutral-500 hover:text-white hover:border-neutral-700'}`}
+              >
+                Painel da Atlética
+              </button>
+            )}
           </div>
         </div>
 
@@ -494,6 +537,199 @@ export default function ChampionshipDetailPage() {
               <Trophy className="mx-auto text-gray-400 mb-4" size={48} />
               <h3 className="text-xl font-bold text-slate-800">Tabela de Jogos</h3>
               <p className="text-gray-500 mt-2 text-sm">Será gerada após encerramento.</p>
+            </div>
+          )}
+
+          {activeTab === 'documentos' && (
+            <div className="animate-in fade-in duration-500 space-y-6">
+              <div className="flex items-center gap-3 mb-6">
+                <FileText className="text-blue-500" size={32} />
+                <div>
+                  <h2 className="text-2xl font-bold text-slate-900">Meus Documentos</h2>
+                  <p className="text-sm text-slate-500">Envie os documentos exigidos para participar do campeonato.</p>
+                </div>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {champ.settings?.requireRg && (
+                    <div className="bg-white rounded-3xl border border-gray-200 p-6 shadow-sm">
+                      <h3 className="font-bold text-slate-900 mb-2">RG / Doc. Oficial</h3>
+                      {athleteDocument?.rgUrl ? (
+                        <div>
+                          <div className={`mb-4 inline-flex items-center px-3 py-1 text-xs font-bold rounded-lg uppercase ${
+                            athleteDocument.rgStatus === 'APPROVED' ? 'bg-emerald-50 text-emerald-700' :
+                            athleteDocument.rgStatus === 'REJECTED' ? 'bg-red-50 text-red-700' :
+                            'bg-orange-50 text-orange-700'
+                          }`}>
+                            {athleteDocument.rgStatus === 'APPROVED' ? 'Aprovado' : athleteDocument.rgStatus === 'REJECTED' ? 'Rejeitado' : 'Em Análise'}
+                          </div>
+                          {athleteDocument.rgStatus === 'REJECTED' && (
+                            <p className="text-xs text-red-600 bg-red-50 p-3 rounded-xl mb-4">{athleteDocument.rgRejectionReason}</p>
+                          )}
+                          <a href={`${API_URL}${athleteDocument.rgUrl}`} target="_blank" rel="noreferrer" className="flex items-center gap-2 text-sm font-bold text-blue-600 hover:text-blue-700">
+                            Visualizar Arquivo
+                          </a>
+                        </div>
+                      ) : (
+                        <div>
+                          <p className="text-sm text-slate-600 mb-4">Você ainda não enviou seu documento.</p>
+                          <label className="cursor-pointer inline-flex items-center bg-blue-50 text-blue-700 font-bold text-sm px-4 py-2 rounded-xl hover:bg-blue-100 transition-colors">
+                            <input type="file" className="hidden" accept="image/*,.pdf" onChange={async (e) => {
+                              const file = e.target.files?.[0];
+                              if (!file) return;
+                              const formData = new FormData();
+                              formData.append('file', file);
+                              try {
+                                const res = await apiClient.post<{url: string}>('/upload', formData, { headers: { 'Content-Type': 'multipart/form-data' } });
+                                await apiClient.post(`/championships/${id}/athlete-document`, { type: 'rg', url: res.url });
+                                toast.success('RG enviado com sucesso!');
+                                fetchAthleteDocument();
+                              } catch (err: any) { toast.error(err.message || 'Erro ao enviar RG'); }
+                            }} />
+                            Enviar RG
+                          </label>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {champ.settings?.requireEnrollment && (
+                    <div className="bg-white rounded-3xl border border-gray-200 p-6 shadow-sm">
+                      <h3 className="font-bold text-slate-900 mb-2">Comprovante de Matrícula</h3>
+                      {athleteDocument?.enrollmentUrl ? (
+                        <div>
+                          <div className={`mb-4 inline-flex items-center px-3 py-1 text-xs font-bold rounded-lg uppercase ${
+                            athleteDocument.enrollmentStatus === 'APPROVED' ? 'bg-emerald-50 text-emerald-700' :
+                            athleteDocument.enrollmentStatus === 'REJECTED' ? 'bg-red-50 text-red-700' :
+                            'bg-orange-50 text-orange-700'
+                          }`}>
+                            {athleteDocument.enrollmentStatus === 'APPROVED' ? 'Aprovado' : athleteDocument.enrollmentStatus === 'REJECTED' ? 'Rejeitado' : 'Em Análise'}
+                          </div>
+                          {athleteDocument.enrollmentStatus === 'REJECTED' && (
+                            <p className="text-xs text-red-600 bg-red-50 p-3 rounded-xl mb-4">{athleteDocument.enrollmentRejectionReason}</p>
+                          )}
+                          <a href={`${API_URL}${athleteDocument.enrollmentUrl}`} target="_blank" rel="noreferrer" className="flex items-center gap-2 text-sm font-bold text-blue-600 hover:text-blue-700">
+                            Visualizar Arquivo
+                          </a>
+                        </div>
+                      ) : (
+                        <div>
+                          <p className="text-sm text-slate-600 mb-4">Você ainda não enviou seu comprovante.</p>
+                          <label className="cursor-pointer inline-flex items-center bg-blue-50 text-blue-700 font-bold text-sm px-4 py-2 rounded-xl hover:bg-blue-100 transition-colors">
+                            <input type="file" className="hidden" accept="image/*,.pdf" onChange={async (e) => {
+                              const file = e.target.files?.[0];
+                              if (!file) return;
+                              const formData = new FormData();
+                              formData.append('file', file);
+                              try {
+                                const res = await apiClient.post<{url: string}>('/upload', formData, { headers: { 'Content-Type': 'multipart/form-data' } });
+                                await apiClient.post(`/championships/${id}/athlete-document`, { type: 'enrollment', url: res.url });
+                                toast.success('Matrícula enviada com sucesso!');
+                                fetchAthleteDocument();
+                              } catch (err: any) { toast.error(err.message || 'Erro ao enviar matrícula'); }
+                            }} />
+                            Enviar Matrícula
+                          </label>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+            </div>
+          )}
+
+          {activeTab === 'painel-atletica' && athleteProfile?.teamRole === 'PRESIDENT' && teamDashboard && (
+            <div className="animate-in fade-in duration-500 space-y-6">
+              <div className="flex items-center gap-3 mb-6">
+                <Shield className="text-indigo-600" size={32} />
+                <div>
+                  <h2 className="text-2xl font-bold text-slate-900">Gestão da Equipe</h2>
+                  <p className="text-sm text-slate-500">Valide as modalidades que seus atletas se inscreveram.</p>
+                </div>
+              </div>
+              
+              {teamDashboard.subscriptions.length === 0 ? (
+                  <div className="bg-white rounded-3xl p-10 text-center border border-gray-200">
+                    <p className="text-slate-500">Nenhum atleta da sua equipe se inscreveu ainda.</p>
+                  </div>
+                ) : (
+                  <div className="bg-white rounded-3xl border border-gray-200 shadow-sm overflow-hidden">
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-left">
+                        <thead className="bg-gray-50 text-xs font-bold uppercase text-gray-500">
+                          <tr>
+                            <th className="px-6 py-4">Atleta</th>
+                            <th className="px-6 py-4">Modalidade</th>
+                            <th className="px-6 py-4">Documentos</th>
+                            <th className="px-6 py-4 text-center">Ações</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-gray-100">
+                          {teamDashboard.subscriptions.map((sub: any) => {
+                            const doc = teamDashboard.documents.find((d: any) => d.athlete?.id === sub.athlete?.id);
+                            return (
+                              <tr key={sub.id} className="hover:bg-gray-50 transition-colors">
+                                <td className="px-6 py-4">
+                                  <div className="font-bold text-slate-900">{sub.athlete?.user?.name}</div>
+                                  <div className="text-xs text-slate-500">{sub.athlete?.cpf || 'Sem CPF'}</div>
+                                </td>
+                                <td className="px-6 py-4">
+                                  <div className="font-bold text-slate-800">{sub.modality?.name}</div>
+                                  <div className="text-[10px] uppercase font-bold text-slate-500">{sub.modality?.type} - {sub.modality?.gender}</div>
+                                </td>
+                                <td className="px-6 py-4">
+                                  {champ.settings?.requireRg || champ.settings?.requireEnrollment ? (
+                                    <div className="flex flex-col gap-1 text-[10px] font-bold uppercase">
+                                      {champ.settings.requireRg && (
+                                        <div className={`flex items-center gap-1 ${doc?.rgStatus === 'APPROVED' ? 'text-emerald-600' : doc?.rgStatus === 'PENDING' ? 'text-amber-500' : 'text-red-500'}`}>
+                                          RG: {doc?.rgStatus === 'APPROVED' ? 'OK' : doc?.rgStatus === 'PENDING' ? 'Pendente' : doc?.rgStatus === 'REJECTED' ? 'Rejeitado' : 'Faltante'}
+                                        </div>
+                                      )}
+                                      {champ.settings.requireEnrollment && (
+                                        <div className={`flex items-center gap-1 ${doc?.enrollmentStatus === 'APPROVED' ? 'text-emerald-600' : doc?.enrollmentStatus === 'PENDING' ? 'text-amber-500' : 'text-red-500'}`}>
+                                          MATR: {doc?.enrollmentStatus === 'APPROVED' ? 'OK' : doc?.enrollmentStatus === 'PENDING' ? 'Pendente' : doc?.enrollmentStatus === 'REJECTED' ? 'Rejeitada' : 'Faltante'}
+                                        </div>
+                                      )}
+                                    </div>
+                                  ) : (
+                                    <span className="text-xs text-slate-400">Não exigido</span>
+                                  )}
+                                </td>
+                                <td className="px-6 py-4 text-center">
+                                  {sub.status === 'PENDING_TEAM_APPROVAL' ? (
+                                    <button
+                                      onClick={async () => {
+                                        if (window.confirm(`Aprovar inscrição de ${sub.athlete?.user?.name}?`)) {
+                                          try {
+                                            await apiClient.post(`/championships/${id}/subscriptions/${sub.id}/approve`);
+                                            toast.success('Inscrição aprovada pela Atlética!');
+                                            fetchTeamDashboard();
+                                            fetchMySubscriptions();
+                                          } catch (err: any) {
+                                            toast.error(err.message || 'Erro ao aprovar.');
+                                          }
+                                        }
+                                      }}
+                                      className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-[10px] font-bold uppercase transition-colors"
+                                    >
+                                      Aprovar Atleta
+                                    </button>
+                                  ) : (
+                                    <span className="px-3 py-1.5 bg-gray-100 text-gray-600 rounded-lg text-[10px] font-bold uppercase">
+                                      {sub.status === 'PENDING_DOCS' ? 'Docs Pendentes' :
+                                       sub.status === 'PENDING_PAYMENT' ? 'Aguardando Pagto' :
+                                       sub.status === 'CONFIRMED' ? 'Confirmado' :
+                                       sub.status === 'REJECTED' ? 'Rejeitado' : 'Em Andamento'}
+                                    </span>
+                                  )}
+                                </td>
+                              </tr>
+                            );
+                          })}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                )}
             </div>
           )}
 

@@ -5,7 +5,7 @@ import TerminalWidget from "../components/TerminalWidget";
 export default function Store() {
   return (
     <>
-      <main className="pt-24 min-h-screen">
+      <main className="pb-12 min-h-screen">
         <ProductGrid limit={undefined} />
       </main>
       <Footer />

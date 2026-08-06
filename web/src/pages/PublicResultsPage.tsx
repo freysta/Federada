@@ -62,8 +62,8 @@ export default function PublicResultsPage() {
   if (loading) {
     return (
       <>
-        <div className="min-h-screen bg-slate-50 flex items-center justify-center pt-20">
-          <Loader2 className="animate-spin text-blue-600" size={48} />
+        <div className="min-h-screen bg-slate-50 flex items-center justify-center pt-6">
+          <Loader2 className="animate-spin text-orange-600" size={48} />
         </div>
       </>
     );
@@ -72,9 +72,9 @@ export default function PublicResultsPage() {
   if (!champ) {
     return (
       <>
-        <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center pt-20">
+        <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center pt-6">
           <h2 className="text-2xl font-bold text-slate-800 mb-4">Campeonato não encontrado</h2>
-          <Link to="/campeonatos" className="text-blue-600 hover:underline">Voltar para a lista</Link>
+          <Link to="/campeonatos" className="text-orange-600 hover:underline">Voltar para a lista</Link>
         </div>
       </>
     );
@@ -82,13 +82,13 @@ export default function PublicResultsPage() {
 
   return (
     <>
-      <div className="min-h-screen bg-slate-50 pb-24 text-slate-800 pt-20">
+      <div className="min-h-screen bg-slate-50 pb-24 text-slate-800 pt-6">
         
         {/* Header */}
         <div className="bg-white border-b border-slate-200 py-8 px-6">
           <div className="max-w-6xl mx-auto flex flex-col md:flex-row gap-6 items-start md:items-center justify-between">
             <div>
-              <Link to={`/campeonatos/${id}`} className="inline-flex items-center gap-2 text-sm font-bold text-slate-500 hover:text-blue-600 transition-colors mb-4">
+              <Link to={`/campeonatos/${id}`} className="inline-flex items-center gap-2 text-sm font-bold text-slate-500 hover:text-orange-600 transition-colors mb-4">
                 <ArrowLeft size={16} /> Voltar ao Campeonato
               </Link>
               <h1 className="text-3xl font-extrabold text-slate-800 flex items-center gap-3">
@@ -100,7 +100,7 @@ export default function PublicResultsPage() {
             <select 
               value={selectedModality}
               onChange={(e) => setSelectedModality(e.target.value)}
-              className="bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 font-semibold text-slate-700 outline-none focus:border-blue-500 w-full md:w-auto"
+              className="bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 font-semibold text-slate-700 outline-none focus:border-orange-500 w-full md:w-auto"
             >
               {champ.modalities?.map((mod: any) => (
                 <option key={mod.id} value={mod.id}>{mod.name}</option>
@@ -117,20 +117,20 @@ export default function PublicResultsPage() {
           <div className="flex gap-4 mb-8">
             <button
               onClick={() => setActiveTab('STANDINGS')}
-              className={`flex-1 md:flex-none px-6 py-3 rounded-xl font-bold text-sm transition-colors ${activeTab === 'STANDINGS' ? 'bg-blue-600 text-white shadow-md shadow-blue-600/20' : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50'}`}
+              className={`flex-1 md:flex-none px-6 py-3 rounded-xl font-bold text-sm transition-colors ${activeTab === 'STANDINGS' ? 'bg-orange-600 text-white shadow-md shadow-orange-600/20' : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50'}`}
             >
               Classificação
             </button>
             <button
               onClick={() => setActiveTab('MATCHES')}
-              className={`flex-1 md:flex-none px-6 py-3 rounded-xl font-bold text-sm transition-colors ${activeTab === 'MATCHES' ? 'bg-blue-600 text-white shadow-md shadow-blue-600/20' : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50'}`}
+              className={`flex-1 md:flex-none px-6 py-3 rounded-xl font-bold text-sm transition-colors ${activeTab === 'MATCHES' ? 'bg-orange-600 text-white shadow-md shadow-orange-600/20' : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50'}`}
             >
               Partidas / Chaves
             </button>
           </div>
 
           {loadingData ? (
-             <div className="flex justify-center py-20"><Loader2 className="animate-spin text-blue-600" size={40} /></div>
+             <div className="flex justify-center py-20"><Loader2 className="animate-spin text-orange-600" size={40} /></div>
           ) : activeTab === 'STANDINGS' ? (
             <div className="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden">
               {standings.length === 0 ? (
@@ -167,7 +167,7 @@ export default function PublicResultsPage() {
                               <span className="font-bold text-slate-800">{team.name}</span>
                             </div>
                           </td>
-                          <td className="py-4 px-6 text-center font-black text-blue-600 text-lg">{team.points}</td>
+                          <td className="py-4 px-6 text-center font-black text-orange-600 text-lg">{team.points}</td>
                           <td className="py-4 px-6 text-center text-slate-600 font-semibold">{team.matches}</td>
                           <td className="py-4 px-6 text-center text-slate-600 font-semibold">{team.wins}</td>
                           <td className="py-4 px-6 text-center text-slate-600 font-semibold">{team.draws}</td>
@@ -194,12 +194,12 @@ export default function PublicResultsPage() {
                     const nameB = match.teamB?.name || match.athleteB?.user?.name || 'A Definir';
                     
                     return (
-                      <div key={match.id} className={`border rounded-2xl p-6 bg-white shadow-sm flex flex-col justify-between ${match.status === 'FINISHED' ? 'border-slate-300 opacity-70' : 'border-blue-200'}`}>
+                      <div key={match.id} className={`border rounded-2xl p-6 bg-white shadow-sm flex flex-col justify-between ${match.status === 'FINISHED' ? 'border-slate-300 opacity-70' : 'border-orange-200'}`}>
                         <div className="flex justify-between items-center mb-4 border-b border-slate-100 pb-3">
                           <span className="text-xs font-bold uppercase tracking-wider text-slate-500 bg-slate-100 px-3 py-1 rounded-full">
                             Rodada {match.round} {match.bracketPosition ? `• Jogo ${match.bracketPosition}` : ''}
                           </span>
-                          <div className={`text-xs font-bold px-2 py-1 rounded-md ${match.status === 'IN_PROGRESS' ? 'bg-red-100 text-red-600 animate-pulse' : match.status === 'FINISHED' ? 'bg-gray-100 text-gray-600' : 'bg-blue-100 text-blue-600'}`}>
+                          <div className={`text-xs font-bold px-2 py-1 rounded-md ${match.status === 'IN_PROGRESS' ? 'bg-red-100 text-red-600 animate-pulse' : match.status === 'FINISHED' ? 'bg-gray-100 text-gray-600' : 'bg-orange-100 text-orange-600'}`}>
                             {match.status === 'IN_PROGRESS' ? 'AO VIVO' : match.status === 'FINISHED' ? 'ENCERRADO' : 'AGENDADO'}
                           </div>
                         </div>

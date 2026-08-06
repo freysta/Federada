@@ -32,6 +32,8 @@ import { Modality } from './championships/entities/modality.entity';
 import { Subscription } from './championships/entities/subscription.entity';
 import { Match } from './championships/entities/match.entity';
 import { ChampionshipDocument } from './championships/entities/championship-document.entity';
+import { AthleteChampionshipDocument } from './championships/entities/athlete-championship-document.entity';
+import { TeamChampionshipEnrollment } from './championships/entities/team-championship-enrollment.entity';
 import { Coupon } from './coupons/entities/coupon.entity';
 import { AthleteAvailability } from './teams/entities/athlete-availability.entity';
 
@@ -94,6 +96,8 @@ import { AthleteAvailability } from './teams/entities/athlete-availability.entit
               Subscription,
               Match,
               ChampionshipDocument,
+              AthleteChampionshipDocument,
+              TeamChampionshipEnrollment,
               Coupon,
               AthleteAvailability,
             ],
@@ -123,6 +127,8 @@ import { AthleteAvailability } from './teams/entities/athlete-availability.entit
             Subscription,
             Match,
             ChampionshipDocument,
+            AthleteChampionshipDocument,
+            TeamChampionshipEnrollment,
             Coupon,
             AthleteAvailability,
           ],

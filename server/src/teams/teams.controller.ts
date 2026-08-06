@@ -3,6 +3,8 @@ import {
   Get,
   Post,
   Patch,
+  Put,
+  Delete,
   Body,
   Param,
   UseGuards,
@@ -20,6 +22,7 @@ import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
 import { CreateTeamDto } from './dto/create-team.dto';
 import { JoinTeamDto } from './dto/join-team.dto';
+import { RequestJoinTeamDto } from './dto/request-join-team.dto';
 
 @Controller('teams')
 export class TeamsController {
@@ -41,6 +44,47 @@ export class TeamsController {
   @Post('join')
   joinTeam(@Request() req: any, @Body() body: JoinTeamDto) {
     return this.teamsService.joinTeam(req.user.userId, body.inviteCode, body);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post(':id/request-join')
+  requestJoinTeam(@Request() req: any, @Param('id') id: string, @Body() body: RequestJoinTeamDto) {
+    return this.teamsService.requestJoinTeam(req.user.userId, id, body);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('my-team/join-requests')
+  getJoinRequests(@Request() req: any) {
+    return this.teamsService.getJoinRequests(req.user.userId);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Patch('my-team/requests/:profileId/status')
+  updateJoinStatus(
+    @Request() req: any,
+    @Param('profileId') profileId: string,
+    @Body('status') status: 'APPROVED' | 'REJECTED'
+  ) {
+    return this.teamsService.updateJoinStatus(req.user.userId, profileId, status);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Delete('my-team/members/:memberId')
+  removeMemberFromMyTeam(
+    @Request() req: any,
+    @Param('memberId') memberId: string,
+  ) {
+    return this.teamsService.removeMemberFromMyTeam(req.user.userId, memberId);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Patch('my-team/members/:memberId/role')
+  updateMemberRole(
+    @Request() req: any,
+    @Param('memberId') memberId: string,
+    @Body('role') role: 'PRESIDENT' | 'MEMBER'
+  ) {
+    return this.teamsService.updateMemberRole(req.user.userId, memberId, role);
   }
 
   @Get('invite/:code')
@@ -123,5 +167,40 @@ export class TeamsController {
     file: Express.Multer.File,
   ) {
     return this.teamsService.uploadDocument(req.user.userId, type, file);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Delete('my/membership')
+  leaveTeam(@Request() req: any) {
+    return this.teamsService.leaveTeam(req.user.userId);
+  }
+
+  // ==== ADMIN TEAM MANAGEMENT ====
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ADMIN', 'SPORTS_ADMIN')
+  @Get('admin/all')
+  findAllAdmin() {
+    return this.teamsService.findAllAdmin();
+  }
+
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ADMIN', 'SPORTS_ADMIN')
+  @Post('admin')
+  createTeamByAdmin(@Body() data: any) {
+    return this.teamsService.createTeamByAdmin(data);
+  }
+
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ADMIN', 'SPORTS_ADMIN')
+  @Put(':id')
+  updateTeamByAdmin(@Param('id') id: string, @Body() data: any) {
+    return this.teamsService.updateTeamByAdmin(id, data);
+  }
+
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ADMIN', 'SPORTS_ADMIN')
+  @Delete(':id')
+  deleteTeamByAdmin(@Param('id') id: string) {
+    return this.teamsService.deleteTeamByAdmin(id);
   }
 }

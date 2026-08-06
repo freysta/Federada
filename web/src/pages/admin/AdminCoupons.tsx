@@ -132,97 +132,106 @@ export default function AdminCoupons() {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+    <div className="space-y-6 font-sans">
+      {/* Standard Header */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 tracking-tight flex items-center gap-2">
-            <Ticket className="text-black" />
-            Cupons de Desconto
+          <h1 className="text-2xl font-black text-slate-900 uppercase tracking-tight flex items-center gap-2">
+            <Ticket className="text-blue-600" size={28} /> Cupons de Desconto
           </h1>
-          <p className="text-gray-500 mt-1">Gerencie os cupons da loja</p>
+          <p className="text-slate-500 text-sm mt-1">Crie e gerencie cupons promocionais para a loja virtual.</p>
         </div>
-        
-        <button
-          onClick={() => openModal()}
-          className="bg-black hover:bg-gray-800 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2"
+
+        <button 
+          onClick={() => openModal()} 
+          className="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl font-bold text-sm transition-all shadow-md shadow-blue-600/20 active:scale-95"
         >
-          <Plus size={16} />
-          Novo Cupom
+          <Plus size={18} /> Novo Cupom
         </button>
       </div>
 
-      {/* Busca */}
-      <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex items-center gap-3">
-        <Search className="text-gray-400" size={20} />
-        <input
-          type="text"
-          placeholder="Buscar por código..."
-          className="bg-transparent outline-none flex-1 text-sm"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-        />
-      </div>
+      {/* Standard Card & Filter Bar */}
+      <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
+        <div className="p-4 border-b border-slate-200 bg-slate-50/50 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="relative flex-1 w-full sm:max-w-md">
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+            <input 
+              type="text" 
+              placeholder="Buscar por código..." 
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full border border-slate-300 rounded-xl pl-10 pr-4 py-2.5 text-sm outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100 transition-all bg-white"
+            />
+          </div>
+          <div className="text-xs font-mono font-bold text-slate-500">
+            Total: {filteredCoupons.length} cupons
+          </div>
+        </div>
 
-      {/* Lista */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-        {loading ? (
-          <div className="flex justify-center items-center py-20">
-            <Loader2 className="w-8 h-8 animate-spin text-black" />
-          </div>
-        ) : filteredCoupons.length === 0 ? (
-          <div className="text-center py-20 text-gray-500">
-            Nenhum cupom encontrado.
-          </div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm">
-              <thead className="bg-gray-50 text-gray-600 font-medium border-b border-gray-100">
+        <div className="overflow-x-auto">
+          {loading ? (
+            <div className="flex justify-center items-center py-20">
+              <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+            </div>
+          ) : filteredCoupons.length === 0 ? (
+            <div className="text-center py-16 text-slate-500 font-medium">
+              Nenhum cupom encontrado.
+            </div>
+          ) : (
+            <table className="w-full text-left text-sm border-collapse">
+              <thead className="bg-slate-100/70 text-slate-700 font-bold text-xs uppercase tracking-wider border-b border-slate-200">
                 <tr>
-                  <th className="py-4 px-6">Código</th>
-                  <th className="py-4 px-6">Desconto</th>
-                  <th className="py-4 px-6">Usos</th>
-                  <th className="py-4 px-6">Validade</th>
-                  <th className="py-4 px-6">Status</th>
-                  <th className="py-4 px-6 text-right">Ações</th>
+                  <th className="px-6 py-4">CÓDIGO</th>
+                  <th className="px-6 py-4">DESCONTO</th>
+                  <th className="px-6 py-4 text-center">USOS</th>
+                  <th className="px-6 py-4 text-center">VALIDADE</th>
+                  <th className="px-6 py-4 text-center">STATUS</th>
+                  <th className="px-6 py-4 text-right">AÇÕES</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-100">
+              <tbody className="divide-y divide-slate-200">
                 {paginatedCoupons.map((coupon) => (
-                  <tr key={coupon.id} className="hover:bg-gray-50 transition-colors">
-                    <td className="py-4 px-6 font-bold text-gray-900">{coupon.code}</td>
-                    <td className="py-4 px-6">
-                      {coupon.discountType === 'PERCENTAGE' ? `${coupon.discountValue}%` : `R$ ${coupon.discountValue}`}
+                  <tr key={coupon.id} className="hover:bg-slate-50/80 transition-colors">
+                    <td className="px-6 py-4 font-mono font-bold text-slate-900">{coupon.code}</td>
+                    <td className="px-6 py-4 font-mono font-bold text-slate-800">
+                      {coupon.discountType === 'PERCENTAGE' ? `${coupon.discountValue}%` : `R$ ${coupon.discountValue.toFixed(2)}`}
                     </td>
-                    <td className="py-4 px-6">
-                      {coupon.usesCount} / {coupon.maxUses || 'Ilimitado'}
+                    <td className="px-6 py-4 text-center font-mono text-xs text-slate-600">
+                      {coupon.usesCount} / {coupon.maxUses || '∞'}
                     </td>
-                    <td className="py-4 px-6 text-gray-500">
-                      {coupon.expiresAt ? new Date(coupon.expiresAt).toLocaleDateString('pt-BR') : 'Sem data límite'}
+                    <td className="px-6 py-4 text-center font-mono text-xs text-slate-600">
+                      {coupon.expiresAt ? new Date(coupon.expiresAt).toLocaleDateString('pt-BR') : 'Sem expiração'}
                     </td>
-                    <td className="py-4 px-6">
-                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${coupon.isActive ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                    <td className="px-6 py-4 text-center">
+                      <span className={`text-[10px] font-black px-2.5 py-1 rounded-full uppercase tracking-wider border ${
+                        coupon.isActive ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-rose-50 text-rose-700 border-rose-200'
+                      }`}>
                         {coupon.isActive ? 'Ativo' : 'Inativo'}
                       </span>
                     </td>
-                    <td className="py-4 px-6 text-right">
-                      <div className="flex items-center justify-end gap-2">
-                        <button onClick={() => openModal(coupon)} className="p-2 text-gray-400 hover:text-blue-600 transition-colors" title="Editar">
-                          <Edit size={16} />
-                        </button>
-                        <button onClick={() => handleDelete(coupon.id)} className="p-2 text-gray-400 hover:text-red-600 transition-colors" title="Excluir">
-                          <Trash2 size={16} />
-                        </button>
-                      </div>
+                    <td className="px-6 py-4 text-right space-x-2">
+                      <button 
+                        onClick={() => openModal(coupon)} 
+                        className="p-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg transition-colors inline-flex items-center" 
+                        title="Editar"
+                      >
+                        <Edit size={16} />
+                      </button>
+                      <button 
+                        onClick={() => handleDelete(coupon.id)} 
+                        className="p-2 bg-rose-50 hover:bg-rose-100 text-rose-600 rounded-lg transition-colors inline-flex items-center" 
+                        title="Excluir"
+                      >
+                        <Trash2 size={16} />
+                      </button>
                     </td>
                   </tr>
                 ))}
               </tbody>
             </table>
-          </div>
-        )}
-      </div>
-
-      <Pagination 
+          )}
+        </div>
+        <Pagination 
           currentPage={currentPage} 
           totalPages={totalPages} 
           totalItems={filteredCoupons.length}
@@ -230,6 +239,7 @@ export default function AdminCoupons() {
           onPageChange={setCurrentPage}
           onItemsPerPageChange={setItemsPerPage}
         />
+      </div>
 
       {/* Modal */}
       {isModalOpen && (

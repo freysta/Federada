@@ -15,6 +15,7 @@ import { AthleteProfile } from '../../teams/entities/athlete-profile.entity';
 import { Team } from '../../teams/entities/team.entity';
 
 export enum SubscriptionStatus {
+  PENDING_TEAM_APPROVAL = 'PENDING_TEAM_APPROVAL',
   PENDING_ROSTER = 'PENDING_ROSTER',
   PENDING_DOCS = 'PENDING_DOCS',
   DOCS_APPROVED = 'DOCS_APPROVED',

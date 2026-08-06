@@ -1,6 +1,6 @@
 import { Outlet, Navigate, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
-import { LayoutDashboard, Package, ShoppingBag, Users, LogOut, Calendar, MessageSquare, FileCheck2, Store, Ticket, Trophy } from 'lucide-react';
+import { LayoutDashboard, Package, ShoppingBag, Users, LogOut, Calendar, MessageSquare, FileCheck2, Store, Ticket, Trophy, Shield } from 'lucide-react';
 
 export default function AdminLayout() {
   const { user, logout } = useAuth();
@@ -24,22 +24,23 @@ export default function AdminLayout() {
       
       { type: 'divider', label: 'CAMPEONATOS', show: isSportsAdmin },
       { path: '/admin/championships', icon: <Trophy size={16} />, label: 'Campeonatos', show: isSportsAdmin },
+      { path: '/admin/teams', icon: <Shield size={16} />, label: 'Atléticas & Equipes', show: isSportsAdmin },
       
       { type: 'divider', label: 'USUÁRIOS', show: isSuperAdmin },
       { path: '/admin/users', icon: <Users size={16} />, label: 'Usuários', show: isSuperAdmin },
 
-      { type: 'divider', label: 'COMUNICAÇÃO', show: isSportsAdmin || isStoreAdmin },
-      { path: '/admin/events', icon: <Calendar size={16} />, label: 'Eventos', show: isSportsAdmin || isStoreAdmin },
-      { path: '/admin/news', icon: <MessageSquare size={16} />, label: 'Fórum', show: isSportsAdmin || isStoreAdmin },
+      { type: 'divider', label: 'COMUNICAÇÃO', show: isStoreAdmin },
+      { path: '/admin/events', icon: <Calendar size={16} />, label: 'Eventos', show: isStoreAdmin },
+      { path: '/admin/news', icon: <MessageSquare size={16} />, label: 'Fórum', show: isStoreAdmin },
       
       { type: 'divider', label: 'SISTEMA', show: true },
-      { path: '/admin/documents', icon: <FileCheck2 size={16} />, label: 'Documentos', show: isSportsAdmin },
+      { path: '/admin/documents', icon: <FileCheck2 size={16} />, label: 'Gestão de Editais', show: isSportsAdmin },
     ];
   
     const visibleMenuItems = menuItems.filter(item => item.show !== false);
   
     return (
-      <div className="min-h-screen bg-gray-100 flex flex-col md:flex-row font-sans">
+      <div className="min-h-screen bg-gray-100 flex flex-col md:flex-row font-inter text-slate-800">
         {/* Sidebar */}
         <aside className="w-full md:w-64 bg-black text-white flex flex-col border-r border-black/20 shrink-0 md:h-screen md:sticky top-0">
           <div className="p-4 border-b border-white/20 shrink-0">
@@ -51,8 +52,8 @@ export default function AdminLayout() {
             {visibleMenuItems.map((item, index) => {
               if (item.type === 'divider') {
                 return (
-                  <div key={`div-${index}`} className="mt-2 mb-1 px-3 flex items-center gap-2">
-                    <span className="text-[9px] font-bold tracking-widest text-gray-500 uppercase">{item.label}</span>
+                  <div key={`div-${index}`} className="mt-4 mb-2 px-4 flex items-center gap-3">
+                    <span className="text-[10px] font-bold tracking-widest text-gray-500 uppercase">{item.label}</span>
                     <div className="flex-1 h-px bg-white/10"></div>
                   </div>
                 );
@@ -63,9 +64,9 @@ export default function AdminLayout() {
                 <Link
                   key={item.path}
                   to={item.path!}
-                  className={`flex shrink-0 items-center gap-2 px-3 py-1.5 font-mono text-[11px] transition-colors rounded-sm mx-1 ${
+                  className={`flex shrink-0 items-center gap-3 px-4 py-2.5 text-sm font-medium transition-colors rounded-lg mx-2 ${
                     isActive 
-                      ? 'bg-white text-black font-bold' 
+                      ? 'bg-white text-black font-bold shadow-sm' 
                       : 'text-gray-300 hover:bg-white/10 hover:text-white'
                   }`}
                 >
@@ -86,23 +87,23 @@ export default function AdminLayout() {
         <div className="p-4 border-t-0 md:border-t border-white/20 mt-auto md:mt-0 flex flex-col md:block hidden md:flex">
           <div className="flex items-center justify-between mb-4 px-2">
             <div className="flex flex-col">
-              <span className="text-xs font-mono text-gray-400">LOGADO COMO</span>
-              <span className="text-sm font-sans font-semibold tracking-normal truncate max-w-[150px]">{user.name}</span>
+              <span className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">Logado como</span>
+              <span className="text-sm font-bold tracking-tight truncate max-w-[150px]">{user.name}</span>
             </div>
           </div>
           <Link 
             to="/"
-            className="w-full flex items-center justify-center gap-2 bg-neutral-800 hover:bg-neutral-700 text-white font-mono text-sm py-2 transition-colors mb-2"
+            className="w-full flex items-center justify-center gap-2 bg-neutral-800 hover:bg-neutral-700 rounded-xl text-white font-bold text-sm py-3 transition-colors mb-2"
           >
-            <Store size={16} />
-            IR PARA A LOJA
+            <Store size={18} />
+            Ir para a Loja
           </Link>
           <button 
             onClick={logout}
-            className="w-full flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700 text-white font-mono text-sm py-2 transition-colors"
+            className="w-full flex items-center justify-center gap-2 bg-red-600/10 hover:bg-red-600 text-red-500 hover:text-white rounded-xl font-bold text-sm py-3 transition-colors"
           >
-            <LogOut size={16} />
-            SAIR DO SISTEMA
+            <LogOut size={18} />
+            Sair do Sistema
           </button>
         </div>
       </aside>

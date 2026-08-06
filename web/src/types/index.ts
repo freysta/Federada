@@ -44,6 +44,7 @@ export interface IAthleteProfile {
   teamRole?: 'PRESIDENT' | 'CAPTAIN' | 'PLAYER';
   cpf?: string;
   gender?: string;
+  teamJoinStatus?: 'PENDING' | 'APPROVED' | 'REJECTED';
 }
 
 export interface IChampionship {
@@ -57,6 +58,8 @@ export interface IChampionship {
   endDate: string;
   registrationDeadline?: string;
   enrollmentDeadline?: string;
+  organizer?: string;
+  audienceFocus?: 'GENERAL' | 'UNIVERSITY' | 'SCHOOL' | 'CITY';
   settings?: any;
   modalities?: IModality[];
 }

@@ -9,7 +9,7 @@ export default function CaadsPage() {
 
   return (
     <div className="bg-white min-h-screen">
-      <div className="pt-20">
+      <div>
         <CAADS />
       </div>
       <Footer />

@@ -26,15 +26,15 @@ export default function Forum() {
   return (
     <div className="bg-neutral-50 min-h-screen flex flex-col">
       
-      <main className="flex-1 pt-32 pb-24">
+      <main className="flex-1 pt-8 pb-24">
         <div className="max-w-4xl mx-auto px-6">
           
           {/* Header */}
           <FadeIn>
             <div className="mb-16 border-b-2 border-black pb-8">
               <div className="flex items-center gap-3 mb-4">
-                <Terminal size={24} className="text-blue-600" />
-                <span className="font-mono text-sm tracking-widest text-blue-600 font-bold">// SECURE_COM_CHANNEL</span>
+                <Terminal size={24} className="text-orange-600" />
+                <span className="font-mono text-sm tracking-widest text-orange-600 font-bold">// SECURE_COM_CHANNEL</span>
               </div>
               <h1 className="text-5xl md:text-7xl font-bold uppercase tracking-normal leading-none mb-4">
                 Fórum <span className="text-transparent stroke-text">Atlética</span>
@@ -78,7 +78,7 @@ export default function Forum() {
                       </div>
 
                       {/* Title */}
-                      <h2 className="text-3xl font-bold mb-4 group-hover:text-blue-700 transition-colors">
+                      <h2 className="text-3xl font-bold mb-4 group-hover:text-orange-600 transition-colors">
                         {item.title}
                       </h2>
 
@@ -94,7 +94,7 @@ export default function Forum() {
                         <span className="font-mono text-xs text-gray-400">
                           {Math.floor(Math.random() * 50) + 10} VIEWS
                         </span>
-                        <button className="flex items-center gap-2 font-bold text-sm hover:text-blue-600 transition-colors">
+                        <button className="flex items-center gap-2 font-bold text-sm hover:text-orange-600 transition-colors">
                           PARTICIPAR DA DISCUSSÃO <ChevronRight size={16} />
                         </button>
                       </div>

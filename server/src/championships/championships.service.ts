@@ -9,7 +9,10 @@ import { Championship } from './entities/championship.entity';
 import { Modality } from './entities/modality.entity';
 import { Subscription } from './entities/subscription.entity';
 import { ChampionshipDocument } from './entities/championship-document.entity';
+import { SubscriptionStatus } from './entities/subscription.entity';
+import { AthleteChampionshipDocument } from './entities/athlete-championship-document.entity';
 import { Match } from './entities/match.entity';
+import { TeamChampionshipEnrollment } from './entities/team-championship-enrollment.entity';
 import { BracketFormat, GenerateBracketDto } from './dto/generate-bracket.dto';
 import { AthleteProfile } from '../teams/entities/athlete-profile.entity';
 import { Team } from '../teams/entities/team.entity';
@@ -22,6 +25,7 @@ import { ChampionshipStatus } from './entities/championship.entity';
 import { CreateChampionshipDto } from './dto/create-championship.dto';
 import { UpdateChampionshipDto } from './dto/update-championship.dto';
 import { CreateModalityDto } from './dto/create-modality.dto';
+import { UpdateModalityDto } from './dto/update-modality.dto';
 
 export interface RequestUser {
   userId: string;
@@ -43,6 +47,10 @@ export class ChampionshipsService {
     private teamRepository: Repository<Team>,
     @InjectRepository(ChampionshipDocument)
     private championshipDocumentRepository: Repository<ChampionshipDocument>,
+    @InjectRepository(TeamChampionshipEnrollment)
+    private teamEnrollmentRepository: Repository<TeamChampionshipEnrollment>,
+    @InjectRepository(AthleteChampionshipDocument)
+    private athleteDocumentRepository: Repository<AthleteChampionshipDocument>,
     @InjectRepository(Match)
     private matchRepository: Repository<Match>,
     private mailerService: MailerService,
@@ -121,6 +129,170 @@ export class ChampionshipsService {
     };
   }
 
+  async enrollTeam(userId: string, championshipId: string) {
+    const profile = await this.athleteProfileRepository.findOne({
+      where: { user: { id: userId } },
+      relations: ['team'],
+    });
+
+    if (!profile || profile.teamRole !== 'PRESIDENT' || !profile.team) {
+      throw new BadRequestException('Apenas o presidente pode inscrever a atlética em campeonatos.');
+    }
+
+    const championship = await this.championshipRepository.findOne({
+      where: { id: championshipId }
+    });
+
+    if (!championship) {
+      throw new NotFoundException('Campeonato não encontrado.');
+    }
+
+    if (championship.enrollmentDeadline && new Date() > new Date(championship.enrollmentDeadline)) {
+      throw new BadRequestException('O prazo de inscrição para este campeonato já foi encerrado.');
+    }
+
+    const existingEnrollment = await this.teamEnrollmentRepository.findOne({
+      where: { team: { id: profile.team.id }, championship: { id: championshipId } }
+    });
+
+    if (existingEnrollment) {
+      throw new BadRequestException('Sua atlética já está inscrita neste campeonato.');
+    }
+
+    const enrollment = this.teamEnrollmentRepository.create({
+      team: profile.team,
+      championship
+    });
+
+    return this.teamEnrollmentRepository.save(enrollment);
+  }
+
+  async getTeamEnrollment(userId: string, championshipId: string) {
+    const profile = await this.athleteProfileRepository.findOne({
+      where: { user: { id: userId } },
+      relations: ['team'],
+    });
+
+    if (!profile || !profile.team) return null;
+
+    return this.teamEnrollmentRepository.findOne({
+      where: { team: { id: profile.team.id }, championship: { id: championshipId } }
+    });
+  }
+
+  async getAthleteDocument(userId: string, championshipId: string) {
+    return this.athleteDocumentRepository.findOne({
+      where: { athlete: { user: { id: userId } }, championship: { id: championshipId } }
+    });
+  }
+
+  async saveAthleteDocument(userId: string, championshipId: string, type: 'rg' | 'enrollment', url: string) {
+    const profile = await this.athleteProfileRepository.findOne({ where: { user: { id: userId } } });
+    if (!profile) throw new BadRequestException('Perfil de atleta não encontrado.');
+
+    const championship = await this.championshipRepository.findOne({ where: { id: championshipId } });
+    if (!championship) throw new NotFoundException('Campeonato não encontrado.');
+
+    let doc = await this.athleteDocumentRepository.findOne({
+      where: { athlete: { id: profile.id }, championship: { id: championshipId } }
+    });
+
+    if (!doc) {
+      doc = this.athleteDocumentRepository.create({ athlete: profile, championship });
+    }
+
+    if (type === 'rg') {
+      doc.rgUrl = url;
+      doc.rgStatus = 'PENDING';
+      doc.rgRejectionReason = null;
+    } else {
+      doc.enrollmentUrl = url;
+      doc.enrollmentStatus = 'PENDING';
+      doc.enrollmentRejectionReason = null;
+    }
+
+    return this.athleteDocumentRepository.save(doc);
+  }
+
+  async getTeamDashboard(userId: string, championshipId: string) {
+    const profile = await this.athleteProfileRepository.findOne({
+      where: { user: { id: userId } },
+      relations: ['team'],
+    });
+
+    if (!profile || profile.teamRole !== 'PRESIDENT' || !profile.team) {
+      throw new BadRequestException('Acesso negado. Apenas o presidente pode acessar o painel.');
+    }
+
+    // Busca as inscrições da equipe neste campeonato
+    const subscriptions = await this.subscriptionRepository.find({
+      where: { team: { id: profile.team.id }, modality: { championship: { id: championshipId } } },
+      relations: ['modality', 'athlete', 'athlete.user'],
+    });
+
+    // Busca os documentos dos atletas da equipe neste campeonato
+    const documents = await this.athleteDocumentRepository.find({
+      where: { athlete: { team: { id: profile.team.id } }, championship: { id: championshipId } },
+      relations: ['athlete', 'athlete.user'],
+    });
+
+    return {
+      subscriptions,
+      documents,
+    };
+  }
+
+  async approveAthleteSubscription(userId: string, championshipId: string, subscriptionId: string) {
+    const profile = await this.athleteProfileRepository.findOne({
+      where: { user: { id: userId } },
+      relations: ['team'],
+    });
+
+    if (!profile || profile.teamRole !== 'PRESIDENT' || !profile.team) {
+      throw new BadRequestException('Apenas o presidente pode aprovar inscrições.');
+    }
+
+    const sub = await this.subscriptionRepository.findOne({
+      where: { id: subscriptionId, team: { id: profile.team.id } },
+      relations: ['modality', 'modality.championship']
+    });
+
+    if (!sub) throw new NotFoundException('Inscrição não encontrada ou não pertence à sua equipe.');
+    
+    if (sub.modality.championship.id !== championshipId) {
+      throw new BadRequestException('A inscrição não pertence a este campeonato.');
+    }
+
+    if (sub.status !== SubscriptionStatus.PENDING_TEAM_APPROVAL) {
+      throw new BadRequestException('Esta inscrição não está pendente de aprovação pela atlética.');
+    }
+
+    sub.status = SubscriptionStatus.PENDING_DOCS;
+    return this.subscriptionRepository.save(sub);
+  }
+
+  async getAdminPendingDocuments() {
+    return this.athleteDocumentRepository.find({
+      relations: ['athlete', 'athlete.user', 'athlete.team', 'championship'],
+      order: { createdAt: 'DESC' }
+    });
+  }
+
+  async updateAdminDocumentStatus(docId: string, data: { type: 'rg' | 'enrollment'; status: 'APPROVED' | 'REJECTED'; rejectionReason?: string }) {
+    const doc = await this.athleteDocumentRepository.findOne({ where: { id: docId } });
+    if (!doc) throw new NotFoundException('Documento não encontrado');
+
+    if (data.type === 'rg') {
+      doc.rgStatus = data.status;
+      doc.rgRejectionReason = data.status === 'REJECTED' ? data.rejectionReason : null;
+    } else {
+      doc.enrollmentStatus = data.status;
+      doc.enrollmentRejectionReason = data.status === 'REJECTED' ? data.rejectionReason : null;
+    }
+
+    return this.athleteDocumentRepository.save(doc);
+  }
+
   async createChampionship(data: CreateChampionshipDto, user: RequestUser) {
     const champ = this.championshipRepository.create({
       ...data,
@@ -182,6 +354,25 @@ export class ChampionshipsService {
     return this.modalityRepository.save(modality);
   }
 
+  async updateModality(champId: string, modId: string, data: UpdateModalityDto, user: RequestUser) {
+    const champ = await this.championshipRepository.findOne({
+      where: { id: champId },
+      relations: ['owner'],
+    });
+    if (!champ) throw new NotFoundException('Campeonato não encontrado.');
+
+    this.permissionService.assertCanManage(champ, user);
+
+    const modality = await this.modalityRepository.findOne({
+      where: { id: modId, championship: { id: champId } },
+    });
+    if (!modality)
+      throw new NotFoundException('Modalidade não encontrada no campeonato especificado.');
+
+    Object.assign(modality, data);
+    return this.modalityRepository.save(modality);
+  }
+
   async removeModality(champId: string, modId: string, user: RequestUser) {
     const champ = await this.championshipRepository.findOne({
       where: { id: champId },
@@ -198,6 +389,14 @@ export class ChampionshipsService {
       throw new NotFoundException(
         'Modalidade não encontrada no campeonato especificado.',
       );
+
+    const activeSubscriptions = await this.subscriptionRepository.count({
+      where: { modality: { id: modId } },
+    });
+
+    if (activeSubscriptions > 0) {
+      throw new BadRequestException('Não é possível excluir uma modalidade que possui equipes ou atletas inscritos.');
+    }
 
     await this.modalityRepository.remove(modality);
     return { success: true };

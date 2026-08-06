@@ -1,9 +1,8 @@
 import { useState, useEffect } from 'react';
 import type { IAthleteProfile, ISubscription, IAthleteProfile as ITeamMember } from '../../types';
-import { API_URL } from '../../config';
 import { apiClient } from '../../utils/apiClient';
 import { useAuth } from '../../contexts/AuthContext';
-import { Loader2, Shield, CheckCircle2, Copy, Users, Info, Upload, Key } from 'lucide-react';
+import { Loader2, Shield, CheckCircle2, Copy, Users, Key } from 'lucide-react';
 import toast from 'react-hot-toast';
 import ActiveSubscriptions from './ActiveSubscriptions';
 
@@ -16,9 +15,9 @@ export default function AthleteDashboard() {
   const [teamMembers, setTeamMembers] = useState<ITeamMember[]>([]);
   const [loadingMembers, setLoadingMembers] = useState(false);
   
-  const [uploadingRg, setUploadingRg] = useState(false);
-  const [uploadingEnrollment, setUploadingEnrollment] = useState(false);
   const [copiedCode, setCopiedCode] = useState(false);
+  
+  const [joinRequests, setJoinRequests] = useState<ITeamMember[]>([]);
 
   useEffect(() => {
     fetchProfile();
@@ -32,8 +31,10 @@ export default function AthleteDashboard() {
     .then(data => {
       setAthleteProfile(data || null);
       setLoadingProfile(false);
-      if (data?.team?.owner?.id === user?.id) {
+      const isPres = data?.teamRole === 'PRESIDENT' || data?.team?.owner?.id === user?.id;
+      if (data?.team && isPres) {
         fetchTeamMembers(data.team.id);
+        fetchJoinRequests();
       }
     })
     .catch(err => {
@@ -62,31 +63,28 @@ export default function AthleteDashboard() {
     });
   };
 
-  const handleUploadDocument = (type: 'rg' | 'enrollment', file: File) => {
+  const fetchJoinRequests = () => {
     if (!token) return;
-    const formData = new FormData();
-    formData.append('file', file);
-    
-    if (type === 'rg') setUploadingRg(true);
-    else setUploadingEnrollment(true);
-    
-    apiClient.post(`/teams/my/documents/${type}`, formData)
-    .then(() => {
-      toast.success('Documento enviado com sucesso!');
-      fetchProfile();
+    apiClient.get<ITeamMember[]>('/teams/my-team/join-requests')
+    .then(data => {
+      setJoinRequests(data || []);
     })
-    .catch((err: any) => toast.error(err.message))
-    .finally(() => {
-      if (type === 'rg') setUploadingRg(false);
-      else setUploadingEnrollment(false);
+    .catch(err => {
+      console.error('Erro ao buscar solicitações', err);
     });
   };
 
-  const getDocStatusLabel = (status: string | undefined) => {
-    if (status === 'APPROVED') return { label: 'Aprovado', desc: 'Seu documento foi verificado e aprovado.', color: 'bg-green-100 text-green-700 border-green-200' };
-    if (status === 'REJECTED') return { label: 'Rejeitado', desc: 'Problema com o documento. Envie novamente.', color: 'bg-red-100 text-red-700 border-red-200' };
-    if (status === 'PENDING') return { label: 'Em Avaliação', desc: 'A organização irá analisar em breve.', color: 'bg-blue-100 text-blue-700 border-blue-200' };
-    return { label: 'Pendente', desc: 'Você precisa fazer o upload deste documento.', color: 'bg-orange-100 text-orange-700 border-orange-200' };
+  const handleJoinRequest = async (profileId: string, status: 'APPROVED' | 'REJECTED') => {
+    try {
+      await apiClient.patch(`/teams/my-team/requests/${profileId}/status`, { status });
+      toast.success(status === 'APPROVED' ? 'Atleta aprovado!' : 'Solicitação recusada.');
+      fetchJoinRequests();
+      if (athleteProfile?.team) {
+        fetchTeamMembers(athleteProfile.team.id);
+      }
+    } catch (err: any) {
+      toast.error(err.message || 'Erro ao atualizar solicitação.');
+    }
   };
 
   const getSubStatusLabel = (status: string | undefined) => {
@@ -176,98 +174,11 @@ export default function AthleteDashboard() {
         {/* Active Subscriptions */}
         <ActiveSubscriptions subscriptions={mySubscriptions} getSubStatusLabel={getSubStatusLabel} />
 
-        {/* Documentação */}
-        <div className="bg-white rounded-3xl shadow-sm border border-slate-200 p-6">
-          <h4 className="font-bold text-slate-800 mb-4 flex items-center gap-2">
-            <Upload size={20} className="text-blue-500" /> Documentação Pessoal
-          </h4>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {/* RG */}
-            <div className="bg-slate-50 border border-slate-200 p-5 rounded-2xl flex flex-col justify-between">
-              <div>
-                <div className="flex justify-between items-start mb-3">
-                  <div>
-                    <div className="font-bold text-slate-800 text-sm">Documento com Foto</div>
-                    <p className="text-[11px] text-slate-500 mt-0.5">Obrigatório para jogos.</p>
-                  </div>
-                  {(() => {
-                    const statusInfo = getDocStatusLabel(athleteProfile.documentRgStatus);
-                    return (
-                      <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider border ${statusInfo.color}`}>
-                        {statusInfo.label}
-                      </span>
-                    );
-                  })()}
-                </div>
-                
-                {athleteProfile.documentRgStatus === 'REJECTED' && athleteProfile.documentRgRejectionReason && (
-                  <div className="bg-red-50 text-red-600 p-2.5 rounded-lg text-xs mb-4 border border-red-100">
-                    <strong>Motivo:</strong> {athleteProfile.documentRgRejectionReason}
-                  </div>
-                )}
-              </div>
-              
-              <div className="flex gap-2 mt-4">
-                <label className="flex-1 cursor-pointer bg-white border border-blue-200 text-blue-600 hover:bg-blue-50 px-3 py-2 rounded-xl text-xs font-bold transition-colors text-center shadow-sm">
-                  {uploadingRg ? <Loader2 className="animate-spin mx-auto" size={16} /> : 'Upload'}
-                  <input type="file" className="hidden" accept=".pdf,image/*" onChange={e => {
-                    if (e.target.files && e.target.files[0]) handleUploadDocument('rg', e.target.files[0]);
-                  }} disabled={uploadingRg} />
-                </label>
-                {athleteProfile.documentRgUrl && (
-                  <a href={`${API_URL}${athleteProfile.documentRgUrl}`} target="_blank" rel="noreferrer" className="flex-1 bg-slate-100 text-slate-600 hover:bg-slate-200 border border-slate-200 px-3 py-2 rounded-xl text-xs font-bold transition-colors text-center flex items-center justify-center gap-1 shadow-sm">
-                    Visualizar
-                  </a>
-                )}
-              </div>
-            </div>
 
-            {/* Matricula */}
-            <div className="bg-slate-50 border border-slate-200 p-5 rounded-2xl flex flex-col justify-between">
-              <div>
-                <div className="flex justify-between items-start mb-3">
-                  <div>
-                    <div className="font-bold text-slate-800 text-sm">Atestado de Matrícula</div>
-                    <p className="text-[11px] text-slate-500 mt-0.5">Comprova o vínculo.</p>
-                  </div>
-                  {(() => {
-                    const statusInfo = getDocStatusLabel(athleteProfile.documentEnrollmentStatus);
-                    return (
-                      <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider border ${statusInfo.color}`}>
-                        {statusInfo.label}
-                      </span>
-                    );
-                  })()}
-                </div>
-                
-                {athleteProfile.documentEnrollmentStatus === 'REJECTED' && athleteProfile.documentEnrollmentRejectionReason && (
-                  <div className="bg-red-50 text-red-600 p-2.5 rounded-lg text-xs mb-4 border border-red-100">
-                    <strong>Motivo:</strong> {athleteProfile.documentEnrollmentRejectionReason}
-                  </div>
-                )}
-              </div>
-              
-              <div className="flex gap-2 mt-4">
-                <label className="flex-1 cursor-pointer bg-white border border-blue-200 text-blue-600 hover:bg-blue-50 px-3 py-2 rounded-xl text-xs font-bold transition-colors text-center shadow-sm">
-                  {uploadingEnrollment ? <Loader2 className="animate-spin mx-auto" size={16} /> : 'Upload'}
-                  <input type="file" className="hidden" accept=".pdf,image/*" onChange={e => {
-                    if (e.target.files && e.target.files[0]) handleUploadDocument('enrollment', e.target.files[0]);
-                  }} disabled={uploadingEnrollment} />
-                </label>
-                {athleteProfile.documentEnrollmentUrl && (
-                  <a href={`${API_URL}${athleteProfile.documentEnrollmentUrl}`} target="_blank" rel="noreferrer" className="flex-1 bg-slate-100 text-slate-600 hover:bg-slate-200 border border-slate-200 px-3 py-2 rounded-xl text-xs font-bold transition-colors text-center flex items-center justify-center gap-1 shadow-sm">
-                    Visualizar
-                  </a>
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
 
         {/* Gestão de Elenco (Se Presidente) */}
         {isPresident && (
-          <div className="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden">
+          <div className="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden mt-6">
             <div className="p-6 border-b border-slate-100 flex items-center gap-2">
               <Users className="text-blue-500" size={20} />
               <h4 className="font-bold text-slate-800">Elenco da Equipe</h4>
@@ -275,6 +186,31 @@ export default function AthleteDashboard() {
                 {teamMembers.length} Atletas
               </span>
             </div>
+
+            {/* Solicitações Pendentes */}
+            {joinRequests.length > 0 && (
+              <div className="bg-orange-50 border-b border-orange-100 p-4">
+                <h5 className="font-bold text-orange-800 text-sm mb-3">Solicitações de Vínculo Pendentes</h5>
+                <div className="space-y-2">
+                  {joinRequests.map(req => (
+                    <div key={req.id} className="bg-white p-3 rounded-xl border border-orange-200 flex items-center justify-between shadow-sm">
+                      <div>
+                        <div className="font-bold text-slate-800 text-sm">{req.user?.name}</div>
+                        <div className="text-xs text-slate-500">CPF: {req.cpf || 'Não inf.'} • Gênero: {req.gender || 'Não inf.'}</div>
+                      </div>
+                      <div className="flex gap-2">
+                        <button onClick={() => handleJoinRequest(req.id, 'REJECTED')} className="px-3 py-1.5 bg-red-50 text-red-600 hover:bg-red-100 rounded-lg text-xs font-bold transition-colors">
+                          Recusar
+                        </button>
+                        <button onClick={() => handleJoinRequest(req.id, 'APPROVED')} className="px-3 py-1.5 bg-green-500 text-white hover:bg-green-600 rounded-lg text-xs font-bold transition-colors">
+                          Aprovar
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
 
             <div className="p-0">
               {loadingMembers ? (
@@ -289,9 +225,7 @@ export default function AthleteDashboard() {
                   <table className="w-full text-left text-sm whitespace-nowrap">
                     <thead>
                       <tr className="bg-slate-50 text-slate-500 border-b border-slate-200 text-xs uppercase tracking-wider">
-                        <th className="px-6 py-3 font-semibold">Atleta</th>
-                        <th className="px-6 py-3 font-semibold text-center">RG</th>
-                        <th className="px-6 py-3 font-semibold text-center">Matrícula</th>
+                        <th className="px-6 py-4 text-left font-black text-slate-500 uppercase tracking-wider">Membro</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-100">
@@ -303,50 +237,6 @@ export default function AthleteDashboard() {
                               {member.user?.id === user?.id && <span className="bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded text-[10px] font-bold">(você)</span>}
                             </p>
                             <p className="text-[11px] text-slate-500 font-mono mt-0.5">CPF: {member.cpf || 'Não informado'}</p>
-                          </td>
-                          <td className="px-6 py-4 text-center">
-                            {(() => {
-                              const statusInfo = getDocStatusLabel(member.documentRgStatus);
-                              const hasDoc = !!member.documentRgUrl;
-                              const content = (
-                                <div className="group relative inline-flex items-center justify-center">
-                                  <span className={`font-bold text-[9px] px-2 py-1 rounded uppercase border ${statusInfo.color} ${hasDoc ? 'cursor-pointer hover:opacity-80' : ''}`}>
-                                    {statusInfo.label}
-                                  </span>
-                                </div>
-                              );
-                              
-                              if (hasDoc) {
-                                return (
-                                  <a href={`${API_URL}${member.documentRgUrl}`} target="_blank" rel="noreferrer" title="Ver Documento">
-                                    {content}
-                                  </a>
-                                );
-                              }
-                              return content;
-                            })()}
-                          </td>
-                          <td className="px-6 py-4 text-center">
-                            {(() => {
-                              const statusInfo = getDocStatusLabel(member.documentEnrollmentStatus);
-                              const hasDoc = !!member.documentEnrollmentUrl;
-                              const content = (
-                                <div className="group relative inline-flex items-center justify-center">
-                                  <span className={`font-bold text-[9px] px-2 py-1 rounded uppercase border ${statusInfo.color} ${hasDoc ? 'cursor-pointer hover:opacity-80' : ''}`}>
-                                    {statusInfo.label}
-                                  </span>
-                                </div>
-                              );
-                              
-                              if (hasDoc) {
-                                return (
-                                  <a href={`${API_URL}${member.documentEnrollmentUrl}`} target="_blank" rel="noreferrer" title="Ver Documento">
-                                    {content}
-                                  </a>
-                                );
-                              }
-                              return content;
-                            })()}
                           </td>
                         </tr>
                       ))}

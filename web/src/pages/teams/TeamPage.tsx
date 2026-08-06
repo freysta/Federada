@@ -97,7 +97,7 @@ export default function TeamPage() {
 
   return (
     <>
-      <div className="min-h-screen bg-slate-50 pt-24 pb-12">
+      <div className="min-h-screen bg-slate-50 pt-6 pb-12">
         <div className="max-w-7xl mx-auto px-6 space-y-6">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
@@ -106,7 +106,7 @@ export default function TeamPage() {
             </div>
             <button 
               onClick={() => { setEditingId(null); setFormData({ name: '', role: '', instagramUrl: '' }); setSelectedFile(null); setIsModalOpen(true); }}
-              className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg font-bold hover:bg-blue-700 transition-colors"
+              className="flex items-center gap-2 bg-orange-600 text-white px-4 py-2 rounded-lg font-bold hover:bg-orange-700 transition-colors"
             >
               <Plus size={18} /> Novo Diretor
             </button>
@@ -121,7 +121,7 @@ export default function TeamPage() {
               placeholder="Buscar diretores..." 
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full border border-gray-300 rounded-lg pl-10 pr-4 py-2 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all bg-white"
+              className="w-full border border-gray-300 rounded-lg pl-10 pr-4 py-2 text-sm outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-200 transition-all bg-white"
             />
           </div>
         </div>
@@ -195,7 +195,7 @@ export default function TeamPage() {
                   </div>
                   <div className="flex justify-end gap-2 pt-4">
                     <button type="button" onClick={() => setIsModalOpen(false)} className="px-4 py-2 text-slate-600 font-bold hover:bg-slate-100 rounded-lg">Cancelar</button>
-                    <button type="submit" className="px-4 py-2 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700">Salvar</button>
+                    <button type="submit" className="px-4 py-2 bg-orange-600 text-white font-bold rounded-lg hover:bg-orange-700">Salvar</button>
                   </div>
                 </form>
               </div>

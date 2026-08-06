@@ -51,7 +51,7 @@ export default function GalleryPage() {
   return (
     <div className="bg-neutral-50 min-h-screen flex flex-col">
       
-      <main className="flex-1 pt-32 pb-24">
+      <main className="flex-1 pt-8 pb-24">
         <div className="max-w-7xl mx-auto px-6">
           
           {/* Header */}
@@ -111,7 +111,7 @@ export default function GalleryPage() {
                         <span className="font-mono text-[10px] text-white tracking-widest border border-white/30 px-2 py-1 backdrop-blur-sm">
                           FILE::{(index + 1).toString().padStart(3, '0')}
                         </span>
-                        <button className="bg-white text-black p-2 hover:bg-blue-500 hover:text-white transition-colors">
+                        <button className="bg-white text-black p-2 hover:bg-orange-500 hover:text-white transition-colors">
                           <ZoomIn size={18} />
                         </button>
                       </div>
@@ -151,7 +151,7 @@ export default function GalleryPage() {
                 VIEWER // FILE::{(posts.indexOf(selectedImage) + 1).toString().padStart(3, '0')}
               </span>
               <div className="flex items-center gap-4">
-                <a href={selectedImage.permalink} target="_blank" rel="noopener noreferrer" className="hover:text-blue-400 transition-colors pointer-events-auto">
+                <a href={selectedImage.permalink} target="_blank" rel="noopener noreferrer" className="hover:text-orange-400 transition-colors pointer-events-auto">
                   <Share2 size={24} />
                 </a>
                 <button 

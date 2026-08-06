@@ -67,13 +67,13 @@ export default function InvitePage() {
 
   return (
     <>
-      <div className="min-h-screen bg-slate-50 pt-24 pb-12 px-6 flex items-center justify-center">
+      <div className="min-h-screen bg-slate-50 pt-6 pb-12 px-6 flex items-center justify-center">
         <div className="max-w-md w-full bg-white rounded-2xl shadow-sm border border-slate-200 p-8">
           <div className="text-center mb-6">
             {inviteInfo?.teamLogo ? (
-              <img src={`${API_URL}/uploads/${inviteInfo.teamLogo}`} alt={inviteInfo.teamName} className="w-20 h-20 object-cover rounded-full mx-auto mb-4 border-4 border-blue-50" />
+              <img src={`${API_URL}/uploads/${inviteInfo.teamLogo}`} alt={inviteInfo.teamName} className="w-20 h-20 object-cover rounded-full mx-auto mb-4 border-4 border-orange-50" />
             ) : (
-              <div className="w-16 h-16 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
+              <div className="w-16 h-16 bg-orange-100 text-orange-600 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Shield size={32} />
               </div>
             )}
@@ -100,24 +100,24 @@ export default function InvitePage() {
               
               <div>
                 <label className="block text-xs font-bold text-slate-600 mb-1 uppercase tracking-wide">CPF</label>
-                <input type="text" required value={formData.cpf} onChange={e => setFormData({...formData, cpf: e.target.value})} className="w-full bg-white border border-slate-300 rounded-lg p-3 outline-none focus:border-blue-500" placeholder="000.000.000-00" />
+                <input type="text" required value={formData.cpf} onChange={e => setFormData({...formData, cpf: e.target.value})} className="w-full bg-white border border-slate-300 rounded-lg p-3 outline-none focus:border-orange-500" placeholder="000.000.000-00" />
               </div>
 
               <div>
                 <label className="block text-xs font-bold text-slate-600 mb-1 uppercase tracking-wide">Data de Nascimento</label>
-                <input type="date" required value={formData.birthDate} onChange={e => setFormData({...formData, birthDate: e.target.value})} className="w-full bg-white border border-slate-300 rounded-lg p-3 outline-none focus:border-blue-500" />
+                <input type="date" required value={formData.birthDate} onChange={e => setFormData({...formData, birthDate: e.target.value})} className="w-full bg-white border border-slate-300 rounded-lg p-3 outline-none focus:border-orange-500" />
               </div>
 
               <div>
                 <label className="block text-xs font-bold text-slate-600 mb-1 uppercase tracking-wide">Gênero</label>
-                <select value={formData.gender} onChange={e => setFormData({...formData, gender: e.target.value})} className="w-full bg-white border border-slate-300 rounded-lg p-3 outline-none focus:border-blue-500">
+                <select value={formData.gender} onChange={e => setFormData({...formData, gender: e.target.value})} className="w-full bg-white border border-slate-300 rounded-lg p-3 outline-none focus:border-orange-500">
                   <option value="MISTO">Prefiro não informar / Outro</option>
                   <option value="MASCULINO">Masculino</option>
                   <option value="FEMININO">Feminino</option>
                 </select>
               </div>
 
-              <button type="submit" disabled={loading} className="w-full bg-blue-600 text-white font-bold py-3 rounded-xl hover:bg-blue-700 transition-colors flex items-center justify-center gap-2 mt-2 shadow-md">
+              <button type="submit" disabled={loading} className="w-full bg-orange-600 text-white font-bold py-3 rounded-xl hover:bg-orange-700 transition-colors flex items-center justify-center gap-2 mt-2 shadow-md">
                 {loading ? 'Aguarde...' : <><CheckCircle size={20} /> Aceitar Convite</>}
               </button>
             </form>

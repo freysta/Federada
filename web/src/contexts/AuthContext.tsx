@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
 import type { ReactNode } from 'react';
 
 interface User {
@@ -34,22 +34,33 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, [token, user]);
 
-  const login = (newToken: string, newUser: User) => {
+  const login = useCallback((newToken: string, newUser: User) => {
     localStorage.setItem('federada_token', newToken);
     localStorage.setItem('federada_user', JSON.stringify(newUser));
     setToken(newToken);
     setUser(newUser);
-  };
+  }, []);
 
-  const logout = () => {
+  const logout = useCallback(() => {
     localStorage.removeItem('federada_token');
     localStorage.removeItem('federada_user');
     setToken(null);
     setUser(null);
-  };
+  }, []);
+
+  const value = useMemo(
+    () => ({
+      user,
+      token,
+      login,
+      logout,
+      isAuthenticated: !!token,
+    }),
+    [user, token, login, logout]
+  );
 
   return (
-    <AuthContext.Provider value={{ user, token, login, logout, isAuthenticated: !!token }}>
+    <AuthContext.Provider value={value}>
       {children}
     </AuthContext.Provider>
   );

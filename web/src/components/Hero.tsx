@@ -48,7 +48,7 @@ export default function Hero() {
         
         {/* SLIDE 1: Original Hero */}
         <div className="flex-[0_0_100%] min-w-0 h-full flex flex-col">
-          <section className="relative flex-1 min-h-screen flex flex-col justify-center pb-12 pt-24 md:pt-20 overflow-hidden bg-white text-black">
+          <section className="relative flex-1 min-h-screen flex flex-col justify-center pb-12 pt-4 md:pt-6 overflow-hidden bg-white text-black">
             <div className="max-w-7xl mx-auto px-6 w-full grid md:grid-cols-2 gap-8 items-center">
               
               {/* Text Content */}
@@ -71,7 +71,7 @@ export default function Hero() {
 
                 <button 
                   onClick={() => navigate('/loja')}
-                  className="group flex w-full md:w-auto justify-center items-center gap-4 bg-black text-white px-6 md:px-10 py-4 md:py-5 hover:bg-[#00f0ff] hover:text-black transition-all duration-300 shadow-xl hover:shadow-[6px_6px_0_0_#000] hover:-translate-y-1 relative overflow-hidden"
+                  className="group flex w-full md:w-auto justify-center items-center gap-4 bg-black text-white px-6 md:px-10 py-4 md:py-5 hover:bg-orange-600 hover:text-white transition-all duration-300 shadow-xl hover:shadow-[6px_6px_0_0_#000] hover:-translate-y-1 relative overflow-hidden"
                 >
                   <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
                   <ShoppingBag className="w-5 h-5 relative z-10" />
@@ -119,8 +119,8 @@ export default function Hero() {
               className="absolute bottom-8 left-1/2 -translate-x-1/2 hidden md:flex flex-col items-center gap-3 z-20 group cursor-pointer"
             >
               <div className="w-12 h-12 border border-black/20 rounded-full flex justify-center items-center relative overflow-hidden group-hover:border-black/50 transition-colors bg-white">
-                  <div className="absolute inset-0 bg-[conic-gradient(from_0deg,transparent_70%,rgba(0,240,255,0.4)_100%)] animate-spin" style={{ animationDuration: '3s' }}></div>
-                  <div className="w-1.5 h-1.5 bg-black rounded-full z-10 relative shadow-[0_0_8px_#00f0ff]"></div>
+                  <div className="absolute inset-0 bg-[conic-gradient(from_0deg,transparent_70%,rgba(249,115,22,0.4)_100%)] animate-spin" style={{ animationDuration: '3s' }}></div>
+                  <div className="w-1.5 h-1.5 bg-black rounded-full z-10 relative shadow-[0_0_8px_#f97316]"></div>
               </div>
               <span className="font-mono text-[10px] tracking-[0.2em] text-gray-400 group-hover:text-black transition-colors uppercase">
                   Scanner de Sistema
@@ -131,20 +131,20 @@ export default function Hero() {
 
         {/* SLIDE 2: Placeholder Drop */}
         <div className="flex-[0_0_100%] min-w-0 bg-[#050505] h-full flex flex-col">
-          <section className="relative flex-1 min-h-screen flex flex-col justify-center pt-20 overflow-hidden text-white">
+          <section className="relative flex-1 min-h-screen flex flex-col justify-center pt-8 overflow-hidden text-white">
             
             {/* Grid Hacker Background */}
-            <div className="absolute inset-0 opacity-20 pointer-events-none" style={{ backgroundImage: 'linear-gradient(rgba(0, 240, 255, 0.2) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 240, 255, 0.2) 1px, transparent 1px)', backgroundSize: '30px 30px' }}></div>
+            <div className="absolute inset-0 opacity-20 pointer-events-none" style={{ backgroundImage: 'linear-gradient(rgba(249, 115, 22, 0.2) 1px, transparent 1px), linear-gradient(90deg, rgba(249, 115, 22, 0.2) 1px, transparent 1px)', backgroundSize: '30px 30px' }}></div>
 
             <div className="relative z-10 max-w-5xl mx-auto px-6 w-full flex flex-col items-center">
               
-              <div className="font-mono text-[#00f0ff] mb-8 flex items-center gap-2 bg-[#00f0ff]/10 px-4 py-2 border border-[#00f0ff]/30">
-                <span className="w-2 h-2 bg-[#00f0ff] rounded-full animate-pulse"></span>
+              <div className="font-mono text-orange-500 mb-8 flex items-center gap-2 bg-orange-500/10 px-4 py-2 border border-orange-500/30">
+                <span className="w-2 h-2 bg-orange-500 rounded-full animate-pulse"></span>
                 SYSTEM_UPDATE_PENDING // V_3.0
               </div>
 
               <h2 className="text-4xl sm:text-5xl md:text-7xl font-bold font-sans uppercase leading-none mb-8 md:mb-12 text-center">
-                PRÓXIMO <span className="text-transparent stroke-text" style={{ WebkitTextStroke: '1px #00f0ff' }}>DROP</span>
+                PRÓXIMO <span className="text-transparent stroke-text" style={{ WebkitTextStroke: '1px #f97316' }}>DROP</span>
               </h2>
               
               {/* Terminal Countdown */}
@@ -155,14 +155,14 @@ export default function Hero() {
                   { label: 'MINUTOS', value: countdown.minutes },
                   { label: 'SEGUNDOS', value: countdown.seconds }
                 ].map((item, i) => (
-                  <div key={i} className="flex flex-col items-center bg-black/50 border border-[#00f0ff]/30 p-2 sm:p-4 md:p-6 backdrop-blur group hover:border-[#00f0ff] hover:bg-[#00f0ff]/10 active:border-[#00f0ff] active:bg-[#00f0ff]/10 transition-colors">
-                    <span className="font-sans text-2xl sm:text-4xl md:text-6xl font-bold text-white group-hover:text-[#00f0ff] active:text-[#00f0ff] transition-colors">{String(item.value).padStart(2, '0')}</span>
-                    <span className="font-mono text-[8px] sm:text-[10px] md:text-xs text-[#00f0ff]/70 mt-1 md:mt-2 tracking-widest">{item.label}</span>
+                  <div key={i} className="flex flex-col items-center bg-black/50 border border-orange-500/30 p-2 sm:p-4 md:p-6 backdrop-blur group hover:border-orange-500 hover:bg-orange-500/10 active:border-orange-500 active:bg-orange-500/10 transition-colors">
+                    <span className="font-sans text-2xl sm:text-4xl md:text-6xl font-bold text-white group-hover:text-orange-500 active:text-orange-500 transition-colors">{String(item.value).padStart(2, '0')}</span>
+                    <span className="font-mono text-[8px] sm:text-[10px] md:text-xs text-orange-500/70 mt-1 md:mt-2 tracking-widest">{item.label}</span>
                   </div>
                 ))}
               </div>
               
-              <button className="bg-[#00f0ff] text-black px-12 py-5 font-bold font-mono tracking-widest hover:bg-white transition-colors shadow-[0_0_20px_rgba(0,240,255,0.4)] hover:shadow-[0_0_30px_rgba(255,255,255,0.6)] translate-y-0 hover:-translate-y-1">
+              <button className="bg-orange-600 text-white px-12 py-5 font-bold font-mono tracking-widest hover:bg-orange-500 transition-colors shadow-[0_0_20px_rgba(249,115,22,0.4)] hover:shadow-[0_0_30px_rgba(255,255,255,0.6)] translate-y-0 hover:-translate-y-1">
                 INICIAR PROTOCOLO DE ALERTA
               </button>
             </div>

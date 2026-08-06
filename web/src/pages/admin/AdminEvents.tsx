@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { apiClient } from '../../utils/apiClient';
-import { Loader2, Plus, Edit, Trash2, Search } from 'lucide-react';
+import { Loader2, Plus, Edit, Trash2, Search, Calendar, X } from 'lucide-react';
 import toast from 'react-hot-toast';
 import Pagination from '../../components/admin/Pagination';
 
@@ -93,84 +93,108 @@ export default function AdminEvents() {
   if (loading) return <div className="flex justify-center p-10"><Loader2 className="animate-spin" size={32} /></div>;
 
   return (
-    <div>
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold font-mono">ROADMAP / EVENTOS (CMS)</h1>
-        <button onClick={() => openModal()} className="bg-black text-white px-4 py-2 text-sm font-bold flex items-center gap-2">
-          <Plus size={16} /> NOVO EVENTO
+    <div className="space-y-6 font-sans">
+      {/* Standard Header */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-black text-slate-900 uppercase tracking-tight flex items-center gap-2">
+            <Calendar className="text-blue-600" size={28} /> Roadmap & Eventos
+          </h1>
+          <p className="text-slate-500 text-sm mt-1">Gerencie os eventos e o roadmap público da plataforma.</p>
+        </div>
+        <button
+          onClick={() => openModal()}
+          className="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl font-bold text-sm transition-all shadow-md shadow-blue-600/20 active:scale-95"
+        >
+          <Plus size={18} /> Novo Evento
         </button>
       </div>
 
-      <div className="bg-white border border-gray-300 rounded-xl shadow-md overflow-hidden">
-        <div className="p-4 border-b border-gray-200 flex gap-4">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
-            <input 
-              type="text" 
-              placeholder="Buscar eventos..." 
+      {/* Standard Card & Filter Bar */}
+      <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
+        <div className="p-4 border-b border-slate-200 bg-slate-50/50 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="relative flex-1 w-full sm:max-w-md">
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+            <input
+              type="text"
+              placeholder="Buscar eventos..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full border border-gray-300 rounded-lg pl-10 pr-4 py-2 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all bg-white"
+              className="w-full border border-slate-300 rounded-xl pl-10 pr-4 py-2.5 text-sm outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100 transition-all bg-white"
             />
+          </div>
+          <div className="text-xs font-mono font-bold text-slate-500">
+            Total: {filteredEvents.length} eventos
           </div>
         </div>
         <div className="overflow-x-auto">
-          <table className="w-full text-left font-sans text-sm">
-            <thead className="bg-gray-50 text-gray-700 font-bold text-xs uppercase tracking-wider border-b border-gray-200">
+          <table className="w-full text-left text-sm border-collapse">
+            <thead className="bg-slate-100/70 text-slate-700 font-bold text-xs uppercase tracking-wider border-b border-slate-200">
               <tr>
-                <th className="px-4 py-3">DATA</th>
-                <th className="px-4 py-3">TÍTULO / DESCRIÇÃO</th>
-                <th className="px-4 py-3">STATUS</th>
-                <th className="px-4 py-3 text-right">AÇÕES</th>
+                <th className="px-6 py-4">DATA</th>
+                <th className="px-6 py-4">TÍTULO / DESCRIÇÃO</th>
+                <th className="px-6 py-4">STATUS</th>
+                <th className="px-6 py-4 text-right">AÇÕES</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-200">
-            {paginatedEvents.length === 0 ? (
-              <tr>
-                <td colSpan={4} className="p-8 text-center text-gray-500 text-sm">Nenhum evento encontrado.</td>
-              </tr>
+            <tbody className="divide-y divide-slate-200">
+              {paginatedEvents.length === 0 ? (
+                <tr>
+                  <td colSpan={4} className="p-12 text-center text-slate-500 font-medium">Nenhum evento encontrado.</td>
+                </tr>
               ) : (
                 paginatedEvents.map((e: any) => (
-              <tr key={e.id} className="hover:bg-gray-50 transition-colors cursor-pointer" onClick={() => openModal(e)}>
-                <td className="px-4 py-2">
-                  <div className="font-bold text-gray-800">{e.date}</div>
-                  <div className="font-mono text-[10px] text-gray-500">{e.version}</div>
-                </td>
-                <td className="px-4 py-2">
-                  <div className="font-bold text-gray-800 leading-tight">{e.title}</div>
-                  <div className="text-[11px] text-gray-500 truncate max-w-xs">{e.description}</div>
-                </td>
-                <td className="px-4 py-2">
-                  <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider ${e.status === 'CONFIRMADO' ? 'bg-green-100 text-green-800 border border-green-200' : 'bg-gray-100 text-gray-600 border border-gray-200'}`}>
-                    {e.status}
-                  </span>
-                </td>
-                <td className="px-4 py-2 text-right">
-                  <button onClick={(ev) => { ev.stopPropagation(); openModal(e); }} className="p-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg mr-1 transition-colors"><Edit size={16} /></button>
-                  <button onClick={(ev) => { ev.stopPropagation(); handleDelete(e.id); }} className="p-1.5 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg transition-colors"><Trash2 size={16} /></button>
-                </td>
-              </tr>
-            )))}
-          </tbody>
-        </table>
+                  <tr key={e.id} className="hover:bg-slate-50/80 transition-colors">
+                    <td className="px-6 py-4">
+                      <div className="font-bold text-slate-900">{e.date}</div>
+                      <div className="font-mono text-[10px] text-slate-500">{e.version}</div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="font-bold text-slate-900 leading-tight">{e.title}</div>
+                      <div className="text-xs text-slate-500 truncate max-w-xs">{e.description}</div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <span className={`text-[10px] font-black px-2.5 py-1 rounded-full uppercase tracking-wider border ${
+                        e.status === 'CONFIRMADO' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-slate-100 text-slate-600 border-slate-200'
+                      }`}>
+                        {e.status}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 text-right space-x-2">
+                      <button onClick={() => openModal(e)} className="p-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg transition-colors inline-flex items-center" title="Editar">
+                        <Edit size={16} />
+                      </button>
+                      <button onClick={() => handleDelete(e.id)} className="p-2 bg-rose-50 hover:bg-rose-100 text-rose-600 rounded-lg transition-colors inline-flex items-center" title="Excluir">
+                        <Trash2 size={16} />
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          totalItems={filteredEvents.length}
+          itemsPerPage={itemsPerPage}
+          onPageChange={setCurrentPage}
+          onItemsPerPageChange={(items) => {
+            setItemsPerPage(items);
+            setCurrentPage(1);
+          }}
+        />
       </div>
-      <Pagination
-        currentPage={currentPage}
-        totalPages={totalPages}
-        totalItems={filteredEvents.length}
-        itemsPerPage={itemsPerPage}
-        onPageChange={setCurrentPage}
-        onItemsPerPageChange={(items) => {
-          setItemsPerPage(items);
-          setCurrentPage(1);
-        }}
-      />
-    </div>
 
       {isModalOpen && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
-          <div className="bg-white w-full max-w-2xl p-6 rounded-xl shadow-2xl overflow-y-auto max-h-[90vh] custom-scrollbar">
-            <h2 className="text-2xl font-bold font-mono text-gray-800 mb-6 border-b pb-3">{editingId ? 'Editar Evento' : 'Novo Evento'}</h2>
+        <div className="fixed inset-0 bg-slate-900/60 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
+          <div className="bg-white w-full max-w-2xl rounded-3xl shadow-2xl overflow-hidden border border-slate-200">
+            <div className="bg-slate-900 text-white p-6 flex justify-between items-center">
+              <h2 className="font-black text-lg uppercase tracking-wide">{editingId ? 'Editar Evento' : 'Novo Evento'}</h2>
+              <button onClick={() => setIsModalOpen(false)} className="text-slate-400 hover:text-white transition-colors"><X size={20} /></button>
+            </div>
+            <div className="p-6 overflow-y-auto max-h-[75vh] custom-scrollbar">
             <form onSubmit={handleSubmit} className="space-y-5">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div>
@@ -199,11 +223,12 @@ export default function AdminEvents() {
                   </select>
                 </div>
               </div>
-              <div className="mt-6 flex justify-end gap-3 pt-2">
-                <button type="button" onClick={() => setIsModalOpen(false)} className="px-5 py-2.5 rounded-lg border border-gray-300 text-gray-700 font-medium hover:bg-gray-50 transition-colors">Cancelar</button>
-                <button type="submit" className="px-5 py-2.5 rounded-lg bg-blue-600 text-white font-bold hover:bg-blue-700 transition-colors shadow-md">Salvar Evento</button>
+              <div className="mt-6 flex justify-end gap-3 pt-2 border-t border-slate-100">
+                <button type="button" onClick={() => setIsModalOpen(false)} className="px-5 py-2.5 rounded-xl border border-slate-300 text-slate-700 font-bold text-sm hover:bg-slate-50 transition-colors">Cancelar</button>
+                <button type="submit" className="px-5 py-2.5 rounded-xl bg-blue-600 text-white font-black text-sm hover:bg-blue-700 transition-colors shadow-md">Salvar Evento</button>
               </div>
             </form>
+            </div>
           </div>
         </div>
       )}

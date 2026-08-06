@@ -41,24 +41,6 @@ export class AthleteProfile {
   @Column({ nullable: true })
   period: string;
 
-  @Column({ nullable: true })
-  documentRgUrl: string;
-
-  @Column({ default: 'PENDING' })
-  documentRgStatus: string; // PENDING, APPROVED, REJECTED
-
-  @Column({ type: 'text', nullable: true })
-  documentRgRejectionReason: string | null;
-
-  @Column({ nullable: true })
-  documentEnrollmentUrl: string;
-
-  @Column({ default: 'PENDING' })
-  documentEnrollmentStatus: string; // PENDING, APPROVED, REJECTED
-
-  @Column({ type: 'text', nullable: true })
-  documentEnrollmentRejectionReason: string | null;
-
   @Column({ unique: true, nullable: true })
   athleteIdCode: string;
 
@@ -66,7 +48,10 @@ export class AthleteProfile {
   teamRole: string; // PRESIDENT, MEMBER, ATHLETE
 
   @Column({ default: 'PENDING' })
-  status: string; // PENDING, APPROVED, REJECTED
+  teamJoinStatus: string; // PENDING, APPROVED, REJECTED
+
+  @Column({ default: 'PENDING' })
+  status: string; // PENDING, APPROVED, REJECTED (for Documents)
 
   @CreateDateColumn()
   createdAt: Date;

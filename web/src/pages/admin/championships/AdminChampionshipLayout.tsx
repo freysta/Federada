@@ -35,6 +35,7 @@ export default function AdminChampionshipLayout() {
 
   const tabs = [
     { path: `/admin/championships/${id}`, label: 'Visão Geral', icon: <Home size={16} /> },
+    { path: `/admin/championships/${id}/modalities`, label: 'Modalidades', icon: <Activity size={16} /> },
     { path: `/admin/championships/${id}/subscriptions`, label: 'Inscrições', icon: <Users size={16} /> },
     { path: `/admin/championships/${id}/matches`, label: 'Partidas', icon: <Flag size={16} /> },
     { path: `/admin/championships/${id}/results`, label: 'Resultados', icon: <Trophy size={16} /> },

@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { API_URL } from '../../config';
 import { apiClient } from '../../utils/apiClient';
 import type { IProduct } from '../../types';
-import { Loader2, Plus, Edit, Trash2, X, Search } from 'lucide-react';
+import { Loader2, Plus, Edit, Trash2, X, Search, Package } from 'lucide-react';
 import toast from 'react-hot-toast';
 import Pagination from '../../components/admin/Pagination';
 
@@ -206,70 +206,96 @@ export default function AdminProducts() {
   );
 
   return (
-    <div className="space-y-6 relative">
-      <div className="flex justify-between items-end border-b-2 border-black pb-2">
-        <h1 className="text-2xl font-bold font-mono tracking-widest uppercase">// Produtos</h1>
-        <button onClick={openNewModal} className="bg-black text-white px-4 py-2 font-mono text-sm hover:bg-neutral-800 transition-colors flex items-center gap-2">
-          <Plus size={16} /> NOVO
+    <div className="space-y-6 relative font-sans">
+      {/* Standard Header */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-black text-slate-900 uppercase tracking-tight flex items-center gap-2">
+            <Package className="text-blue-600" size={28} /> Produtos da Loja
+          </h1>
+          <p className="text-slate-500 text-sm mt-1">Gerencie o catálogo de produtos, preços, imagens e variações.</p>
+        </div>
+
+        <button 
+          onClick={openNewModal} 
+          className="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl font-bold text-sm transition-all shadow-md shadow-blue-600/20 active:scale-95"
+        >
+          <Plus size={18} /> Novo Produto
         </button>
       </div>
       
-      <div className="bg-white border border-gray-300 rounded-xl shadow-md overflow-hidden">
-        <div className="p-4 border-b border-gray-200 flex gap-4">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
+      {/* Standard Card & Filter Bar */}
+      <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
+        <div className="p-4 border-b border-slate-200 bg-slate-50/50 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="relative flex-1 w-full sm:max-w-md">
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
             <input 
               type="text" 
-              placeholder="Buscar produtos..." 
+              placeholder="Buscar por nome ou categoria..." 
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full border border-gray-300 rounded-lg pl-10 pr-4 py-2 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all bg-white"
+              className="w-full border border-slate-300 rounded-xl pl-10 pr-4 py-2.5 text-sm outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100 transition-all bg-white"
             />
           </div>
+          <div className="text-xs font-mono font-bold text-slate-500">
+            Total: {filteredProducts.length} produtos
+          </div>
         </div>
+
         <div className="overflow-x-auto">
-          <table className="w-full text-left font-sans text-sm min-w-[600px]">
-            <thead className="bg-gray-50 text-gray-700 font-bold text-xs uppercase tracking-wider border-b border-gray-200">
+          <table className="w-full text-left text-sm min-w-[600px] border-collapse">
+            <thead className="bg-slate-100/70 text-slate-700 font-bold text-xs uppercase tracking-wider border-b border-slate-200">
               <tr>
-                <th className="px-4 py-3 text-left">PRODUTO</th>
-                <th className="px-4 py-3 text-left">PREÇO</th>
-                <th className="px-4 py-3 text-left">CATEGORIA</th>
-                <th className="px-4 py-3 text-left">TAMANHOS</th>
-                <th className="px-4 py-3 text-right">AÇÕES</th>
+                <th className="px-6 py-4">PRODUTO</th>
+                <th className="px-6 py-4">PREÇO</th>
+                <th className="px-6 py-4">CATEGORIA</th>
+                <th className="px-6 py-4">TAMANHOS</th>
+                <th className="px-6 py-4 text-right">AÇÕES</th>
               </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-200">
+            </thead>
+            <tbody className="divide-y divide-slate-200">
               {filteredProducts.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="p-8 text-center text-gray-500 text-sm">Nenhum produto encontrado.</td>
+                  <td colSpan={5} className="p-12 text-center text-slate-500 font-medium">Nenhum produto encontrado.</td>
                 </tr>
               ) : (
                 filteredProducts.map((p) => (
-              <tr key={p.id} className="hover:bg-gray-50 transition-colors cursor-pointer" onClick={() => handleEdit(p as any)}>
-                <td className="px-4 py-2">
-                  <div className="flex items-center">
-                    <div className="w-10 h-10 bg-gray-200 overflow-hidden rounded-lg mr-3 border border-gray-300 shrink-0">
-                      {p.imageUrl && <img src={p.imageUrl.startsWith('http') ? p.imageUrl : `${API_URL}${p.imageUrl}`} alt={p.name} className="w-full h-full object-cover" />}
-                    </div>
-                    <div>
-                      <div className="font-bold text-gray-800 leading-tight">{p.name}</div>
-                      {p.isCustomizable && <span className="text-[9px] bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full font-bold">Customizável</span>}
-                    </div>
-                  </div>
-                </td>
-                <td className="px-4 py-2 font-mono font-bold text-gray-700">R$ {Number(p.price).toFixed(2).replace('.', ',')}</td>
-                <td className="px-4 py-2 text-gray-700">{p.category}</td>
-                <td className="px-4 py-2 font-mono text-xs text-gray-600">{p.sizes ? p.sizes.join(', ') : '-'}</td>
-                <td className="px-4 py-2 text-right">
-                  <div className="flex justify-end gap-2">
-                    <button onClick={(e) => { e.stopPropagation(); handleEdit(p as any); }} className="p-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors"><Edit size={16} /></button>
-                    <button onClick={(e) => { e.stopPropagation(); handleDelete(p.id); }} className="p-1.5 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg transition-colors"><Trash2 size={16} /></button>
-                  </div>
-                </td>
-              </tr>
-            )))}
-          </tbody>
-        </table>
+                  <tr key={p.id} className="hover:bg-slate-50/80 transition-colors">
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-3">
+                        <div className="w-12 h-12 bg-slate-100 overflow-hidden rounded-xl border border-slate-200 shrink-0 flex items-center justify-center">
+                          {p.imageUrl && <img src={p.imageUrl.startsWith('http') ? p.imageUrl : `${API_URL}${p.imageUrl}`} alt={p.name} className="w-full h-full object-cover" />}
+                        </div>
+                        <div>
+                          <div className="font-bold text-slate-900 leading-tight">{p.name}</div>
+                          {p.isCustomizable && <span className="text-[10px] bg-blue-50 text-blue-700 border border-blue-200 px-2 py-0.5 rounded-full font-bold">Customizável</span>}
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 font-mono font-bold text-slate-800">R$ {Number(p.price).toFixed(2).replace('.', ',')}</td>
+                    <td className="px-6 py-4 font-medium text-slate-700">{p.category}</td>
+                    <td className="px-6 py-4 font-mono text-xs text-slate-600">{p.sizes ? p.sizes.join(', ') : '-'}</td>
+                    <td className="px-6 py-4 text-right space-x-2">
+                      <button 
+                        onClick={() => handleEdit(p as any)} 
+                        className="p-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg transition-colors inline-flex items-center" 
+                        title="Editar"
+                      >
+                        <Edit size={16} />
+                      </button>
+                      <button 
+                        onClick={() => handleDelete(p.id)} 
+                        className="p-2 bg-rose-50 hover:bg-rose-100 text-rose-600 rounded-lg transition-colors inline-flex items-center" 
+                        title="Excluir"
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
         </div>
         <Pagination
           currentPage={page}

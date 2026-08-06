@@ -22,6 +22,13 @@ export enum ChampionshipStatus {
   ARCHIVED = 'ARCHIVED',
 }
 
+export enum AudienceFocus {
+  GENERAL = 'GENERAL',
+  UNIVERSITY = 'UNIVERSITY',
+  SCHOOL = 'SCHOOL',
+  CITY = 'CITY',
+}
+
 @Entity()
 export class Championship {
   @PrimaryGeneratedColumn('uuid')
@@ -53,6 +60,12 @@ export class Championship {
 
   @Column({ type: 'varchar', default: ChampionshipStatus.DRAFT })
   status: ChampionshipStatus;
+
+  @Column({ type: 'varchar', nullable: true })
+  organizer: string;
+
+  @Column({ type: 'varchar', default: AudienceFocus.GENERAL })
+  audienceFocus: AudienceFocus;
 
   @Column({ type: 'datetime', nullable: true })
   publishedAt: Date | null;

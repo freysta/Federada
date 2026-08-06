@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { apiClient } from '../../utils/apiClient';
-import { Loader2, Edit, Ban, CheckCircle, Package, MessageCircle, Trash2, Search, X } from 'lucide-react';
+import { Loader2, Edit, Ban, CheckCircle, Package, MessageCircle, Trash2, Search, X, Users, Plus } from 'lucide-react';
 import toast from 'react-hot-toast';
 import Pagination from '../../components/admin/Pagination';
 
@@ -132,84 +132,100 @@ export default function AdminUsers() {
   if (loading) return <div className="flex justify-center p-10"><Loader2 className="animate-spin text-black" size={32} /></div>;
 
   return (
-    <div className="space-y-6 relative">
-      <div className="flex justify-between items-center mb-6">
+    <div className="space-y-6 relative font-sans">
+      {/* Standard Header */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold font-mono uppercase tracking-wider">Gestão de Usuários</h1>
-          <p className="text-sm text-gray-500 mt-1">Gerencie membros, cargos e visualize históricos</p>
+          <h1 className="text-2xl font-black text-slate-900 uppercase tracking-tight flex items-center gap-2">
+            <Users className="text-blue-600" size={28} /> Gestão de Usuários
+          </h1>
+          <p className="text-slate-500 text-sm mt-1">Gerencie os membros da plataforma, niveis de acesso e privilégios.</p>
         </div>
-        <button onClick={openNewModal} className="bg-black text-white px-4 py-2 text-sm font-bold hover:bg-neutral-800 transition-colors">
-          + NOVO USUÁRIO
+
+        <button 
+          onClick={openNewModal} 
+          className="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl font-bold text-sm transition-all shadow-md shadow-blue-600/20 active:scale-95"
+        >
+          <Plus size={18} /> Novo Usuário
         </button>
       </div>
       
-      <div className="bg-white border border-gray-300 rounded-xl shadow-md overflow-hidden">
-        <div className="p-4 border-b border-gray-200 flex gap-4">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
+      {/* Standard Card & Filter Bar */}
+      <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
+        <div className="p-4 border-b border-slate-200 bg-slate-50/50 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="relative flex-1 w-full sm:max-w-md">
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
             <input 
               type="text" 
               placeholder="Buscar por nome, email ou CPF..." 
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full border border-gray-300 rounded-lg pl-10 pr-4 py-2 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all bg-white"
+              className="w-full border border-slate-300 rounded-xl pl-10 pr-4 py-2.5 text-sm outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100 transition-all bg-white"
             />
           </div>
+          <div className="text-xs font-mono font-bold text-slate-500">
+            Total: {filteredUsers.length} usuários
+          </div>
         </div>
+
         <div className="overflow-x-auto">
-          <table className="w-full text-left font-sans text-sm min-w-[600px]">
-            <thead className="bg-gray-50 text-gray-700 font-bold text-xs uppercase tracking-wider border-b border-gray-200">
+          <table className="w-full text-left text-sm min-w-[600px] border-collapse">
+            <thead className="bg-slate-100/70 text-slate-700 font-bold text-xs uppercase tracking-wider border-b border-slate-200">
               <tr>
-                <th className="px-4 py-3">NOME / EMAIL</th>
-                <th className="px-4 py-3">TIPO</th>
-                <th className="px-4 py-3">WHATSAPP</th>
-                <th className="px-4 py-3">STATUS / CARGO</th>
-                <th className="px-4 py-3 text-right">AÇÕES</th>
+                <th className="px-6 py-4">NOME / EMAIL</th>
+                <th className="px-6 py-4">TIPO</th>
+                <th className="px-6 py-4">WHATSAPP</th>
+                <th className="px-6 py-4">STATUS / CARGO</th>
+                <th className="px-6 py-4 text-right">AÇÕES</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-200">
+            <tbody className="divide-y divide-slate-200">
               {paginatedUsers.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="p-8 text-center text-gray-500 text-sm">Nenhum usuário encontrado.</td>
+                  <td colSpan={5} className="p-12 text-center text-slate-500 font-medium">Nenhum usuário encontrado.</td>
                 </tr>
               ) : (
                 paginatedUsers.map(u => (
-              <tr key={u.id} className="hover:bg-gray-50 cursor-pointer transition-colors" onClick={() => openDetails(u)}>
-                <td className="px-4 py-2">
-                  <div className="font-bold uppercase flex items-center gap-2 text-gray-800">
-                    {u.name} {u.id === currentUser?.id && <span className="text-[10px] bg-blue-100 text-blue-800 px-1 rounded">VOCÊ</span>}
-                  </div>
-                  <div className="text-xs text-gray-500 font-mono">{u.email}</div>
-                </td>
-                <td className="px-4 py-2">
-                  <div className="text-xs font-bold text-gray-800">{u.userType || 'N/A'}</div>
-                  {u.period && <div className="text-[10px] text-gray-500">{u.period}</div>}
-                </td>
-                <td className="px-4 py-2 font-mono text-xs text-gray-600">{u.phone || '-'}</td>
-                <td className="px-4 py-2">
-                  <div className="flex flex-col gap-1 items-start">
-                    <span className={`text-[9px] font-mono px-2.5 py-0.5 font-bold rounded-full ${
-                      u.role === 'ADMIN' ? 'bg-purple-100 text-purple-800 border border-purple-200' : 
-                      u.role === 'STORE_ADMIN' ? 'bg-green-100 text-green-800 border border-green-200' :
-                      u.role === 'SPORTS_ADMIN' ? 'bg-blue-100 text-blue-800 border border-blue-200' :
-                      'bg-gray-100 text-gray-600 border border-gray-200'
-                    }`}>
-                      {u.role === 'ADMIN' ? 'SUPER ADMIN' : u.role === 'STORE_ADMIN' ? 'GERENTE LOJA' : u.role === 'SPORTS_ADMIN' ? 'ORG. ESPORTIVO' : u.role}
-                    </span>
-                    <span className={`text-[9px] font-mono px-2.5 py-0.5 font-bold rounded-full ${u.isActive !== false ? 'bg-green-100 text-green-800 border border-green-200' : 'bg-red-100 text-red-800 border border-red-200'}`}>
-                      {u.isActive !== false ? 'ATIVO' : 'DESATIVADO'}
-                    </span>
-                  </div>
-                </td>
-                <td className="px-4 py-2 text-right">
-                  <button onClick={(e) => { e.stopPropagation(); openEditModal(u); }} className="p-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors">
-                    <Edit size={16} />
-                  </button>
-                </td>
-              </tr>
-            )))}
-          </tbody>
-        </table>
+                  <tr key={u.id} className="hover:bg-slate-50/80 transition-colors">
+                    <td className="px-6 py-4">
+                      <div className="font-bold uppercase flex items-center gap-2 text-slate-900">
+                        {u.name} {u.id === currentUser?.id && <span className="text-[10px] bg-blue-50 text-blue-700 border border-blue-200 px-1.5 py-0.5 rounded font-mono font-bold">VOCÊ</span>}
+                      </div>
+                      <div className="text-xs text-slate-500 font-mono">{u.email}</div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="text-xs font-bold text-slate-800">{u.userType || 'N/A'}</div>
+                      {u.period && <div className="text-[10px] text-slate-500">{u.period}</div>}
+                    </td>
+                    <td className="px-6 py-4 font-mono text-xs text-slate-600">{u.phone || '-'}</td>
+                    <td className="px-6 py-4">
+                      <div className="flex flex-col gap-1 items-start">
+                        <span className={`text-[10px] font-black px-2.5 py-0.5 rounded-full uppercase tracking-wider border ${
+                          u.role === 'ADMIN' ? 'bg-purple-50 text-purple-700 border-purple-200' : 
+                          u.role === 'STORE_ADMIN' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' :
+                          u.role === 'SPORTS_ADMIN' ? 'bg-blue-50 text-blue-700 border-blue-200' :
+                          'bg-slate-100 text-slate-600 border border-slate-200'
+                        }`}>
+                          {u.role === 'ADMIN' ? 'SUPER ADMIN' : u.role === 'STORE_ADMIN' ? 'GERENTE LOJA' : u.role === 'SPORTS_ADMIN' ? 'ORG. ESPORTIVO' : u.role}
+                        </span>
+                        <span className={`text-[10px] font-black px-2.5 py-0.5 rounded-full uppercase tracking-wider border ${u.isActive !== false ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-rose-50 text-rose-700 border-rose-200'}`}>
+                          {u.isActive !== false ? 'ATIVO' : 'DESATIVADO'}
+                        </span>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 text-right space-x-2">
+                      <button onClick={() => openDetails(u)} className="p-2 bg-blue-50 hover:bg-blue-100 text-blue-600 rounded-lg transition-colors inline-flex items-center" title="Ver Detalhes">
+                        <Search size={16} />
+                      </button>
+                      <button onClick={() => openEditModal(u)} className="p-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg transition-colors inline-flex items-center" title="Editar">
+                        <Edit size={16} />
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
         </div>
         <Pagination
           currentPage={currentPage}
