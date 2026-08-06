@@ -107,9 +107,10 @@ export class ChampionshipsController {
     @Param('id') id: string,
     @Body('type') type: 'rg' | 'enrollment',
     @Body('url') url: string,
-    @Request() req: { user: RequestUser }
+    @Request() req: { user: RequestUser },
+    @Body('athleteId') athleteId?: string,
   ) {
-    return this.championshipsService.saveAthleteDocument(req.user.userId, id, type, url);
+    return this.championshipsService.saveAthleteDocument(req.user.userId, id, type, url, athleteId);
   }
 
   @UseGuards(JwtAuthGuard)
@@ -296,10 +297,12 @@ export class ChampionshipsController {
   subscribe(
     @Request() req: { user: RequestUser },
     @Param('modalityId') modalityId: string,
+    @Body('athleteId') athleteId?: string,
   ) {
     return this.subscriptionService.subscribeAthlete(
       req.user.userId,
       modalityId,
+      athleteId,
     );
   }
 

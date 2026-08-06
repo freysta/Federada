@@ -104,27 +104,7 @@ export class TeamsController {
     return this.teamsService.getMyProfile(req.user.userId);
   }
 
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('ADMIN', 'SPORTS_ADMIN')
-  @Get('admin/documents')
-  getPendingDocuments() {
-    return this.teamsService.getPendingDocuments();
-  }
 
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('ADMIN', 'SPORTS_ADMIN')
-  @Patch('profile/:profileId/documents')
-  updateDocumentStatus(
-    @Param('profileId') profileId: string,
-    @Body()
-    data: {
-      type: 'rg' | 'enrollment';
-      status: 'APPROVED' | 'REJECTED';
-      rejectionReason?: string;
-    },
-  ) {
-    return this.teamsService.updateDocumentStatus(profileId, data);
-  }
 
   // ==== AVAILABILITY ====
   @UseGuards(JwtAuthGuard)
@@ -150,24 +130,7 @@ export class TeamsController {
     return this.teamsService.getAvailabilities(teamId, championshipId);
   }
 
-  @UseGuards(JwtAuthGuard)
-  @Post('my/documents/:type')
-  @UseInterceptors(FileInterceptor('file'))
-  uploadDocument(
-    @Request() req: any,
-    @Param('type') type: 'rg' | 'enrollment',
-    @UploadedFile(
-      new ParseFilePipe({
-        validators: [
-          new MaxFileSizeValidator({ maxSize: 5 * 1024 * 1024 }), // 5MB
-          new FileTypeValidator({ fileType: '.(png|jpeg|jpg|pdf)' }),
-        ],
-      }),
-    )
-    file: Express.Multer.File,
-  ) {
-    return this.teamsService.uploadDocument(req.user.userId, type, file);
-  }
+
 
   @UseGuards(JwtAuthGuard)
   @Delete('my/membership')

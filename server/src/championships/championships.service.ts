@@ -20,7 +20,6 @@ import { MailerService } from '@nestjs-modules/mailer';
 import { ChampionshipStateMachine } from './services/championship-state-machine.service';
 import { ChampionshipPermissionService } from './services/championship-permission.service';
 import { User } from '../orders/entities/user.entity';
-import { SubscriptionStatus } from './entities/subscription.entity';
 import { ChampionshipStatus } from './entities/championship.entity';
 import { CreateChampionshipDto } from './dto/create-championship.dto';
 import { UpdateChampionshipDto } from './dto/update-championship.dto';
@@ -112,10 +111,10 @@ export class ChampionshipsService {
     ] = await Promise.all([
       this.championshipRepository.count(),
       this.athleteProfileRepository.count(),
-      this.athleteProfileRepository.count({
+      this.athleteDocumentRepository.count({
         where: [
-          { documentRgStatus: 'PENDING' },
-          { documentEnrollmentStatus: 'PENDING' },
+          { rgStatus: 'PENDING' },
+          { enrollmentStatus: 'PENDING' },
         ],
       }),
       this.subscriptionRepository.count(),
@@ -186,9 +185,33 @@ export class ChampionshipsService {
     });
   }
 
-  async saveAthleteDocument(userId: string, championshipId: string, type: 'rg' | 'enrollment', url: string) {
-    const profile = await this.athleteProfileRepository.findOne({ where: { user: { id: userId } } });
-    if (!profile) throw new BadRequestException('Perfil de atleta não encontrado.');
+  async saveAthleteDocument(userId: string, championshipId: string, type: 'rg' | 'enrollment', url: string, targetAthleteId?: string) {
+    const loggedProfile = await this.athleteProfileRepository.findOne({ 
+      where: { user: { id: userId } },
+      relations: ['team']
+    });
+    if (!loggedProfile) throw new BadRequestException('Perfil de atleta não encontrado.');
+
+    let profileToUpdate = loggedProfile;
+
+    if (targetAthleteId) {
+      if (loggedProfile.teamRole !== 'PRESIDENT') {
+        throw new BadRequestException('Apenas o presidente pode enviar documentos de outros atletas.');
+      }
+      
+      const targetProfile = await this.athleteProfileRepository.findOne({
+        where: { id: targetAthleteId },
+        relations: ['team'],
+      });
+
+      if (!targetProfile || targetProfile.team?.id !== loggedProfile.team?.id) {
+        throw new BadRequestException('Atleta não encontrado ou não pertence a sua equipe.');
+      }
+      
+      profileToUpdate = targetProfile;
+    }
+
+    const profile = profileToUpdate;
 
     const championship = await this.championshipRepository.findOne({ where: { id: championshipId } });
     if (!championship) throw new NotFoundException('Campeonato não encontrado.');
@@ -284,10 +307,10 @@ export class ChampionshipsService {
 
     if (data.type === 'rg') {
       doc.rgStatus = data.status;
-      doc.rgRejectionReason = data.status === 'REJECTED' ? data.rejectionReason : null;
+      doc.rgRejectionReason = data.status === 'REJECTED' ? (data.rejectionReason || null) : null;
     } else {
       doc.enrollmentStatus = data.status;
-      doc.enrollmentRejectionReason = data.status === 'REJECTED' ? data.rejectionReason : null;
+      doc.enrollmentRejectionReason = data.status === 'REJECTED' ? (data.rejectionReason || null) : null;
     }
 
     return this.athleteDocumentRepository.save(doc);

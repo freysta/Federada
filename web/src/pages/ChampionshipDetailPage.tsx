@@ -7,14 +7,49 @@ import { useAuth } from '../contexts/AuthContext';
 import { 
   Loader2, Trophy, Shield, CheckCircle2, XCircle, Info, ArrowLeft, 
   Calendar, MapPin, AlertCircle, Clock, Search, Filter, Upload, 
-  FileText, Users, Copy, Check, ExternalLink, FileCheck2, UserCheck, Sparkles, Swords
+  FileText, Users, Copy, Check, ExternalLink, FileCheck2, UserCheck, Sparkles, Swords,
+  QrCode, Plus, X
 } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { QRCodeSVG } from 'qrcode.react';
 
 import ConfirmSubscriptionModal from '../components/championships/ConfirmSubscriptionModal';
+import DelegateSubscriptionModal from '../components/championships/DelegateSubscriptionModal';
+import DelegateDocumentUploadModal from '../components/championships/DelegateDocumentUploadModal';
 import RosterModal from '../components/championships/RosterModal';
 import ModalityCard from '../components/championships/ModalityCard';
 import ChampionshipDetailNav from '../components/championships/ChampionshipDetailNav';
+
+function InviteQrCodeModal({ isOpen, onClose, inviteLink }: { isOpen: boolean, onClose: () => void, inviteLink: string }) {
+  if (!isOpen || !inviteLink) return null;
+  return (
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200 font-inter">
+      <div className="bg-white rounded-3xl w-full max-w-sm overflow-hidden shadow-2xl border border-slate-200 animate-in zoom-in-95 duration-200 p-6 text-center">
+        <div className="flex justify-between items-center mb-4">
+          <h3 className="font-extrabold text-slate-900 text-lg">Convite da Atlética</h3>
+          <button onClick={onClose} className="text-slate-400 hover:text-slate-700 transition-colors">
+            <X size={20} />
+          </button>
+        </div>
+        <div className="bg-slate-50 p-4 rounded-2xl flex justify-center border border-slate-200 mb-4">
+          <QRCodeSVG value={inviteLink} size={200} />
+        </div>
+        <p className="text-xs text-slate-500 mb-4">
+          Mostre este QR Code para os atletas escanearem e entrarem na sua atlética.
+        </p>
+        <button 
+          onClick={() => {
+            navigator.clipboard.writeText(inviteLink);
+            toast.success('Link de convite copiado!');
+          }}
+          className="w-full bg-orange-600 text-white font-bold py-2.5 rounded-xl hover:bg-orange-700 transition-colors flex items-center justify-center gap-2 text-sm"
+        >
+          <Copy size={16} /> Copiar Link
+        </button>
+      </div>
+    </div>
+  );
+}
 
 function QuickProfileEditModal({ 
   isOpen, 
@@ -154,6 +189,14 @@ export default function ChampionshipDetailPage() {
   const [selectedSubscription, setSelectedSubscription] = useState<any>(null);
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
 
+  // Delegate Management State
+  const [teamDashboard, setTeamDashboard] = useState<any>(null);
+  const [isDelegateSubModalOpen, setIsDelegateSubModalOpen] = useState(false);
+  const [isQrCodeModalOpen, setIsQrCodeModalOpen] = useState(false);
+  const [delegateDocModalState, setDelegateDocModalState] = useState<{isOpen: boolean, athleteId: string, athleteName: string, docType: 'rg'|'enrollment'}>({
+    isOpen: false, athleteId: '', athleteName: '', docType: 'rg'
+  });
+
   // Filters State
   const [filterText, setFilterText] = useState('');
   const [filterType, setFilterType] = useState('ALL');
@@ -186,6 +229,7 @@ export default function ChampionshipDetailPage() {
         if (isPres) {
           fetchTeamMembers(data.team.id);
           fetchJoinRequests();
+          fetchTeamDashboard();
         }
       }
     })
@@ -243,6 +287,17 @@ export default function ChampionshipDetailPage() {
       console.error('Erro ao buscar solicitações de entrada:', err);
       setLoadingJoinRequests(false);
     });
+  };
+
+  const fetchTeamDashboard = () => {
+    if (!token || !id) return;
+    apiClient.get<any>(`/championships/${id}/team-dashboard`)
+      .then(data => setTeamDashboard(data))
+      .catch(err => console.error('Erro ao buscar team dashboard:', err));
+  };
+
+  const getAthleteDocument = (athleteId: string) => {
+    return teamDashboard?.documents?.find((doc: any) => doc.athlete?.id === athleteId);
   };
 
   useEffect(() => {
@@ -1218,21 +1273,37 @@ export default function ChampionshipDetailPage() {
                     </div>
                   </div>
 
-                  {/* Invite Link Button */}
+                  {/* Invite & Delegate Subscription Buttons */}
                   {athleteProfile?.team?.inviteCode && (
-                    <button 
-                      onClick={() => {
-                        const link = `${window.location.origin}/invite/${athleteProfile.team?.inviteCode}`;
-                        navigator.clipboard.writeText(link);
-                        setCopiedInvite(true);
-                        toast.success('Link de convite copiado!');
-                        setTimeout(() => setCopiedInvite(false), 2500);
-                      }}
-                      className="w-full sm:w-auto bg-slate-900 hover:bg-slate-800 text-white font-bold px-4 py-2.5 rounded-xl text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 shrink-0 shadow-sm"
-                    >
-                      {copiedInvite ? <Check size={16} className="text-emerald-400" /> : <Copy size={16} />}
-                      <span>{copiedInvite ? 'Link Copiado!' : 'Copiar Convite Atletas'}</span>
-                    </button>
+                    <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+                      <button 
+                        onClick={() => setIsQrCodeModalOpen(true)}
+                        className="w-full sm:w-auto bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold px-4 py-2.5 rounded-xl text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 shrink-0 border border-slate-300 shadow-sm"
+                      >
+                        <QrCode size={16} />
+                        <span>QR Code</span>
+                      </button>
+                      <button 
+                        onClick={() => {
+                          const link = `${window.location.origin}/invite/${athleteProfile.team?.inviteCode}`;
+                          navigator.clipboard.writeText(link);
+                          setCopiedInvite(true);
+                          toast.success('Link de convite copiado!');
+                          setTimeout(() => setCopiedInvite(false), 2500);
+                        }}
+                        className="w-full sm:w-auto bg-slate-900 hover:bg-slate-800 text-white font-bold px-4 py-2.5 rounded-xl text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 shrink-0 shadow-sm"
+                      >
+                        {copiedInvite ? <Check size={16} className="text-emerald-400" /> : <Copy size={16} />}
+                        <span>{copiedInvite ? 'Copiado!' : 'Copiar Convite'}</span>
+                      </button>
+                      <button 
+                        onClick={() => setIsDelegateSubModalOpen(true)}
+                        className="w-full sm:w-auto bg-orange-600 hover:bg-orange-700 text-white font-bold px-4 py-2.5 rounded-xl text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 shrink-0 shadow-sm"
+                      >
+                        <Plus size={16} />
+                        <span>Inscrever Atleta</span>
+                      </button>
+                    </div>
                   )}
                 </div>
 
@@ -1350,45 +1421,123 @@ export default function ChampionshipDetailPage() {
                     <p className="text-[11px] text-slate-500 mt-0.5">Use o botão de convite para adicionar membros.</p>
                   </div>
                 ) : (
-                  <div className="overflow-x-auto">
-                    <table className="w-full text-left text-xs whitespace-nowrap">
-                      <thead>
-                        <tr className="bg-slate-50 text-slate-500 border-b border-slate-200 uppercase tracking-wider font-black">
-                          <th className="px-4 py-3">Atleta</th>
-                          <th className="px-4 py-3">Cargo</th>
-                          <th className="px-4 py-3">RG / Identidade</th>
-                          <th className="px-4 py-3">Matrícula</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-slate-100 font-medium">
-                        {teamMembers.map(member => (
-                          <tr key={member.id} className="hover:bg-slate-50/80 transition-colors">
-                            <td className="px-4 py-3.5">
-                              <p className="font-bold text-slate-900 text-xs flex items-center gap-1.5">
+                  <div className="mt-4">
+                    {/* Mobile View: Cards */}
+                    <div className="grid grid-cols-1 gap-4 md:hidden">
+                      {teamMembers.map(member => (
+                        <div key={member.id} className="bg-slate-50 p-4 rounded-2xl border border-slate-200">
+                          <div className="flex justify-between items-start mb-3 pb-3 border-b border-slate-200">
+                            <div>
+                              <p className="font-bold text-slate-900 text-sm flex items-center gap-1.5">
                                 {member.user?.name || 'Sem nome'}
                                 {member.user?.id === user?.id && (
-                                  <span className="bg-orange-100 text-orange-700 px-1.5 py-0.2 rounded text-[9px] font-black">(Você)</span>
+                                  <span className="bg-orange-100 text-orange-700 px-1.5 py-0.5 rounded text-[9px] font-black uppercase">(Você)</span>
                                 )}
                               </p>
-                              <p className="text-[10px] text-slate-500 font-mono">CPF: {member.cpf || 'N/A'}</p>
-                            </td>
-                            <td className="px-4 py-3.5">
-                              <span className={`px-2 py-0.5 rounded text-[10px] font-black uppercase ${
-                                member.teamRole === 'PRESIDENT' ? 'bg-orange-100 text-orange-800' : 'bg-slate-100 text-slate-700'
-                              }`}>
-                                {member.teamRole === 'PRESIDENT' ? 'Presidente' : 'Atleta'}
-                              </span>
-                            </td>
-                            <td className="px-4 py-3.5">
-                              {getDocStatusBadge(member.documentRgStatus)}
-                            </td>
-                            <td className="px-4 py-3.5">
-                              {getDocStatusBadge(member.documentEnrollmentStatus)}
-                            </td>
+                              <p className="text-xs text-slate-500 font-mono mt-0.5">CPF: {member.cpf || 'N/A'}</p>
+                            </div>
+                            <span className={`px-2 py-1 rounded text-[10px] font-black uppercase shrink-0 ${
+                              member.teamRole === 'PRESIDENT' ? 'bg-orange-100 text-orange-800' : 'bg-slate-100 text-slate-700'
+                            }`}>
+                              {member.teamRole === 'PRESIDENT' ? 'Presidente' : 'Atleta'}
+                            </span>
+                          </div>
+                          
+                          <div className="space-y-3">
+                            <div className="flex justify-between items-center bg-white p-2.5 rounded-xl border border-slate-100 shadow-sm">
+                              <span className="text-[10px] font-black uppercase text-slate-400">RG/Identidade</span>
+                              <div className="flex items-center gap-2">
+                                {getDocStatusBadge(getAthleteDocument(member.id)?.rgStatus)}
+                                {(!getAthleteDocument(member.id)?.rgStatus || getAthleteDocument(member.id)?.rgStatus === 'REJECTED') && (
+                                  <button 
+                                    onClick={() => setDelegateDocModalState({ isOpen: true, athleteId: member.id, athleteName: member.user?.name || '', docType: 'rg' })}
+                                    className="text-[10px] bg-blue-50 text-blue-600 font-bold px-2.5 py-1.5 rounded-lg hover:bg-blue-100 transition-colors"
+                                  >
+                                    Enviar
+                                  </button>
+                                )}
+                              </div>
+                            </div>
+                            <div className="flex justify-between items-center bg-white p-2.5 rounded-xl border border-slate-100 shadow-sm">
+                              <span className="text-[10px] font-black uppercase text-slate-400">Matrícula</span>
+                              <div className="flex items-center gap-2">
+                                {getDocStatusBadge(getAthleteDocument(member.id)?.enrollmentStatus)}
+                                {(!getAthleteDocument(member.id)?.enrollmentStatus || getAthleteDocument(member.id)?.enrollmentStatus === 'REJECTED') && (
+                                  <button 
+                                    onClick={() => setDelegateDocModalState({ isOpen: true, athleteId: member.id, athleteName: member.user?.name || '', docType: 'enrollment' })}
+                                    className="text-[10px] bg-blue-50 text-blue-600 font-bold px-2.5 py-1.5 rounded-lg hover:bg-blue-100 transition-colors"
+                                  >
+                                    Enviar
+                                  </button>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Desktop View: Table */}
+                    <div className="hidden md:block overflow-x-auto bg-white border border-slate-200 rounded-2xl">
+                      <table className="w-full text-left text-xs whitespace-nowrap">
+                        <thead>
+                          <tr className="bg-slate-50 text-slate-500 border-b border-slate-200 uppercase tracking-wider font-black">
+                            <th className="px-6 py-4">Atleta</th>
+                            <th className="px-6 py-4">Cargo</th>
+                            <th className="px-6 py-4">RG / Identidade</th>
+                            <th className="px-6 py-4">Matrícula</th>
                           </tr>
-                        ))}
-                      </tbody>
-                    </table>
+                        </thead>
+                        <tbody className="divide-y divide-slate-100 font-medium">
+                          {teamMembers.map(member => (
+                            <tr key={member.id} className="hover:bg-slate-50/80 transition-colors">
+                              <td className="px-6 py-4">
+                                <p className="font-bold text-slate-900 text-sm flex items-center gap-1.5">
+                                  {member.user?.name || 'Sem nome'}
+                                  {member.user?.id === user?.id && (
+                                    <span className="bg-orange-100 text-orange-700 px-1.5 py-0.5 rounded text-[9px] font-black uppercase">(Você)</span>
+                                  )}
+                                </p>
+                                <p className="text-xs text-slate-500 font-mono mt-0.5">CPF: {member.cpf || 'N/A'}</p>
+                              </td>
+                              <td className="px-6 py-4">
+                                <span className={`px-2.5 py-1 rounded-md text-[10px] font-black uppercase ${
+                                  member.teamRole === 'PRESIDENT' ? 'bg-orange-100 text-orange-800' : 'bg-slate-100 text-slate-700'
+                                }`}>
+                                  {member.teamRole === 'PRESIDENT' ? 'Presidente' : 'Atleta'}
+                                </span>
+                              </td>
+                              <td className="px-6 py-4">
+                                <div className="flex items-center justify-between gap-3 min-w-[140px]">
+                                  {getDocStatusBadge(getAthleteDocument(member.id)?.rgStatus)}
+                                  {(!getAthleteDocument(member.id)?.rgStatus || getAthleteDocument(member.id)?.rgStatus === 'REJECTED') && (
+                                    <button 
+                                      onClick={() => setDelegateDocModalState({ isOpen: true, athleteId: member.id, athleteName: member.user?.name || '', docType: 'rg' })}
+                                      className="text-xs bg-blue-50 text-blue-600 font-bold px-3 py-1.5 rounded-lg hover:bg-blue-100 transition-colors"
+                                    >
+                                      Enviar
+                                    </button>
+                                  )}
+                                </div>
+                              </td>
+                              <td className="px-6 py-4">
+                                <div className="flex items-center justify-between gap-3 min-w-[140px]">
+                                  {getDocStatusBadge(getAthleteDocument(member.id)?.enrollmentStatus)}
+                                  {(!getAthleteDocument(member.id)?.enrollmentStatus || getAthleteDocument(member.id)?.enrollmentStatus === 'REJECTED') && (
+                                    <button 
+                                      onClick={() => setDelegateDocModalState({ isOpen: true, athleteId: member.id, athleteName: member.user?.name || '', docType: 'enrollment' })}
+                                      className="text-xs bg-blue-50 text-blue-600 font-bold px-3 py-1.5 rounded-lg hover:bg-blue-100 transition-colors"
+                                    >
+                                      Enviar
+                                    </button>
+                                  )}
+                                </div>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
                   </div>
                 )}
               </div>
@@ -1457,6 +1606,33 @@ export default function ChampionshipDetailPage() {
           setAthleteProfile(updated);
           handleBulkSubscribe();
         }}
+      />
+      <DelegateSubscriptionModal 
+        isOpen={isDelegateSubModalOpen}
+        onClose={() => setIsDelegateSubModalOpen(false)}
+        championshipId={id || ''}
+        teamMembers={teamMembers}
+        modalities={champ?.modalities || []}
+        onSuccess={() => {
+          fetchTeamDashboard();
+          fetchMySubscriptions();
+        }}
+      />
+
+      <DelegateDocumentUploadModal 
+        isOpen={delegateDocModalState.isOpen}
+        onClose={() => setDelegateDocModalState(prev => ({ ...prev, isOpen: false }))}
+        championshipId={id || ''}
+        athleteId={delegateDocModalState.athleteId}
+        athleteName={delegateDocModalState.athleteName}
+        docType={delegateDocModalState.docType}
+        onSuccess={() => fetchTeamDashboard()}
+      />
+
+      <InviteQrCodeModal
+        isOpen={isQrCodeModalOpen}
+        onClose={() => setIsQrCodeModalOpen(false)}
+        inviteLink={athleteProfile?.team?.inviteCode ? `${window.location.origin}/invite/${athleteProfile.team.inviteCode}` : ''}
       />
     </div>
   );

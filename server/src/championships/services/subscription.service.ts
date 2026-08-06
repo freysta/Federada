@@ -28,15 +28,36 @@ export class SubscriptionService {
     private athleteDocumentRepository: Repository<AthleteChampionshipDocument>,
   ) {}
 
-  async subscribeAthlete(userId: string, modalityId: string) {
-    const profile = await this.athleteProfileRepository.findOne({
+  async subscribeAthlete(userId: string, modalityId: string, targetAthleteId?: string) {
+    const loggedProfile = await this.athleteProfileRepository.findOne({
       where: { user: { id: userId } },
       relations: ['team', 'user'],
     });
-    if (!profile)
+    if (!loggedProfile)
       throw new BadRequestException(
         'Você precisa criar ou entrar em uma Atlética primeiro (Perfil de Atleta).',
       );
+
+    let profileToEnroll = loggedProfile;
+
+    if (targetAthleteId) {
+      if (loggedProfile.teamRole !== 'PRESIDENT') {
+        throw new BadRequestException('Apenas o presidente pode inscrever outros atletas.');
+      }
+      
+      const targetProfile = await this.athleteProfileRepository.findOne({
+        where: { id: targetAthleteId },
+        relations: ['team', 'user'],
+      });
+
+      if (!targetProfile || targetProfile.team?.id !== loggedProfile.team?.id) {
+        throw new BadRequestException('Atleta não encontrado ou não pertence a sua equipe.');
+      }
+      
+      profileToEnroll = targetProfile;
+    }
+    
+    const profile = profileToEnroll;
 
     const modality = await this.modalityRepository.findOne({
       where: { id: modalityId },
@@ -152,7 +173,7 @@ export class SubscriptionService {
       }
 
       let initialStatus = SubscriptionStatus.PENDING_DOCS;
-      if (modality.championship.audienceFocus === 'UNIVERSITY') {
+      if (modality.championship.audienceFocus === 'UNIVERSITY' && loggedProfile.teamRole !== 'PRESIDENT') {
         initialStatus = SubscriptionStatus.PENDING_TEAM_APPROVAL;
       } else if (!needsDocs) {
         initialStatus = modality.price > 0 ? SubscriptionStatus.PENDING_PAYMENT : SubscriptionStatus.CONFIRMED;
