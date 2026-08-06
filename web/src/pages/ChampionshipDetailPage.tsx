@@ -4,8 +4,17 @@ import type { IChampionship, IAthleteProfile, ISubscription } from '../types';
 import { API_URL } from '../config';
 import { apiClient } from '../utils/apiClient';
 import { useAuth } from '../contexts/AuthContext';
-import { Loader2, Trophy, Shield, CheckCircle2, Info, ArrowLeft, Calendar, MapPin, AlertCircle, Clock, Search, Filter, FileText } from 'lucide-react';
+import { 
+  Loader2, Trophy, Shield, CheckCircle2, XCircle, Info, ArrowLeft, 
+  Calendar, MapPin, AlertCircle, Clock, Search, Filter, Upload, 
+  FileText, Users, Copy, Check, ExternalLink, FileCheck2, UserCheck, Sparkles, Swords
+} from 'lucide-react';
 import toast from 'react-hot-toast';
+
+import ConfirmSubscriptionModal from '../components/championships/ConfirmSubscriptionModal';
+import RosterModal from '../components/championships/RosterModal';
+import ModalityCard from '../components/championships/ModalityCard';
+import ChampionshipDetailNav from '../components/championships/ChampionshipDetailNav';
 
 function QuickProfileEditModal({ 
   isOpen, 
@@ -36,33 +45,39 @@ function QuickProfileEditModal({
         gender,
         cpf: cpf || undefined
       });
-      toast.success('Perfil atualizado!');
+      toast.success('Perfil atualizado com sucesso!');
       onSuccess(data);
       onClose();
     } catch (err: any) {
-      toast.error(err.message || 'Erro ao atualizar perfil');
+      toast.error(err.message || 'Erro ao atualizar perfil.');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-      <div className="bg-white rounded-2xl w-full max-w-md overflow-hidden shadow-2xl animate-in zoom-in-95 duration-200">
-        <div className="bg-orange-50 p-4 border-b border-orange-100 flex items-start gap-3">
-          <AlertCircle className="text-orange-500 shrink-0 mt-0.5" size={24} />
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200 font-inter">
+      <div className="bg-white rounded-3xl w-full max-w-md overflow-hidden shadow-2xl border border-slate-200 animate-in zoom-in-95 duration-200">
+        <div className="bg-orange-50 p-6 border-b border-orange-100 flex items-start gap-4">
+          <div className="w-10 h-10 rounded-2xl bg-orange-100 text-orange-600 flex items-center justify-center shrink-0">
+            <AlertCircle size={22} />
+          </div>
           <div>
-            <h3 className="font-bold text-orange-800">Informação Faltante</h3>
-            <p className="text-sm text-orange-700 mt-1">Para continuar com a inscrição, precisamos que você complete alguns dados do seu perfil.</p>
+            <h3 className="font-extrabold text-slate-900 text-lg">Informações Obrigatórias</h3>
+            <p className="text-xs text-slate-600 mt-1 leading-relaxed">
+              Para prosseguir com a inscrição, precisamos de alguns dados essenciais no seu perfil de atleta.
+            </p>
           </div>
         </div>
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           <div>
-            <label className="block text-sm font-bold text-slate-700 mb-1">Gênero <span className="text-red-500">*</span></label>
+            <label className="block text-xs font-black uppercase tracking-wider text-slate-700 mb-1.5">
+              Gênero <span className="text-orange-600">*</span>
+            </label>
             <select 
               value={gender} 
               onChange={e => setGender(e.target.value)} 
-              className="w-full border border-slate-300 rounded-lg p-2.5 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+              className="w-full border border-slate-300 rounded-xl p-3 text-sm text-slate-900 outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 font-medium transition-all"
               required
             >
               <option value="">Selecione o gênero...</option>
@@ -71,20 +86,31 @@ function QuickProfileEditModal({
             </select>
           </div>
           <div>
-            <label className="block text-sm font-bold text-slate-700 mb-1">CPF <span className="text-slate-400 font-normal">(Opcional)</span></label>
+            <label className="block text-xs font-black uppercase tracking-wider text-slate-700 mb-1.5">
+              CPF <span className="text-slate-400 font-normal">(Opcional)</span>
+            </label>
             <input 
               type="text" 
               value={cpf} 
               onChange={e => setCpf(e.target.value)} 
               placeholder="000.000.000-00"
-              className="w-full border border-slate-300 rounded-lg p-2.5 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+              className="w-full border border-slate-300 rounded-xl p-3 text-sm text-slate-900 outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 font-medium transition-all"
             />
           </div>
-          <div className="flex justify-end gap-3 pt-4 mt-6 border-t border-slate-100">
-            <button type="button" onClick={onClose} className="px-4 py-2 font-bold text-slate-600 hover:bg-slate-100 rounded-lg transition-colors">
+          <div className="flex items-center justify-end gap-3 pt-4 mt-6 border-t border-slate-100">
+            <button 
+              type="button" 
+              onClick={onClose} 
+              className="px-5 py-2.5 font-bold text-slate-600 hover:bg-slate-100 rounded-xl text-xs transition-colors"
+            >
               Cancelar
             </button>
-            <button type="submit" disabled={loading} className="px-6 py-2 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors">
+            <button 
+              type="submit" 
+              disabled={loading} 
+              className="px-6 py-2.5 bg-orange-600 text-white font-black rounded-xl hover:bg-orange-700 disabled:opacity-50 text-xs tracking-wider uppercase transition-colors shadow-md shadow-orange-600/20 flex items-center gap-2"
+            >
+              {loading ? <Loader2 className="animate-spin" size={16} /> : null}
               {loading ? 'Salvando...' : 'Salvar e Continuar'}
             </button>
           </div>
@@ -94,25 +120,14 @@ function QuickProfileEditModal({
   );
 }
 
-import ConfirmSubscriptionModal from '../components/championships/ConfirmSubscriptionModal';
-import RosterModal from '../components/championships/RosterModal';
-import ModalityCard from '../components/championships/ModalityCard';
-
 export default function ChampionshipDetailPage() {
   const { id } = useParams();
   const { user, token } = useAuth();
   
   const [isAvailable, setIsAvailable] = useState(false);
   const [loadingAvailability, setLoadingAvailability] = useState(false);
+  const [copiedInvite, setCopiedInvite] = useState(false);
 
-  const toggleAvailability = async () => {
-    setLoadingAvailability(true);
-    setTimeout(() => {
-      setIsAvailable(!isAvailable);
-      setLoadingAvailability(false);
-    }, 500);
-  };
-  
   const [champ, setChamp] = useState<IChampionship | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -120,14 +135,20 @@ export default function ChampionshipDetailPage() {
   const [mySubscriptions, setMySubscriptions] = useState<ISubscription[]>([]);
   const [teamMembers, setTeamMembers] = useState<IAthleteProfile[]>([]);
   const [loadingMembers, setLoadingMembers] = useState(false);
-  
+  const [joinRequests, setJoinRequests] = useState<IAthleteProfile[]>([]);
+  const [loadingJoinRequests, setLoadingJoinRequests] = useState(false);
+
   const [showQuickProfile, setShowQuickProfile] = useState(false);
   const [selectedModalities, setSelectedModalities] = useState<string[]>([]);
   const [teamAvailabilities, setTeamAvailabilities] = useState<any[]>([]);
-  
+
+  // Document Uploading States
+  const [uploadingRg, setUploadingRg] = useState(false);
+  const [uploadingEnrollment, setUploadingEnrollment] = useState(false);
+
   // Bulk Registration State
   const [isSubscribing, setIsSubscribing] = useState(false);
-  
+
   // Roster Management State
   const [showRosterModal, setShowRosterModal] = useState(false);
   const [selectedSubscription, setSelectedSubscription] = useState<any>(null);
@@ -139,11 +160,7 @@ export default function ChampionshipDetailPage() {
   const [filterGender, setFilterGender] = useState('ALL');
 
   // Tabs State
-  const [activeTab, setActiveTab] = useState<'overview' | 'modalities' | 'teams' | 'brackets' | 'documentos' | 'painel-atletica'>('overview');
-
-  // Dashboard & Documents State
-  const [teamDashboard, setTeamDashboard] = useState<{subscriptions: any[], documents: any[]} | null>(null);
-  const [athleteDocument, setAthleteDocument] = useState<any>(null);
+  const [activeTab, setActiveTab] = useState('visao-geral');
 
   const fetchChampionship = () => {
     setLoading(true);
@@ -153,7 +170,7 @@ export default function ChampionshipDetailPage() {
         setLoading(false);
       })
       .catch(() => {
-        toast.error('Erro ao buscar campeonato');
+        toast.error('Erro ao carregar detalhes do campeonato');
         setLoading(false);
       });
   };
@@ -165,9 +182,14 @@ export default function ChampionshipDetailPage() {
       setAthleteProfile(data || null);
       if (data?.team?.id) {
         fetchAvailabilities(data.team.id);
+        const isPres = data.teamRole === 'PRESIDENT' || data.team.owner?.id === user?.id || (user as any)?.userType === 'PRESIDENT';
+        if (isPres) {
+          fetchTeamMembers(data.team.id);
+          fetchJoinRequests();
+        }
       }
     })
-    .catch(err => console.error('Erro ao buscar perfil', err));
+    .catch(err => console.error('Erro ao buscar perfil:', err));
   };
 
   const fetchAvailabilities = (teamId: string) => {
@@ -176,9 +198,15 @@ export default function ChampionshipDetailPage() {
     .then(data => {
       if (Array.isArray(data)) {
         setTeamAvailabilities(data);
+        if (athleteProfile?.id) {
+          const myAvail = data.find(av => av.athleteProfile?.id === athleteProfile.id || av.athleteId === athleteProfile.id);
+          if (myAvail) {
+            setIsAvailable(myAvail.status === 'AVAILABLE');
+          }
+        }
       }
     })
-    .catch(err => console.error('Erro ao buscar disponibilidade', err));
+    .catch(err => console.error('Erro ao buscar disponibilidade:', err));
   };
 
   const fetchMySubscriptions = () => {
@@ -187,50 +215,87 @@ export default function ChampionshipDetailPage() {
     .then(data => {
       setMySubscriptions(data || []);
     })
-    .catch(err => console.error('Erro ao buscar inscrições', err));
+    .catch(err => console.error('Erro ao buscar inscrições:', err));
   };
 
   const fetchTeamMembers = (teamId: string) => {
     setLoadingMembers(true);
     apiClient.get<IAthleteProfile[]>(`/teams/${teamId}/members`)
     .then(data => {
-      setTeamMembers(data);
+      setTeamMembers(data || []);
       setLoadingMembers(false);
     })
     .catch(err => {
-      console.error('Erro ao buscar membros', err);
+      console.error('Erro ao buscar membros da equipe:', err);
       setLoadingMembers(false);
     });
   };
 
-  const fetchTeamDashboard = () => {
-    if (!token || !id) return;
-    apiClient.get(`/championships/${id}/team-dashboard`)
-      .then((data: any) => setTeamDashboard(data))
-      .catch((err) => console.error('Erro ao buscar dashboard da equipe', err));
-  };
-
-  const fetchAthleteDocument = () => {
-    if (!token || !id) return;
-    apiClient.get(`/championships/${id}/athlete-document`)
-      .then((data: any) => setAthleteDocument(data))
-      .catch((err) => console.error('Erro ao buscar documentos do atleta', err));
+  const fetchJoinRequests = () => {
+    if (!token) return;
+    setLoadingJoinRequests(true);
+    apiClient.get<IAthleteProfile[]>('/teams/my-team/join-requests')
+    .then(data => {
+      setJoinRequests(data || []);
+      setLoadingJoinRequests(false);
+    })
+    .catch(err => {
+      console.error('Erro ao buscar solicitações de entrada:', err);
+      setLoadingJoinRequests(false);
+    });
   };
 
   useEffect(() => {
     fetchChampionship();
-    if (token) {
-      fetchProfile();
-      fetchMySubscriptions();
-      fetchAthleteDocument();
-    }
-  }, [id, token]);
+    fetchProfile();
+    fetchMySubscriptions();
+  }, [id]);
 
-  useEffect(() => {
-    if (athleteProfile?.teamRole === 'PRESIDENT') {
-      fetchTeamDashboard();
+  const toggleAvailability = async () => {
+    setLoadingAvailability(true);
+    setTimeout(() => {
+      const nextState = !isAvailable;
+      setIsAvailable(nextState);
+      setLoadingAvailability(false);
+      if (nextState) {
+        toast.success('Disponibilidade confirmada! Seu presidente foi notificado.');
+      } else {
+        toast('Sua disponibilidade foi removida.', { icon: 'ℹ️' });
+      }
+    }, 400);
+  };
+
+  const handleJoinRequest = async (profileId: string, status: 'APPROVED' | 'REJECTED') => {
+    try {
+      await apiClient.patch(`/teams/my-team/requests/${profileId}/status`, { status });
+      toast.success(status === 'APPROVED' ? 'Atleta aprovado para a equipe!' : 'Solicitação recusada com sucesso.');
+      fetchJoinRequests();
+      if (athleteProfile?.team?.id) {
+        fetchTeamMembers(athleteProfile.team.id);
+      }
+    } catch (err: any) {
+      toast.error(err.message || 'Erro ao processar solicitação.');
     }
-  }, [athleteProfile?.teamRole]);
+  };
+
+  const handleUploadDocument = async (type: 'rg' | 'enrollment', file: File) => {
+    if (!file) return;
+    const formData = new FormData();
+    formData.append('file', file);
+    if (type === 'rg') setUploadingRg(true);
+    else setUploadingEnrollment(true);
+
+    try {
+      await apiClient.post(`/teams/my/documents/${type}`, formData);
+      toast.success(`Documento (${type === 'rg' ? 'RG / Identidade' : 'Matrícula'}) enviado com sucesso!`);
+      fetchProfile();
+    } catch (err: any) {
+      toast.error(err.message || 'Falha no envio do documento.');
+    } finally {
+      if (type === 'rg') setUploadingRg(false);
+      else setUploadingEnrollment(false);
+    }
+  };
 
   const toggleModality = (modId: string) => {
     setSelectedModalities(prev => 
@@ -240,7 +305,7 @@ export default function ChampionshipDetailPage() {
 
   const handleBulkSubscribe = async () => {
     if (!user) {
-      toast.error('Faça login para se inscrever!');
+      toast.error('Faça login para realizar inscrições.');
       return;
     }
     if (!athleteProfile?.team) {
@@ -254,7 +319,7 @@ export default function ChampionshipDetailPage() {
     if (selectedModalities.length === 0) return;
 
     setIsSubscribing(true);
-    const toastId = toast.loading(`Processando ${selectedModalities.length} inscrição(ões)...`);
+    const toastId = toast.loading(`Iniciando ${selectedModalities.length} inscrição(ões)...`);
     
     let successCount = 0;
     let errors: string[] = [];
@@ -269,12 +334,12 @@ export default function ChampionshipDetailPage() {
     }
 
     if (successCount > 0) {
-      toast.success(`${successCount} inscrição(ões) realizada(s) com sucesso!`, { id: toastId });
+      toast.success(`${successCount} modalidade(s) inscrita(s) com sucesso!`, { id: toastId });
       setSelectedModalities([]);
       setIsConfirmModalOpen(false);
       fetchMySubscriptions();
     } else {
-      toast.error('Nenhuma inscrição foi concluída. Erro: ' + errors[0], { id: toastId });
+      toast.error('Nenhuma inscrição concluída. Motivo: ' + (errors[0] || 'Erro interno'), { id: toastId });
     }
     
     setIsSubscribing(false);
@@ -284,24 +349,22 @@ export default function ChampionshipDetailPage() {
     const toastId = toast.loading('Cancelando inscrição...');
     try {
       await apiClient.post(`/championships/${modId}/unenroll`, {});
-      
-      toast.success('Inscrição cancelada!', { id: toastId });
+      toast.success('Inscrição cancelada com sucesso!', { id: toastId });
       fetchMySubscriptions();
     } catch (err: any) {
-      toast.error(err.message, { id: toastId });
+      toast.error(err.message || 'Erro ao cancelar inscrição.', { id: toastId });
     }
   };
 
   const handleAddToRoster = async (subId: string, athleteId: string) => {
-    const toastId = toast.loading('Adicionando ao elenco...');
+    const toastId = toast.loading('Adicionando atleta ao elenco...');
     try {
       const data = await apiClient.post<any>(`/championships/subscription/${subId}/roster/${athleteId}`, {});
-      
-      toast.success('Atleta adicionado!', { id: toastId });
+      toast.success('Atleta adicionado ao elenco!', { id: toastId });
       setSelectedSubscription(data);
       fetchMySubscriptions();
     } catch (err: any) {
-      toast.error(err.message, { id: toastId });
+      toast.error(err.message || 'Erro ao adicionar ao elenco.', { id: toastId });
     }
   };
 
@@ -309,626 +372,1055 @@ export default function ChampionshipDetailPage() {
     const toastId = toast.loading('Removendo do elenco...');
     try {
       const data = await apiClient.delete<any>(`/championships/subscription/${subId}/roster/${athleteId}`);
-      
-      toast.success('Atleta removido!', { id: toastId });
+      toast.success('Atleta removido do elenco!', { id: toastId });
       setSelectedSubscription(data);
       fetchMySubscriptions();
     } catch (err: any) {
-      toast.error(err.message, { id: toastId });
+      toast.error(err.message || 'Erro ao remover do elenco.', { id: toastId });
     }
+  };
+
+  const getDocStatusBadge = (status?: string) => {
+    if (status === 'APPROVED') {
+      return (
+        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black bg-emerald-50 text-emerald-700 border border-emerald-200 uppercase tracking-wider">
+          <CheckCircle2 size={14} /> Aprovado
+        </span>
+      );
+    }
+    if (status === 'REJECTED') {
+      return (
+        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black bg-rose-50 text-rose-700 border border-rose-200 uppercase tracking-wider">
+          <XCircle size={14} /> Rejeitado
+        </span>
+      );
+    }
+    if (status === 'PENDING') {
+      return (
+        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black bg-amber-50 text-amber-700 border border-amber-200 uppercase tracking-wider">
+          <Clock size={14} /> Em Análise
+        </span>
+      );
+    }
+    return (
+      <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black bg-slate-100 text-slate-600 border border-slate-200 uppercase tracking-wider">
+        Pendente
+      </span>
+    );
   };
 
   if (loading) {
     return (
-      <>
-        <div className="min-h-screen bg-slate-50 flex items-center justify-center pt-20">
-          <Loader2 className="animate-spin text-blue-600" size={48} />
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center pt-20">
+        <div className="text-center space-y-4">
+          <Loader2 className="animate-spin text-orange-600 mx-auto" size={48} />
+          <p className="text-slate-500 font-medium text-sm">Carregando detalhes do campeonato...</p>
         </div>
-      </>
+      </div>
     );
   }
 
   if (!champ) {
     return (
-      <>
-        <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center pt-20">
-          <h2 className="text-2xl font-bold text-slate-800 mb-4">Campeonato não encontrado</h2>
-          <Link to="/campeonatos" className="text-blue-600 hover:underline">Voltar para a lista</Link>
+      <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center pt-20 px-4">
+        <div className="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm max-w-md w-full text-center">
+          <AlertCircle size={48} className="text-orange-500 mx-auto mb-4" />
+          <h2 className="text-2xl font-black text-slate-900 mb-2">Campeonato Não Encontrado</h2>
+          <p className="text-slate-500 text-sm mb-6">O campeonato solicitado não existe ou foi removido.</p>
+          <Link 
+            to="/campeonatos" 
+            className="inline-flex items-center justify-center gap-2 w-full bg-orange-600 hover:bg-orange-700 text-white font-bold py-3 px-6 rounded-xl transition-all shadow-md shadow-orange-600/20 text-sm"
+          >
+            <ArrowLeft size={18} /> Voltar para a lista
+          </Link>
         </div>
-      </>
+      </div>
     );
   }
 
   const isEnrollmentOpen = champ.status === 'OPEN' && (!champ.enrollmentDeadline || new Date(champ.enrollmentDeadline) >= new Date());
+  const isPresident = athleteProfile?.teamRole === 'PRESIDENT' || (user as any)?.userType === 'ATHLETICA_PRESIDENT' || (user as any)?.role === 'ADMIN';
+  const isAthlete = !!user && (!isPresident || !!athleteProfile);
 
   return (
-    <>
-      <div className="min-h-screen bg-transparent pb-24 font-inter text-slate-200 pt-20">
-        
-        {/* HERO HEADER */}
-        <div className="relative pt-10 pb-10 overflow-hidden">
-          {champ.bannerUrl ? (
-            <>
-              <div 
-                className="absolute inset-0 bg-cover bg-center"
-                style={{ backgroundImage: `url(${API_URL}${champ.bannerUrl})` }}
-              />
-              <div className="absolute inset-0 bg-blue-900/80 backdrop-blur-sm" />
-            </>
-          ) : (
-            <div className="absolute inset-0 bg-gradient-to-r from-slate-900 to-slate-800" />
-          )}
-          <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
-          
-          <div className="max-w-6xl mx-auto px-6 relative z-10 text-white">
-            <Link 
-              to="/campeonatos" 
-              className="inline-flex items-center gap-2 px-4 py-2 bg-neutral-900 border-2 border-neutral-800 hover:border-[#00f0ff] transition-all mb-8 text-sm font-bold tracking-widest uppercase font-mono"
-            >
-              <ArrowLeft size={16} /> Voltar
-            </Link>
+    <div className="min-h-screen bg-slate-50 pb-28 font-inter text-slate-900 pt-20">
+      
+      {/* 1. HERO HEADER */}
+      <div className="bg-gradient-to-br from-slate-900 via-slate-900 to-slate-800 text-white py-8 md:py-12 px-4 sm:px-6 shadow-md relative overflow-hidden">
+        {/* Decorative Background */}
+        <div className="absolute top-0 right-0 opacity-5 pointer-events-none transform translate-x-1/4 -translate-y-1/4">
+          <Trophy size={450} />
+        </div>
+        <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-transparent to-transparent pointer-events-none"></div>
 
-            <div className="flex flex-col md:flex-row gap-8 items-start">
-              
-              <div className="w-full md:w-1/3 max-w-sm mx-auto md:mx-0 shrink-0">
-                <div className="aspect-[4/5] bg-neutral-900 rounded-none shadow-[6px_6px_0_0_#00f0ff] border-2 border-neutral-800 overflow-hidden relative group">
-                  {champ.bannerUrl ? (
-                    <img 
-                      src={`${API_URL}${champ.bannerUrl}`} 
-                      alt={champ.name} 
-                      className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500"
-                    />
-                  ) : (
-                    <div className="w-full h-full flex flex-col items-center justify-center text-neutral-700 bg-neutral-950 p-6 text-center" style={{ backgroundImage: 'radial-gradient(#333 1px, transparent 1px)', backgroundSize: '10px 10px' }}>
-                      <Trophy size={64} className="mb-4 opacity-50" />
-                      <span className="font-mono font-bold tracking-widest uppercase">Sem Imagem</span>
-                    </div>
-                  )}
-                  <div className="absolute inset-0 border-4 border-black/10 pointer-events-none"></div>
-                </div>
-              </div>
-              
-              <div className="flex-1 w-full pt-4">
-                <div className="flex items-center gap-3 mb-6">
-                  <span className={`px-3 py-1 text-xs font-mono font-bold tracking-widest uppercase border-2 border-black ${isEnrollmentOpen ? 'bg-[#00f0ff] text-black' : 'bg-red-500 text-white'}`}>
-                    {isEnrollmentOpen ? 'INSCRIÇÕES ABERTAS' : 'INSCRIÇÕES ENCERRADAS'}
-                  </span>
-                  {champ.settings?.requireRg && (
-                    <span className="px-3 py-1 text-xs font-mono font-bold uppercase tracking-widest bg-yellow-400 text-black border-2 border-black flex items-center gap-1">
-                      <AlertCircle size={12} /> EXIGE DOC
-                    </span>
-                  )}
-                </div>
-                
-                <h1 className="text-3xl md:text-5xl font-mono font-bold uppercase tracking-tighter mb-4 text-white">
-                  {champ.name}
-                </h1>
-                
-                <p className="text-neutral-400 text-base max-w-2xl leading-relaxed font-sans">
-                  {champ.description || 'Nenhuma descrição fornecida para este campeonato.'}
-                </p>
-              </div>
-            </div>
+        <div className="max-w-7xl mx-auto relative z-10">
+          <Link 
+            to="/campeonatos" 
+            className="inline-flex items-center gap-2 text-slate-400 hover:text-white transition-colors mb-6 text-xs font-bold uppercase tracking-wider bg-slate-800/80 px-3 py-1.5 rounded-lg border border-slate-700/60"
+          >
+            <ArrowLeft size={14} /> Voltar para Campeonatos
+          </Link>
+
+          <div className="flex flex-col md:flex-row gap-6 md:gap-8 items-start">
             
-            {/* Metadata Bar */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mt-8 border-t-2 border-neutral-800 pt-8 font-mono">
-              <div className="flex items-start gap-3 p-4 bg-neutral-900 border-2 border-neutral-800">
-                <Calendar className="text-[#00f0ff] mt-0.5 shrink-0" size={20} />
-                <div>
-                  <p className="text-[10px] text-neutral-500 font-bold uppercase tracking-widest mb-1">Período</p>
-                  <p className="font-bold text-white text-sm">
-                    {champ.startDate ? new Date(champ.startDate).toLocaleDateString() : 'A definir'}
-                    {champ.endDate ? ` até ${new Date(champ.endDate).toLocaleDateString()}` : ''}
-                  </p>
-                </div>
-              </div>
-              
-              <div className="flex items-start gap-3 p-4 bg-neutral-900 border-2 border-neutral-800">
-                <Clock className="text-[#00f0ff] mt-0.5 shrink-0" size={20} />
-                <div>
-                  <p className="text-[10px] text-neutral-500 font-bold uppercase tracking-widest mb-1">Prazo de Inscrição</p>
-                  <p className="font-bold text-white text-sm">
-                    {champ.enrollmentDeadline ? new Date(champ.enrollmentDeadline).toLocaleDateString() : 'Sem prazo'}
-                  </p>
-                </div>
-              </div>
-              
-              <div className="flex items-start gap-3 p-4 bg-neutral-900 border-2 border-neutral-800">
-                <MapPin className="text-[#00f0ff] mt-0.5 shrink-0" size={20} />
-                <div>
-                  <p className="text-[10px] text-neutral-500 font-bold uppercase tracking-widest mb-1">Local(is)</p>
-                  <p className="font-bold text-white text-sm">
-                    {champ.settings?.locations?.join(', ') || 'A definir'}
-                  </p>
-                </div>
-              </div>
-              
-              <div className="flex items-start gap-3 p-4 bg-neutral-900 border-2 border-neutral-800">
-                <Trophy className="text-[#00f0ff] mt-0.5 shrink-0" size={20} />
-                <div>
-                  <p className="text-[10px] text-neutral-500 font-bold uppercase tracking-widest mb-1">Modalidades</p>
-                  <p className="font-bold text-white text-sm">
-                    {champ.modalities?.length || 0} disputas
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* TABS NAVIGATION */}
-        <div className="bg-black border-b-2 border-neutral-800 sticky top-0 z-30">
-          <div className="max-w-6xl mx-auto px-6 flex gap-8 overflow-x-auto no-scrollbar font-mono text-sm uppercase tracking-widest font-bold">
-            <button 
-              onClick={() => setActiveTab('overview')}
-              className={`py-4 border-b-4 whitespace-nowrap transition-colors ${activeTab === 'overview' ? 'border-[#00f0ff] text-[#00f0ff]' : 'border-transparent text-neutral-500 hover:text-white hover:border-neutral-700'}`}
-            >
-              Visão Geral
-            </button>
-            <button 
-              onClick={() => setActiveTab('modalities')}
-              className={`py-4 border-b-4 whitespace-nowrap transition-colors flex items-center gap-2 ${activeTab === 'modalities' ? 'border-[#00f0ff] text-[#00f0ff]' : 'border-transparent text-neutral-500 hover:text-white hover:border-neutral-700'}`}
-            >
-              Modalidades
-              {champ.modalities && champ.modalities.length > 0 && (
-                <span className="bg-neutral-800 text-white py-0.5 px-2 rounded-none text-xs border border-neutral-700">{champ.modalities.length}</span>
-              )}
-            </button>
-            <button 
-              onClick={() => setActiveTab('teams')}
-              className={`py-4 border-b-4 whitespace-nowrap transition-colors ${activeTab === 'teams' ? 'border-[#00f0ff] text-[#00f0ff]' : 'border-transparent text-neutral-500 hover:text-white hover:border-neutral-700'}`}
-            >
-              Equipes
-            </button>
-            <button 
-              onClick={() => setActiveTab('brackets')}
-              className={`py-4 border-b-4 whitespace-nowrap transition-colors ${activeTab === 'brackets' ? 'border-[#00f0ff] text-[#00f0ff]' : 'border-transparent text-neutral-500 hover:text-white hover:border-neutral-700'}`}
-            >
-              Tabela
-            </button>
-            {athleteProfile && champ.settings && (champ.settings.requireRg || champ.settings.requireEnrollment) && (
-              <button 
-                onClick={() => setActiveTab('documentos')}
-                className={`py-4 border-b-4 whitespace-nowrap transition-colors ${activeTab === 'documentos' ? 'border-[#00f0ff] text-[#00f0ff]' : 'border-transparent text-neutral-500 hover:text-white hover:border-neutral-700'}`}
-              >
-                Meus Documentos
-              </button>
-            )}
-            {athleteProfile?.teamRole === 'PRESIDENT' && teamDashboard && (
-              <button 
-                onClick={() => setActiveTab('painel-atletica')}
-                className={`py-4 border-b-4 whitespace-nowrap transition-colors ${activeTab === 'painel-atletica' ? 'border-[#00f0ff] text-[#00f0ff]' : 'border-transparent text-neutral-500 hover:text-white hover:border-neutral-700'}`}
-              >
-                Painel da Atlética
-              </button>
-            )}
-          </div>
-        </div>
-
-        <div className="max-w-6xl mx-auto px-6 py-10 space-y-10">
-          
-          {activeTab === 'overview' && (
-            <div className="animate-in fade-in duration-500 space-y-8">
-              <div className="bg-white rounded-3xl p-8 border border-gray-200 shadow-sm">
-                <h3 className="text-xl font-bold text-slate-900 mb-4">Sobre o Evento</h3>
-                <p className="text-slate-600 font-sans whitespace-pre-wrap">{champ.description || 'Nenhuma descrição detalhada fornecida para este campeonato.'}</p>
-              </div>
-              
-              <div className="bg-white rounded-3xl p-8 border border-gray-200 shadow-sm">
-                <h3 className="text-xl font-bold text-slate-900 mb-4">Regulamento</h3>
-                <div className="bg-gray-50 rounded-2xl p-6 border border-dashed border-gray-300 text-center">
-                  <Info className="mx-auto text-gray-400 mb-2" size={32} />
-                  <p className="text-gray-500 text-sm">Documento pendente.</p>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {activeTab === 'teams' && (
-            <div className="animate-in fade-in duration-500 text-center py-20 bg-white rounded-3xl border border-dashed border-gray-300 shadow-sm">
-              <Shield className="mx-auto text-gray-400 mb-4" size={48} />
-              <h3 className="text-xl font-bold text-slate-800">Equipes Inscritas</h3>
-              <p className="text-gray-500 mt-2 text-sm">Disponível em breve.</p>
-            </div>
-          )}
-
-          {activeTab === 'brackets' && (
-            <div className="animate-in fade-in duration-500 text-center py-20 bg-white rounded-3xl border border-dashed border-gray-300 shadow-sm">
-              <Trophy className="mx-auto text-gray-400 mb-4" size={48} />
-              <h3 className="text-xl font-bold text-slate-800">Tabela de Jogos</h3>
-              <p className="text-gray-500 mt-2 text-sm">Será gerada após encerramento.</p>
-            </div>
-          )}
-
-          {activeTab === 'documentos' && (
-            <div className="animate-in fade-in duration-500 space-y-6">
-              <div className="flex items-center gap-3 mb-6">
-                <FileText className="text-blue-500" size={32} />
-                <div>
-                  <h2 className="text-2xl font-bold text-slate-900">Meus Documentos</h2>
-                  <p className="text-sm text-slate-500">Envie os documentos exigidos para participar do campeonato.</p>
-                </div>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {champ.settings?.requireRg && (
-                    <div className="bg-white rounded-3xl border border-gray-200 p-6 shadow-sm">
-                      <h3 className="font-bold text-slate-900 mb-2">RG / Doc. Oficial</h3>
-                      {athleteDocument?.rgUrl ? (
-                        <div>
-                          <div className={`mb-4 inline-flex items-center px-3 py-1 text-xs font-bold rounded-lg uppercase ${
-                            athleteDocument.rgStatus === 'APPROVED' ? 'bg-emerald-50 text-emerald-700' :
-                            athleteDocument.rgStatus === 'REJECTED' ? 'bg-red-50 text-red-700' :
-                            'bg-orange-50 text-orange-700'
-                          }`}>
-                            {athleteDocument.rgStatus === 'APPROVED' ? 'Aprovado' : athleteDocument.rgStatus === 'REJECTED' ? 'Rejeitado' : 'Em Análise'}
-                          </div>
-                          {athleteDocument.rgStatus === 'REJECTED' && (
-                            <p className="text-xs text-red-600 bg-red-50 p-3 rounded-xl mb-4">{athleteDocument.rgRejectionReason}</p>
-                          )}
-                          <a href={`${API_URL}${athleteDocument.rgUrl}`} target="_blank" rel="noreferrer" className="flex items-center gap-2 text-sm font-bold text-blue-600 hover:text-blue-700">
-                            Visualizar Arquivo
-                          </a>
-                        </div>
-                      ) : (
-                        <div>
-                          <p className="text-sm text-slate-600 mb-4">Você ainda não enviou seu documento.</p>
-                          <label className="cursor-pointer inline-flex items-center bg-blue-50 text-blue-700 font-bold text-sm px-4 py-2 rounded-xl hover:bg-blue-100 transition-colors">
-                            <input type="file" className="hidden" accept="image/*,.pdf" onChange={async (e) => {
-                              const file = e.target.files?.[0];
-                              if (!file) return;
-                              const formData = new FormData();
-                              formData.append('file', file);
-                              try {
-                                const res = await apiClient.post<{url: string}>('/upload', formData, { headers: { 'Content-Type': 'multipart/form-data' } });
-                                await apiClient.post(`/championships/${id}/athlete-document`, { type: 'rg', url: res.url });
-                                toast.success('RG enviado com sucesso!');
-                                fetchAthleteDocument();
-                              } catch (err: any) { toast.error(err.message || 'Erro ao enviar RG'); }
-                            }} />
-                            Enviar RG
-                          </label>
-                        </div>
-                      )}
-                    </div>
-                  )}
-
-                  {champ.settings?.requireEnrollment && (
-                    <div className="bg-white rounded-3xl border border-gray-200 p-6 shadow-sm">
-                      <h3 className="font-bold text-slate-900 mb-2">Comprovante de Matrícula</h3>
-                      {athleteDocument?.enrollmentUrl ? (
-                        <div>
-                          <div className={`mb-4 inline-flex items-center px-3 py-1 text-xs font-bold rounded-lg uppercase ${
-                            athleteDocument.enrollmentStatus === 'APPROVED' ? 'bg-emerald-50 text-emerald-700' :
-                            athleteDocument.enrollmentStatus === 'REJECTED' ? 'bg-red-50 text-red-700' :
-                            'bg-orange-50 text-orange-700'
-                          }`}>
-                            {athleteDocument.enrollmentStatus === 'APPROVED' ? 'Aprovado' : athleteDocument.enrollmentStatus === 'REJECTED' ? 'Rejeitado' : 'Em Análise'}
-                          </div>
-                          {athleteDocument.enrollmentStatus === 'REJECTED' && (
-                            <p className="text-xs text-red-600 bg-red-50 p-3 rounded-xl mb-4">{athleteDocument.enrollmentRejectionReason}</p>
-                          )}
-                          <a href={`${API_URL}${athleteDocument.enrollmentUrl}`} target="_blank" rel="noreferrer" className="flex items-center gap-2 text-sm font-bold text-blue-600 hover:text-blue-700">
-                            Visualizar Arquivo
-                          </a>
-                        </div>
-                      ) : (
-                        <div>
-                          <p className="text-sm text-slate-600 mb-4">Você ainda não enviou seu comprovante.</p>
-                          <label className="cursor-pointer inline-flex items-center bg-blue-50 text-blue-700 font-bold text-sm px-4 py-2 rounded-xl hover:bg-blue-100 transition-colors">
-                            <input type="file" className="hidden" accept="image/*,.pdf" onChange={async (e) => {
-                              const file = e.target.files?.[0];
-                              if (!file) return;
-                              const formData = new FormData();
-                              formData.append('file', file);
-                              try {
-                                const res = await apiClient.post<{url: string}>('/upload', formData, { headers: { 'Content-Type': 'multipart/form-data' } });
-                                await apiClient.post(`/championships/${id}/athlete-document`, { type: 'enrollment', url: res.url });
-                                toast.success('Matrícula enviada com sucesso!');
-                                fetchAthleteDocument();
-                              } catch (err: any) { toast.error(err.message || 'Erro ao enviar matrícula'); }
-                            }} />
-                            Enviar Matrícula
-                          </label>
-                        </div>
-                      )}
-                    </div>
-                  )}
-                </div>
-            </div>
-          )}
-
-          {activeTab === 'painel-atletica' && athleteProfile?.teamRole === 'PRESIDENT' && teamDashboard && (
-            <div className="animate-in fade-in duration-500 space-y-6">
-              <div className="flex items-center gap-3 mb-6">
-                <Shield className="text-indigo-600" size={32} />
-                <div>
-                  <h2 className="text-2xl font-bold text-slate-900">Gestão da Equipe</h2>
-                  <p className="text-sm text-slate-500">Valide as modalidades que seus atletas se inscreveram.</p>
-                </div>
-              </div>
-              
-              {teamDashboard.subscriptions.length === 0 ? (
-                  <div className="bg-white rounded-3xl p-10 text-center border border-gray-200">
-                    <p className="text-slate-500">Nenhum atleta da sua equipe se inscreveu ainda.</p>
-                  </div>
+            {/* Banner/Logo Card */}
+            <div className="w-full md:w-56 lg:w-64 max-w-xs mx-auto md:mx-0 shrink-0">
+              <div className="aspect-square bg-slate-800 rounded-3xl overflow-hidden relative group shadow-xl border-2 border-slate-700/80">
+                {champ.bannerUrl ? (
+                  <img 
+                    src={`${API_URL}${champ.bannerUrl}`} 
+                    alt={champ.name} 
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
+                  />
                 ) : (
-                  <div className="bg-white rounded-3xl border border-gray-200 shadow-sm overflow-hidden">
-                    <div className="overflow-x-auto">
-                      <table className="w-full text-left">
-                        <thead className="bg-gray-50 text-xs font-bold uppercase text-gray-500">
-                          <tr>
-                            <th className="px-6 py-4">Atleta</th>
-                            <th className="px-6 py-4">Modalidade</th>
-                            <th className="px-6 py-4">Documentos</th>
-                            <th className="px-6 py-4 text-center">Ações</th>
-                          </tr>
-                        </thead>
-                        <tbody className="divide-y divide-gray-100">
-                          {teamDashboard.subscriptions.map((sub: any) => {
-                            const doc = teamDashboard.documents.find((d: any) => d.athlete?.id === sub.athlete?.id);
-                            return (
-                              <tr key={sub.id} className="hover:bg-gray-50 transition-colors">
-                                <td className="px-6 py-4">
-                                  <div className="font-bold text-slate-900">{sub.athlete?.user?.name}</div>
-                                  <div className="text-xs text-slate-500">{sub.athlete?.cpf || 'Sem CPF'}</div>
-                                </td>
-                                <td className="px-6 py-4">
-                                  <div className="font-bold text-slate-800">{sub.modality?.name}</div>
-                                  <div className="text-[10px] uppercase font-bold text-slate-500">{sub.modality?.type} - {sub.modality?.gender}</div>
-                                </td>
-                                <td className="px-6 py-4">
-                                  {champ.settings?.requireRg || champ.settings?.requireEnrollment ? (
-                                    <div className="flex flex-col gap-1 text-[10px] font-bold uppercase">
-                                      {champ.settings.requireRg && (
-                                        <div className={`flex items-center gap-1 ${doc?.rgStatus === 'APPROVED' ? 'text-emerald-600' : doc?.rgStatus === 'PENDING' ? 'text-amber-500' : 'text-red-500'}`}>
-                                          RG: {doc?.rgStatus === 'APPROVED' ? 'OK' : doc?.rgStatus === 'PENDING' ? 'Pendente' : doc?.rgStatus === 'REJECTED' ? 'Rejeitado' : 'Faltante'}
-                                        </div>
-                                      )}
-                                      {champ.settings.requireEnrollment && (
-                                        <div className={`flex items-center gap-1 ${doc?.enrollmentStatus === 'APPROVED' ? 'text-emerald-600' : doc?.enrollmentStatus === 'PENDING' ? 'text-amber-500' : 'text-red-500'}`}>
-                                          MATR: {doc?.enrollmentStatus === 'APPROVED' ? 'OK' : doc?.enrollmentStatus === 'PENDING' ? 'Pendente' : doc?.enrollmentStatus === 'REJECTED' ? 'Rejeitada' : 'Faltante'}
-                                        </div>
-                                      )}
-                                    </div>
-                                  ) : (
-                                    <span className="text-xs text-slate-400">Não exigido</span>
-                                  )}
-                                </td>
-                                <td className="px-6 py-4 text-center">
-                                  {sub.status === 'PENDING_TEAM_APPROVAL' ? (
-                                    <button
-                                      onClick={async () => {
-                                        if (window.confirm(`Aprovar inscrição de ${sub.athlete?.user?.name}?`)) {
-                                          try {
-                                            await apiClient.post(`/championships/${id}/subscriptions/${sub.id}/approve`);
-                                            toast.success('Inscrição aprovada pela Atlética!');
-                                            fetchTeamDashboard();
-                                            fetchMySubscriptions();
-                                          } catch (err: any) {
-                                            toast.error(err.message || 'Erro ao aprovar.');
-                                          }
-                                        }
-                                      }}
-                                      className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-[10px] font-bold uppercase transition-colors"
-                                    >
-                                      Aprovar Atleta
-                                    </button>
-                                  ) : (
-                                    <span className="px-3 py-1.5 bg-gray-100 text-gray-600 rounded-lg text-[10px] font-bold uppercase">
-                                      {sub.status === 'PENDING_DOCS' ? 'Docs Pendentes' :
-                                       sub.status === 'PENDING_PAYMENT' ? 'Aguardando Pagto' :
-                                       sub.status === 'CONFIRMED' ? 'Confirmado' :
-                                       sub.status === 'REJECTED' ? 'Rejeitado' : 'Em Andamento'}
-                                    </span>
-                                  )}
-                                </td>
-                              </tr>
-                            );
-                          })}
-                        </tbody>
-                      </table>
-                    </div>
+                  <div className="w-full h-full flex flex-col items-center justify-center text-slate-500 bg-slate-800 p-6 text-center">
+                    <Trophy size={56} className="mb-3 opacity-40 text-orange-500" />
+                    <span className="font-bold text-xs uppercase tracking-wider text-slate-400">Federada Sports</span>
                   </div>
                 )}
-            </div>
-          )}
-
-          {activeTab === 'modalities' && (
-            <div className="animate-in fade-in duration-500 space-y-10">
-              {!user && (
-            <div className="bg-blue-50 border border-blue-200 rounded-2xl p-6 flex flex-col sm:flex-row items-center justify-between gap-6 shadow-sm">
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-blue-100 flex items-center justify-center text-blue-600 rounded-full shrink-0">
-                  <Info size={24} />
-                </div>
-                <div>
-                   <h3 className="font-bold text-lg text-slate-900">Quer participar?</h3>
-                   <p className="text-slate-600 text-sm mt-1">Faça login e vincule-se a uma atlética para se inscrever nas modalidades.</p>
-                 </div>
               </div>
-              <Link to="/" className="bg-blue-600 text-white font-bold py-2.5 px-6 rounded-xl hover:bg-blue-700 transition-colors whitespace-nowrap shadow-sm">
-                Fazer Login
-              </Link>
             </div>
-          )}
 
-          {user && !athleteProfile?.team && (
-             <div className="bg-orange-50 border border-orange-200 rounded-2xl p-6 flex flex-col sm:flex-row items-center justify-between gap-6 shadow-sm">
-               <div className="flex items-center gap-4">
-                 <div className="w-12 h-12 bg-orange-100 flex items-center justify-center text-orange-600 rounded-full shrink-0">
-                   <Shield size={24} />
-                 </div>
-                 <div>
-                   <h3 className="font-bold text-lg text-slate-900">Quase lá!</h3>
-                   <p className="text-slate-600 text-sm mt-1">Você precisa estar vinculado a uma atlética para poder se inscrever.</p>
-                 </div>
-               </div>
-               <Link to="/perfil" className="bg-orange-600 text-white font-bold py-2.5 px-6 rounded-xl hover:bg-orange-700 transition-colors whitespace-nowrap shadow-sm">
-                 Vincular-se a uma Atlética
-               </Link>
-             </div>
-          )}
+            {/* Content Details */}
+            <div className="flex-1 w-full">
+              <div className="flex flex-wrap items-center gap-2.5 mb-4">
+                <span className={`px-3 py-1 text-xs font-black tracking-wider uppercase rounded-full border ${
+                  isEnrollmentOpen 
+                    ? 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30' 
+                    : 'bg-rose-500/15 text-rose-400 border-rose-500/30'
+                }`}>
+                  {isEnrollmentOpen ? 'Inscrições Abertas' : 'Inscrições Encerradas'}
+                </span>
 
-          {/* Painel de Disponibilidade do Atleta */}
-          {user && athleteProfile?.team && athleteProfile.teamRole !== 'PRESIDENT' && isEnrollmentOpen && (
-            <div className={`p-6 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-6 transition-colors duration-300 border shadow-sm ${isAvailable ? 'bg-green-50 border-green-200' : 'bg-gray-50 border-gray-200'}`}>
-              <div className="flex items-center gap-4">
-                <div className={`w-12 h-12 rounded-full flex items-center justify-center shrink-0 ${isAvailable ? 'bg-green-100 text-green-600' : 'bg-gray-200 text-gray-500'}`}>
-                  {isAvailable ? <CheckCircle2 size={24} /> : <Info size={24} />}
+                {(champ.settings?.requireRg || champ.settings?.requireEnrollment) && (
+                  <span className="px-3 py-1 text-xs font-black uppercase tracking-wider bg-amber-500/15 text-amber-400 border border-amber-500/30 rounded-full flex items-center gap-1.5">
+                    <AlertCircle size={14} /> Exige Documentação
+                  </span>
+                )}
+
+                {champ.audienceFocus && (
+                  <span className="px-3 py-1 text-xs font-bold uppercase tracking-wider bg-slate-800 text-slate-300 border border-slate-700 rounded-full">
+                    {champ.audienceFocus}
+                  </span>
+                )}
+              </div>
+
+              <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black uppercase tracking-tight text-white mb-3">
+                {champ.name}
+              </h1>
+
+              <p className="text-slate-300 text-sm sm:text-base max-w-3xl leading-relaxed font-normal mb-6 line-clamp-3">
+                {champ.description || 'Campeonato oficial organizado na plataforma Federada. Confira abaixo todas as regras, modalidades e prazos para participar.'}
+              </p>
+
+              {/* Metadata Bar */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 pt-4 border-t border-slate-800">
+                <div className="flex items-start gap-2.5">
+                  <div className="w-8 h-8 rounded-lg bg-orange-500/10 border border-orange-500/20 text-orange-400 flex items-center justify-center shrink-0 mt-0.5">
+                    <Calendar size={16} />
+                  </div>
+                  <div>
+                    <p className="text-[10px] text-slate-400 font-black uppercase tracking-wider">Período</p>
+                    <p className="font-semibold text-slate-200 text-xs sm:text-sm">
+                      {champ.startDate ? new Date(champ.startDate).toLocaleDateString('pt-BR') : 'A definir'}
+                      {champ.endDate ? ` a ${new Date(champ.endDate).toLocaleDateString('pt-BR')}` : ''}
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <h3 className="font-bold text-lg text-slate-900">Sua Disponibilidade</h3>
-                  <p className={`text-sm mt-1 ${isAvailable ? 'text-green-800' : 'text-gray-600'}`}>
-                    {isAvailable 
-                      ? "Você está marcado como DISPONÍVEL para jogar. Seu presidente será notificado!"
-                      : "Confirme sua disponibilidade para sinalizar ao seu presidente que você quer ser convocado."}
-                  </p>
+
+                <div className="flex items-start gap-2.5">
+                  <div className="w-8 h-8 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-400 flex items-center justify-center shrink-0 mt-0.5">
+                    <Clock size={16} />
+                  </div>
+                  <div>
+                    <p className="text-[10px] text-slate-400 font-black uppercase tracking-wider">Prazo Inscrições</p>
+                    <p className="font-semibold text-slate-200 text-xs sm:text-sm">
+                      {champ.enrollmentDeadline ? new Date(champ.enrollmentDeadline).toLocaleDateString('pt-BR') : 'Sem prazo'}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-2.5">
+                  <div className="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0 mt-0.5">
+                    <MapPin size={16} />
+                  </div>
+                  <div>
+                    <p className="text-[10px] text-slate-400 font-black uppercase tracking-wider">Local</p>
+                    <p className="font-semibold text-slate-200 text-xs sm:text-sm truncate max-w-[120px]">
+                      {champ.settings?.locations?.join(', ') || 'A definir'}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-2.5">
+                  <div className="w-8 h-8 rounded-lg bg-blue-500/10 border border-blue-500/20 text-blue-400 flex items-center justify-center shrink-0 mt-0.5">
+                    <Trophy size={16} />
+                  </div>
+                  <div>
+                    <p className="text-[10px] text-slate-400 font-black uppercase tracking-wider">Modalidades</p>
+                    <p className="font-semibold text-slate-200 text-xs sm:text-sm">
+                      {champ.modalities?.length || 0} categorias
+                    </p>
+                  </div>
                 </div>
               </div>
-              <button 
-                onClick={toggleAvailability}
-                disabled={loadingAvailability}
-                className={`font-bold py-2.5 px-6 rounded-xl transition-all whitespace-nowrap disabled:opacity-50 shadow-sm ${isAvailable ? 'bg-white text-green-700 border border-green-200 hover:bg-green-50' : 'bg-green-600 text-white hover:bg-green-700'}`}
-              >
-                {loadingAvailability ? 'Atualizando...' : (isAvailable ? 'Remover Disponibilidade' : 'Estou Disponível!')}
-              </button>
             </div>
-          )}
 
-          {/* Modalities Section */}
-          <div>
-            <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-4 mb-6">
-              <h2 className="text-2xl font-bold text-slate-900 flex items-center gap-3">
-                <CheckCircle2 className="text-blue-500" /> 
-                Modalidades
-              </h2>
-              
-              {/* Filter Bar */}
-              {champ.modalities && champ.modalities.length > 0 && (
-                <div className="flex flex-col sm:flex-row gap-3">
-                  <div className="relative">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
-                    <input 
-                      type="text" 
-                      placeholder="Buscar modalidade..." 
-                      className="w-full sm:w-64 pl-9 pr-4 py-2 bg-white border border-gray-300 rounded-xl text-sm text-slate-900 placeholder:text-gray-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors shadow-sm"
-                      value={filterText}
-                      onChange={(e) => setFilterText(e.target.value)}
-                    />
-                  </div>
-                  <div className="flex gap-2">
-                    <select 
-                      className="px-4 py-2 bg-white border border-gray-300 rounded-xl font-medium text-sm text-slate-700 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 shadow-sm cursor-pointer"
-                      value={filterType}
-                      onChange={(e) => setFilterType(e.target.value)}
-                    >
-                      <option value="ALL">Todos os Tipos</option>
-                      <option value="INDIVIDUAL">Individual</option>
-                      <option value="COLETIVO">Coletivo</option>
-                    </select>
-                    <select 
-                      className="px-4 py-2 bg-white border border-gray-300 rounded-xl font-medium text-sm text-slate-700 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 shadow-sm cursor-pointer"
-                      value={filterGender}
-                      onChange={(e) => setFilterGender(e.target.value)}
-                    >
-                      <option value="ALL">Todos os Gêneros</option>
-                      <option value="MASCULINO">Masculino</option>
-                      <option value="FEMININO">Feminino</option>
-                      <option value="MISTO">Misto</option>
-                    </select>
-                  </div>
-                </div>
-              )}
-            </div>
-            
-            {(() => {
-              const filteredModalities = champ.modalities?.filter((mod: any) => {
-                const matchesText = mod.name.toLowerCase().includes(filterText.toLowerCase());
-                const matchesType = filterType === 'ALL' || mod.type === filterType;
-                const matchesGender = filterGender === 'ALL' || (mod.gender || 'MISTO') === filterGender;
-                return matchesText && matchesType && matchesGender;
-              }) || [];
-
-              if (!champ.modalities || champ.modalities.length === 0) {
-                return (
-                  <div className="text-center py-16 bg-white rounded-3xl border border-gray-200 shadow-sm">
-                    <Trophy size={48} className="mx-auto text-gray-400 mb-4" />
-                    <h3 className="text-xl font-bold text-slate-800">Nenhuma modalidade disponível</h3>
-                    <p className="text-gray-500 mt-2">A organização ainda não cadastrou modalidades para este campeonato.</p>
-                  </div>
-                );
-              }
-
-              if (filteredModalities.length === 0) {
-                return (
-                  <div className="text-center py-12 bg-white rounded-3xl border border-dashed border-gray-300">
-                    <Filter size={32} className="mx-auto text-gray-400 mb-3" />
-                    <h3 className="font-bold text-slate-800">Nenhuma modalidade encontrada</h3>
-                    <p className="text-gray-500 text-sm mt-1">Tente ajustar os filtros de busca para encontrar outras modalidades.</p>
-                    <button 
-                      onClick={() => { setFilterText(''); setFilterType('ALL'); setFilterGender('ALL'); }}
-                      className="mt-4 px-4 py-2 text-sm font-bold text-slate-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
-                    >
-                      Limpar Filtros
-                    </button>
-                  </div>
-                );
-              }
-
-              return (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {filteredModalities.map((mod: any) => {
-                  const subscription = mySubscriptions?.find(s => s.modality?.id === mod.id);
-                  const isSelected = selectedModalities.includes(mod.id);
-                  
-                  return (
-                    <ModalityCard 
-                      key={mod.id}
-                      mod={mod}
-                      subscription={subscription}
-                      isSelected={isSelected}
-                      isEnrollmentOpen={isEnrollmentOpen}
-                      athleteProfile={athleteProfile}
-                      onToggle={toggleModality}
-                      onUnsubscribe={handleUnsubscribe}
-                      onShowRoster={(sub) => {
-                        setSelectedSubscription(sub); 
-                        if(athleteProfile?.team?.id) fetchTeamMembers(athleteProfile.team.id);
-                        setShowRosterModal(true); 
-                      }}
-                    />
-                  );
-                })}
-              </div>
-              );
-            })()}
           </div>
-            </div>
-          )}
         </div>
       </div>
 
-      {/* FLOATING ACTION BAR FOR BULK SUBSCRIPTION */}
+      {/* 2. ROLE CONTEXT BANNER */}
+      <div className="max-w-7xl mx-auto px-4 lg:px-6 -mt-3 relative z-20">
+        {isPresident && (
+          <div className="bg-white border-l-4 border-l-orange-500 border border-slate-200 rounded-2xl p-4 sm:p-5 shadow-md flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div className="flex items-center gap-3.5">
+              <div className="w-12 h-12 rounded-xl bg-orange-50 text-orange-600 border border-orange-200 flex items-center justify-center shrink-0 shadow-sm">
+                <Shield size={24} />
+              </div>
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="bg-orange-100 text-orange-800 text-[10px] font-black uppercase px-2 py-0.5 rounded">
+                    Painel da Atlética Ativo
+                  </span>
+                  <span className="text-slate-800 font-black text-sm">
+                    {athleteProfile?.team?.name || 'Sua Atlética'}
+                  </span>
+                </div>
+                <p className="text-xs text-slate-500 mt-1">
+                  {joinRequests.length > 0 
+                    ? `⚠️ ${joinRequests.length} solicitação(ões) de atletas aguardando sua aprovação.` 
+                    : 'Gerencie inscrições, membros e elenco da sua atlética neste campeonato.'}
+                </p>
+              </div>
+            </div>
+
+            <button 
+              onClick={() => setActiveTab('painel-atletica')}
+              className="w-full sm:w-auto bg-slate-900 hover:bg-slate-800 text-white font-bold px-5 py-2.5 rounded-xl text-xs uppercase tracking-wider transition-all shadow-sm flex items-center justify-center gap-2 shrink-0"
+            >
+              <span>Ir para Painel da Atlética</span>
+              {joinRequests.length > 0 && (
+                <span className="bg-orange-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-[10px] font-black">
+                  {joinRequests.length}
+                </span>
+              )}
+            </button>
+          </div>
+        )}
+
+        {!isPresident && user && athleteProfile?.team && (
+          <div className="bg-white border-l-4 border-l-orange-500 border border-slate-200 rounded-2xl p-4 sm:p-5 shadow-md flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div className="flex items-center gap-3.5">
+              <div className="w-12 h-12 rounded-xl bg-orange-50 text-orange-600 border border-orange-200 flex items-center justify-center shrink-0 shadow-sm">
+                <UserCheck size={24} />
+              </div>
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Sua Atlética:</span>
+                  <span className="text-slate-900 font-black text-sm">{athleteProfile.team.name}</span>
+                  {isAvailable && (
+                    <span className="bg-emerald-100 text-emerald-800 text-[10px] font-black uppercase px-2 py-0.5 rounded flex items-center gap-1">
+                      <CheckCircle2 size={10} /> Disponível
+                    </span>
+                  )}
+                </div>
+                <p className="text-xs text-slate-500 mt-1">
+                  {isAvailable 
+                    ? 'Você está marcado como disponível para os jogos. Seu presidente pode adicioná-lo ao elenco.'
+                    : 'Confirme sua disponibilidade para informar seu presidente que deseja competir.'}
+                </p>
+              </div>
+            </div>
+
+            {isEnrollmentOpen && (
+              <button
+                onClick={toggleAvailability}
+                disabled={loadingAvailability}
+                className={`w-full sm:w-auto px-5 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider transition-all shadow-sm flex items-center justify-center gap-2 shrink-0 ${
+                  isAvailable 
+                    ? 'bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100' 
+                    : 'bg-orange-600 hover:bg-orange-700 text-white shadow-orange-600/20'
+                }`}
+              >
+                {loadingAvailability ? <Loader2 className="animate-spin" size={14} /> : null}
+                <span>{isAvailable ? 'Disponibilidade Ativa ✓' : 'Estou Disponível para Convocação'}</span>
+              </button>
+            )}
+          </div>
+        )}
+
+        {!user && (
+          <div className="bg-white border-l-4 border-l-blue-500 border border-slate-200 rounded-2xl p-4 sm:p-5 shadow-md flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div className="flex items-center gap-3.5">
+              <div className="w-11 h-11 rounded-xl bg-blue-50 text-blue-600 border border-blue-200 flex items-center justify-center shrink-0">
+                <Info size={22} />
+              </div>
+              <div>
+                <h4 className="font-bold text-slate-900 text-sm">Deseja participar deste campeonato?</h4>
+                <p className="text-xs text-slate-500 mt-0.5">
+                  Faça login e vincule-se a uma atlética para se inscrever nas modalidades disponíveis.
+                </p>
+              </div>
+            </div>
+            <Link 
+              to="/login" 
+              className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white font-bold px-5 py-2.5 rounded-xl text-xs uppercase tracking-wider transition-all shadow-sm text-center shrink-0"
+            >
+              Fazer Login / Cadastrar
+            </Link>
+          </div>
+        )}
+
+        {user && !athleteProfile?.team && (
+          <div className="bg-white border-l-4 border-l-amber-500 border border-slate-200 rounded-2xl p-4 sm:p-5 shadow-md flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div className="flex items-center gap-3.5">
+              <div className="w-11 h-11 rounded-xl bg-amber-50 text-amber-600 border border-amber-200 flex items-center justify-center shrink-0">
+                <AlertCircle size={22} />
+              </div>
+              <div>
+                <h4 className="font-bold text-slate-900 text-sm">Vínculo de Atlética Necessário</h4>
+                <p className="text-xs text-slate-500 mt-0.5">
+                  Para participar e se inscrever, é necessário estar vinculado a uma Atlética cadastrada.
+                </p>
+              </div>
+            </div>
+            <Link 
+              to="/perfil" 
+              className="w-full sm:w-auto bg-amber-500 hover:bg-amber-600 text-white font-bold px-5 py-2.5 rounded-xl text-xs uppercase tracking-wider transition-all shadow-sm text-center shrink-0"
+            >
+              Vincular à minha Atlética
+            </Link>
+          </div>
+        )}
+      </div>
+
+      {/* 3. MAIN NAVIGATION & CONTENT LAYOUT */}
+      <div className="max-w-7xl mx-auto px-4 lg:px-6 py-6 lg:py-8 flex flex-col lg:flex-row gap-6 lg:gap-8">
+        
+        {/* Left Navigation Sidebar (Desktop) / Fixed Bottom Bar (Mobile) */}
+        <aside className="w-full lg:w-64 shrink-0">
+          <ChampionshipDetailNav
+            modalitiesCount={champ.modalities?.length || 0}
+            activeSection={activeTab}
+            onSelectSection={setActiveTab}
+            isPresident={isPresident}
+            isAthlete={isAthlete}
+          />
+        </aside>
+
+        {/* Right Main Content */}
+        <main className="flex-1 space-y-6 min-w-0">
+
+          {/* TAB 1: VISÃO GERAL */}
+          {activeTab === 'visao-geral' && (
+            <div className="space-y-6 animate-in fade-in duration-300">
+              
+              {/* Event Description Card */}
+              <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-sm">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-10 h-10 rounded-2xl bg-orange-50 text-orange-600 border border-orange-200 flex items-center justify-center">
+                    <Sparkles size={20} />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-black text-slate-900 uppercase tracking-tight">Sobre o Campeonato</h3>
+                    <p className="text-xs text-slate-500 font-medium">Informações gerais e apresentação da competição</p>
+                  </div>
+                </div>
+                
+                <p className="text-slate-700 text-sm sm:text-base leading-relaxed whitespace-pre-wrap font-normal">
+                  {champ.description || 'Nenhuma descrição detalhada fornecida para este campeonato.'}
+                </p>
+              </div>
+
+              {/* Event Quick Specs Grid */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div className="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm">
+                  <Calendar className="text-orange-500 mb-3" size={28} />
+                  <h4 className="text-xs font-black uppercase tracking-wider text-slate-400">Datas Oficiais</h4>
+                  <p className="text-slate-900 font-extrabold text-base mt-1">
+                    {champ.startDate ? new Date(champ.startDate).toLocaleDateString('pt-BR') : 'A definir'}
+                  </p>
+                  <p className="text-xs text-slate-500 mt-0.5">
+                    {champ.endDate ? `Até ${new Date(champ.endDate).toLocaleDateString('pt-BR')}` : 'Encerramento a definir'}
+                  </p>
+                </div>
+
+                <div className="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm">
+                  <MapPin className="text-emerald-500 mb-3" size={28} />
+                  <h4 className="text-xs font-black uppercase tracking-wider text-slate-400">Sede dos Jogos</h4>
+                  <p className="text-slate-900 font-extrabold text-base mt-1 truncate">
+                    {champ.settings?.locations?.join(', ') || 'A definir'}
+                  </p>
+                  <p className="text-xs text-slate-500 mt-0.5">Locais oficiais das partidas</p>
+                </div>
+
+                <div className="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm">
+                  <Trophy className="text-blue-500 mb-3" size={28} />
+                  <h4 className="text-xs font-black uppercase tracking-wider text-slate-400">Total Modalidades</h4>
+                  <p className="text-slate-900 font-extrabold text-base mt-1">
+                    {champ.modalities?.length || 0} disputas ativas
+                  </p>
+                  <p className="text-xs text-slate-500 mt-0.5">Masculino, Feminino e Misto</p>
+                </div>
+              </div>
+
+              {/* Regulamento Quick Banner */}
+              <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-2xl bg-slate-100 text-slate-700 flex items-center justify-center shrink-0 border border-slate-200">
+                    <FileText size={24} />
+                  </div>
+                  <div>
+                    <h4 className="font-extrabold text-slate-900 text-base">Regulamento Oficial</h4>
+                    <p className="text-slate-500 text-xs mt-0.5">
+                      Consulte as diretrizes técnicas, normas disciplinares e formato dos jogos.
+                    </p>
+                  </div>
+                </div>
+
+                <button 
+                  onClick={() => setActiveTab('regulamento')}
+                  className="w-full sm:w-auto bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold px-5 py-2.5 rounded-xl text-xs uppercase tracking-wider transition-colors border border-slate-300 text-center shrink-0"
+                >
+                  Ver Regulamento
+                </button>
+              </div>
+
+            </div>
+          )}
+
+          {/* TAB 2: REGULAMENTO */}
+          {activeTab === 'regulamento' && (
+            <div className="space-y-6 animate-in fade-in duration-300">
+              <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-sm">
+                <div className="flex items-center gap-3 mb-6 pb-4 border-b border-slate-100">
+                  <div className="w-12 h-12 rounded-2xl bg-orange-50 text-orange-600 border border-orange-200 flex items-center justify-center">
+                    <FileText size={24} />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-black text-slate-900 uppercase tracking-tight">Regulamento Geral do Campeonato</h3>
+                    <p className="text-xs text-slate-500 font-medium">Normas gerais, elegibilidade de atletas e código disciplinar</p>
+                  </div>
+                </div>
+
+                {champ.rulesUrl ? (
+                  <div className="bg-slate-50 rounded-2xl p-6 border border-slate-200 text-center space-y-4">
+                    <FileCheck2 className="mx-auto text-emerald-600" size={48} />
+                    <div>
+                      <h4 className="font-extrabold text-slate-900 text-lg">Documento Disponível</h4>
+                      <p className="text-xs text-slate-500 mt-1 max-w-md mx-auto">
+                        O regulamento oficial foi homologado pela comissão organizadora e está disponível para download.
+                      </p>
+                    </div>
+                    <a 
+                      href={`${API_URL}${champ.rulesUrl}`} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 bg-orange-600 hover:bg-orange-700 text-white font-bold px-6 py-3 rounded-xl text-xs uppercase tracking-wider transition-all shadow-md shadow-orange-600/20"
+                    >
+                      <ExternalLink size={16} /> Baixar PDF do Regulamento
+                    </a>
+                  </div>
+                ) : (
+                  <div className="bg-slate-50 rounded-2xl p-8 border border-dashed border-slate-300 text-center">
+                    <Info className="mx-auto text-slate-400 mb-3" size={40} />
+                    <h4 className="font-extrabold text-slate-800 text-base">Documentação em Fase de Homologação</h4>
+                    <p className="text-slate-500 text-xs mt-1 max-w-md mx-auto">
+                      O regulamento específico deste campeonato será publicado em breve pela organização. As regras gerais da federação permanecem válidas.
+                    </p>
+                  </div>
+                )}
+
+                <div className="mt-8 space-y-4">
+                  <h4 className="font-extrabold text-slate-900 text-sm uppercase tracking-wider">Principais Diretrizes</h4>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200">
+                      <h5 className="font-bold text-xs text-slate-900 uppercase tracking-wider mb-1">1. Elegibilidade</h5>
+                      <p className="text-xs text-slate-600 leading-relaxed">
+                        Todos os atletas devem estar regularmente matriculados e com documentação verificada no sistema.
+                      </p>
+                    </div>
+                    <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200">
+                      <h5 className="font-bold text-xs text-slate-900 uppercase tracking-wider mb-1">2. Prazos de Inscrição</h5>
+                      <p className="text-xs text-slate-600 leading-relaxed">
+                        Inscrições e alterações no elenco devem ser realizadas impreterivelmente até a data limite estipulada.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          )}
+
+          {/* TAB 3: MODALIDADES */}
+          {activeTab === 'modalidades' && (
+            <div className="space-y-6 animate-in fade-in duration-300">
+              
+              {/* Header & Filter Controls */}
+              <div className="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm space-y-4">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-100">
+                  <div>
+                    <h3 className="text-xl font-black text-slate-900 uppercase tracking-tight flex items-center gap-2">
+                      <Trophy className="text-orange-500" size={22} /> Modalidades Disponíveis
+                    </h3>
+                    <p className="text-xs text-slate-500 mt-0.5">
+                      Selecione as modalidades desejadas para inscrever sua equipe ou atleta
+                    </p>
+                  </div>
+                  <span className="text-xs font-mono font-bold bg-orange-50 text-orange-700 px-3 py-1 rounded-full border border-orange-200 shrink-0 self-start sm:self-auto">
+                    {champ.modalities?.length || 0} disputas cadastradas
+                  </span>
+                </div>
+
+                {champ.modalities && champ.modalities.length > 0 && (
+                  <div className="grid grid-cols-1 sm:grid-cols-12 gap-3">
+                    <div className="sm:col-span-6 relative">
+                      <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+                      <input 
+                        type="text" 
+                        placeholder="Buscar modalidade por nome..." 
+                        className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-orange-500 focus:bg-white transition-colors"
+                        value={filterText}
+                        onChange={(e) => setFilterText(e.target.value)}
+                      />
+                    </div>
+                    <div className="sm:col-span-3">
+                      <select 
+                        className="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl font-medium text-xs text-slate-700 focus:outline-none focus:border-orange-500 focus:bg-white transition-colors cursor-pointer"
+                        value={filterType}
+                        onChange={(e) => setFilterType(e.target.value)}
+                      >
+                        <option value="ALL">Todos os Tipos</option>
+                        <option value="INDIVIDUAL">Individual</option>
+                        <option value="COLETIVO">Coletivo</option>
+                      </select>
+                    </div>
+                    <div className="sm:col-span-3">
+                      <select 
+                        className="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl font-medium text-xs text-slate-700 focus:outline-none focus:border-orange-500 focus:bg-white transition-colors cursor-pointer"
+                        value={filterGender}
+                        onChange={(e) => setFilterGender(e.target.value)}
+                      >
+                        <option value="ALL">Todos os Gêneros</option>
+                        <option value="MASCULINO">Masculino</option>
+                        <option value="FEMININO">Feminino</option>
+                        <option value="MISTO">Misto</option>
+                      </select>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Modality Cards Grid */}
+              {(() => {
+                const filteredModalities = champ.modalities?.filter((mod: any) => {
+                  const matchesText = mod.name.toLowerCase().includes(filterText.toLowerCase());
+                  const matchesType = filterType === 'ALL' || mod.type === filterType;
+                  const matchesGender = filterGender === 'ALL' || (mod.gender || 'MISTO') === filterGender;
+                  return matchesText && matchesType && matchesGender;
+                }) || [];
+
+                if (!champ.modalities || champ.modalities.length === 0) {
+                  return (
+                    <div className="text-center py-16 bg-white rounded-3xl border border-slate-200 shadow-sm p-6">
+                      <Trophy size={48} className="mx-auto text-slate-300 mb-3" />
+                      <h4 className="text-lg font-black text-slate-800">Nenhuma Modalidade Cadastrada</h4>
+                      <p className="text-slate-500 text-xs mt-1">A organização ainda não registrou as modalidades para este campeonato.</p>
+                    </div>
+                  );
+                }
+
+                if (filteredModalities.length === 0) {
+                  return (
+                    <div className="text-center py-12 bg-white rounded-3xl border border-dashed border-slate-300 p-6">
+                      <Filter size={32} className="mx-auto text-slate-400 mb-3" />
+                      <h4 className="font-extrabold text-slate-800 text-base">Nenhuma modalidade encontrada</h4>
+                      <p className="text-slate-500 text-xs mt-1">Tente alterar os termos de busca ou filtros selecionados.</p>
+                      <button 
+                        onClick={() => { setFilterText(''); setFilterType('ALL'); setFilterGender('ALL'); }}
+                        className="mt-4 px-4 py-2 text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors"
+                      >
+                        Limpar Filtros
+                      </button>
+                    </div>
+                  );
+                }
+
+                return (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+                    {filteredModalities.map((mod: any) => {
+                      const subscription = mySubscriptions?.find(s => s.modality?.id === mod.id);
+                      const isSelected = selectedModalities.includes(mod.id);
+                      
+                      return (
+                        <ModalityCard 
+                          key={mod.id}
+                          mod={mod}
+                          subscription={subscription}
+                          isSelected={isSelected}
+                          isEnrollmentOpen={isEnrollmentOpen}
+                          athleteProfile={athleteProfile}
+                          onToggle={toggleModality}
+                          onUnsubscribe={handleUnsubscribe}
+                          onShowRoster={(sub) => {
+                            setSelectedSubscription(sub); 
+                            if (athleteProfile?.team?.id) fetchTeamMembers(athleteProfile.team.id);
+                            setShowRosterModal(true); 
+                          }}
+                        />
+                      );
+                    })}
+                  </div>
+                );
+              })()}
+
+            </div>
+          )}
+
+          {/* TAB 4: JOGOS */}
+          {activeTab === 'jogos' && (
+            <div className="space-y-6 animate-in fade-in duration-300">
+              <div className="bg-white rounded-3xl p-8 border border-slate-200 shadow-sm text-center">
+                <Swords className="mx-auto text-slate-300 mb-4" size={56} />
+                <h3 className="text-xl font-black text-slate-900 uppercase tracking-tight">Tabela de Jogos & Confrontos</h3>
+                <p className="text-slate-500 text-xs mt-1 max-w-md mx-auto">
+                  A tabela oficial das partidas será divulgada após o encerramento das inscrições e a realização do sorteio dos grupos.
+                </p>
+                <div className="mt-6 inline-flex items-center gap-2 bg-amber-50 text-amber-800 border border-amber-200 px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider">
+                  <Clock size={16} /> Aguardando encerramento das inscrições
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* TAB 5: EQUIPES */}
+          {activeTab === 'equipes' && (
+            <div className="space-y-6 animate-in fade-in duration-300">
+              <div className="bg-white rounded-3xl p-8 border border-slate-200 shadow-sm text-center">
+                <Shield className="mx-auto text-slate-300 mb-4" size={56} />
+                <h3 className="text-xl font-black text-slate-900 uppercase tracking-tight">Equipes Confirmadas</h3>
+                <p className="text-slate-500 text-xs mt-1 max-w-md mx-auto">
+                  A lista de atléticas e equipes homologadas será atualizada em tempo real conforme a validação das documentações.
+                </p>
+              </div>
+            </div>
+          )}
+
+          {/* TAB 6: MEUS DOCUMENTOS (Athlete view) */}
+          {activeTab === 'documentos' && (
+            <div className="space-y-6 animate-in fade-in duration-300">
+              
+              {/* Section Header */}
+              <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-sm">
+                <div className="flex items-center gap-3.5 mb-2">
+                  <div className="w-12 h-12 rounded-2xl bg-orange-50 text-orange-600 border border-orange-200 flex items-center justify-center shrink-0">
+                    <FileText size={24} />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-black text-slate-900 uppercase tracking-tight">Meus Documentos de Inscrição</h3>
+                    <p className="text-xs text-slate-500 font-medium">
+                      Envie a documentação exigida para homologar sua elegibilidade nas partidas
+                    </p>
+                  </div>
+                </div>
+
+                {athleteProfile && (
+                  <div className="mt-4 p-4 rounded-2xl bg-slate-50 border border-slate-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                    <div className="flex items-center gap-3">
+                      <div className="w-9 h-9 rounded-full bg-slate-200 text-slate-700 font-black flex items-center justify-center text-sm">
+                        {user?.name?.charAt(0) || 'A'}
+                      </div>
+                      <div>
+                        <p className="font-bold text-slate-900 text-xs sm:text-sm">{user?.name}</p>
+                        <p className="text-[11px] text-slate-500 font-mono">CPF: {athleteProfile.cpf || 'Não cadastrado'}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      {getDocStatusBadge(athleteProfile.documentRgStatus)}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Upload Cards Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                
+                {/* 1. Documento de Identidade (RG / CNH) */}
+                <div className="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm flex flex-col justify-between">
+                  <div>
+                    <div className="flex justify-between items-start mb-4">
+                      <div>
+                        <h4 className="font-black text-slate-900 text-base uppercase tracking-tight">1. RG ou CNH (Frente e Verso)</h4>
+                        <p className="text-xs text-slate-500 mt-0.5">Comprovante oficial de identidade com foto</p>
+                      </div>
+                      {getDocStatusBadge(athleteProfile?.documentRgStatus)}
+                    </div>
+
+                    {athleteProfile?.documentRgStatus === 'REJECTED' && athleteProfile?.documentRgRejectionReason && (
+                      <div className="bg-rose-50 border border-rose-200 p-3 rounded-xl mb-4 text-xs text-rose-800">
+                        <strong className="block font-bold">Motivo da Rejeição:</strong>
+                        {athleteProfile.documentRgRejectionReason}
+                      </div>
+                    )}
+
+                    {athleteProfile?.documentRgUrl && (
+                      <div className="mb-4">
+                        <a 
+                          href={`${API_URL}${athleteProfile.documentRgUrl}`} 
+                          target="_blank" 
+                          rel="noreferrer"
+                          className="inline-flex items-center gap-2 text-xs font-bold text-blue-600 hover:text-blue-800 bg-blue-50 px-3 py-2 rounded-xl border border-blue-200 transition-colors"
+                        >
+                          <ExternalLink size={14} /> Visualizar Documento Enviado
+                        </a>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="pt-4 border-t border-slate-100 mt-4">
+                    <label className="block text-xs font-black uppercase tracking-wider text-slate-700 mb-2">
+                      {athleteProfile?.documentRgUrl ? 'Substituir Documento' : 'Enviar Documento'}
+                    </label>
+                    <div className="flex items-center gap-3">
+                      <input 
+                        type="file" 
+                        accept="image/*,application/pdf"
+                        id="rg-upload-input"
+                        className="hidden"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) handleUploadDocument('rg', file);
+                        }}
+                      />
+                      <label 
+                        htmlFor="rg-upload-input"
+                        className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl border-2 border-dashed text-xs font-bold cursor-pointer transition-all ${
+                          uploadingRg 
+                            ? 'bg-slate-100 border-slate-300 text-slate-400 cursor-not-allowed' 
+                            : 'bg-slate-50 border-orange-300 text-orange-600 hover:bg-orange-50 hover:border-orange-500'
+                        }`}
+                      >
+                        {uploadingRg ? (
+                          <>
+                            <Loader2 className="animate-spin" size={16} />
+                            <span>Enviando arquivo...</span>
+                          </>
+                        ) : (
+                          <>
+                            <Upload size={16} />
+                            <span>Selecionar PDF ou Imagem</span>
+                          </>
+                        )}
+                      </label>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 2. Comprovante de Matrícula */}
+                <div className="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm flex flex-col justify-between">
+                  <div>
+                    <div className="flex justify-between items-start mb-4">
+                      <div>
+                        <h4 className="font-black text-slate-900 text-base uppercase tracking-tight">2. Comprovante de Matrícula</h4>
+                        <p className="text-xs text-slate-500 mt-0.5">Declaração da instituição de ensino ou carteirinha</p>
+                      </div>
+                      {getDocStatusBadge(athleteProfile?.documentEnrollmentStatus)}
+                    </div>
+
+                    {athleteProfile?.documentEnrollmentStatus === 'REJECTED' && athleteProfile?.documentEnrollmentRejectionReason && (
+                      <div className="bg-rose-50 border border-rose-200 p-3 rounded-xl mb-4 text-xs text-rose-800">
+                        <strong className="block font-bold">Motivo da Rejeição:</strong>
+                        {athleteProfile.documentEnrollmentRejectionReason}
+                      </div>
+                    )}
+
+                    {athleteProfile?.documentEnrollmentUrl && (
+                      <div className="mb-4">
+                        <a 
+                          href={`${API_URL}${athleteProfile.documentEnrollmentUrl}`} 
+                          target="_blank" 
+                          rel="noreferrer"
+                          className="inline-flex items-center gap-2 text-xs font-bold text-blue-600 hover:text-blue-800 bg-blue-50 px-3 py-2 rounded-xl border border-blue-200 transition-colors"
+                        >
+                          <ExternalLink size={14} /> Visualizar Documento Enviado
+                        </a>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="pt-4 border-t border-slate-100 mt-4">
+                    <label className="block text-xs font-black uppercase tracking-wider text-slate-700 mb-2">
+                      {athleteProfile?.documentEnrollmentUrl ? 'Substituir Documento' : 'Enviar Documento'}
+                    </label>
+                    <div className="flex items-center gap-3">
+                      <input 
+                        type="file" 
+                        accept="image/*,application/pdf"
+                        id="enrollment-upload-input"
+                        className="hidden"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) handleUploadDocument('enrollment', file);
+                        }}
+                      />
+                      <label 
+                        htmlFor="enrollment-upload-input"
+                        className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl border-2 border-dashed text-xs font-bold cursor-pointer transition-all ${
+                          uploadingEnrollment 
+                            ? 'bg-slate-100 border-slate-300 text-slate-400 cursor-not-allowed' 
+                            : 'bg-slate-50 border-orange-300 text-orange-600 hover:bg-orange-50 hover:border-orange-500'
+                        }`}
+                      >
+                        {uploadingEnrollment ? (
+                          <>
+                            <Loader2 className="animate-spin" size={16} />
+                            <span>Enviando arquivo...</span>
+                          </>
+                        ) : (
+                          <>
+                            <Upload size={16} />
+                            <span>Selecionar PDF ou Imagem</span>
+                          </>
+                        )}
+                      </label>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+
+            </div>
+          )}
+
+          {/* TAB 7: PAINEL DA ATLÉTICA (President view) */}
+          {activeTab === 'painel-atletica' && (
+            <div className="space-y-6 animate-in fade-in duration-300">
+              
+              {/* President Dashboard Header */}
+              <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-sm">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-6 border-b border-slate-100">
+                  <div className="flex items-center gap-4">
+                    <div className="w-14 h-14 rounded-2xl bg-orange-600 text-white font-black flex items-center justify-center text-2xl shadow-lg shadow-orange-600/20 shrink-0">
+                      {athleteProfile?.team?.name?.charAt(0) || 'A'}
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <h3 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
+                          {athleteProfile?.team?.name || 'Painel da Atlética'}
+                        </h3>
+                        <span className="bg-orange-100 text-orange-800 text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full">
+                          Presidente
+                        </span>
+                      </div>
+                      <p className="text-xs text-slate-500 mt-1">Gestão da atlética e controle de atletas no campeonato</p>
+                    </div>
+                  </div>
+
+                  {/* Invite Link Button */}
+                  {athleteProfile?.team?.inviteCode && (
+                    <button 
+                      onClick={() => {
+                        const link = `${window.location.origin}/invite/${athleteProfile.team?.inviteCode}`;
+                        navigator.clipboard.writeText(link);
+                        setCopiedInvite(true);
+                        toast.success('Link de convite copiado!');
+                        setTimeout(() => setCopiedInvite(false), 2500);
+                      }}
+                      className="w-full sm:w-auto bg-slate-900 hover:bg-slate-800 text-white font-bold px-4 py-2.5 rounded-xl text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 shrink-0 shadow-sm"
+                    >
+                      {copiedInvite ? <Check size={16} className="text-emerald-400" /> : <Copy size={16} />}
+                      <span>{copiedInvite ? 'Link Copiado!' : 'Copiar Convite Atletas'}</span>
+                    </button>
+                  )}
+                </div>
+
+                {/* Dashboard Quick Stats */}
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-6">
+                  <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200">
+                    <p className="text-[10px] font-black uppercase tracking-wider text-slate-400">Total no Elenco</p>
+                    <p className="text-2xl font-black text-slate-900 mt-1">{teamMembers.length}</p>
+                    <p className="text-[11px] text-slate-500 mt-0.5">Atletas vinculados</p>
+                  </div>
+
+                  <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200">
+                    <p className="text-[10px] font-black uppercase tracking-wider text-slate-400">Aprovações Pendentes</p>
+                    <p className="text-2xl font-black text-orange-600 mt-1">{joinRequests.length}</p>
+                    <p className="text-[11px] text-slate-500 mt-0.5">Solicitações de entrada</p>
+                  </div>
+
+                  <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200">
+                    <p className="text-[10px] font-black uppercase tracking-wider text-slate-400">Inscrições Ativas</p>
+                    <p className="text-2xl font-black text-emerald-600 mt-1">{mySubscriptions.length}</p>
+                    <p className="text-[11px] text-slate-500 mt-0.5">Modalidades no campeonato</p>
+                  </div>
+
+                  <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200">
+                    <p className="text-[10px] font-black uppercase tracking-wider text-slate-400">Disponíveis p/ Jogar</p>
+                    <p className="text-2xl font-black text-blue-600 mt-1">{teamAvailabilities.filter(a => a.status === 'AVAILABLE').length}</p>
+                    <p className="text-[11px] text-slate-500 mt-0.5">Sinalizaram disponibilidade</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Solicitações de Vínculo (Pending Approvals) */}
+              <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-sm">
+                <div className="flex items-center justify-between pb-4 mb-4 border-b border-slate-100">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-2xl bg-orange-50 text-orange-600 border border-orange-200 flex items-center justify-center">
+                      <UserCheck size={20} />
+                    </div>
+                    <div>
+                      <h4 className="font-extrabold text-slate-900 text-base">Solicitações de Vínculo Pendentes</h4>
+                      <p className="text-xs text-slate-500">Atletas que pediram entrada na sua atlética</p>
+                    </div>
+                  </div>
+                  <span className="bg-orange-100 text-orange-800 text-xs font-black px-3 py-1 rounded-full">
+                    {joinRequests.length} pendente(s)
+                  </span>
+                </div>
+
+                {loadingJoinRequests ? (
+                  <div className="flex justify-center py-8"><Loader2 className="animate-spin text-orange-600" size={32} /></div>
+                ) : joinRequests.length === 0 ? (
+                  <div className="bg-slate-50 rounded-2xl p-6 text-center border border-dashed border-slate-300">
+                    <CheckCircle2 size={32} className="mx-auto text-emerald-500 mb-2" />
+                    <p className="text-xs font-bold text-slate-700">Nenhuma solicitação pendente</p>
+                    <p className="text-[11px] text-slate-500 mt-0.5">Todos os novos atletas foram processados.</p>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {joinRequests.map(req => (
+                      <div key={req.id} className="bg-slate-50 p-4 rounded-2xl border border-slate-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <span className="font-extrabold text-slate-900 text-sm">{req.user?.name}</span>
+                            <span className="bg-amber-100 text-amber-800 text-[10px] font-black uppercase px-2 py-0.5 rounded">
+                              Aguardando Aprovação
+                            </span>
+                          </div>
+                          <p className="text-xs text-slate-500 mt-1 font-mono">
+                            CPF: {req.cpf || 'Não informado'} • Gênero: {req.gender || 'Não informado'}
+                          </p>
+                        </div>
+                        <div className="flex items-center gap-2 w-full sm:w-auto">
+                          <button 
+                            onClick={() => handleJoinRequest(req.id, 'REJECTED')} 
+                            className="flex-1 sm:flex-initial px-4 py-2 bg-rose-50 text-rose-700 hover:bg-rose-100 rounded-xl text-xs font-bold transition-colors border border-rose-200"
+                          >
+                            Recusar
+                          </button>
+                          <button 
+                            onClick={() => handleJoinRequest(req.id, 'APPROVED')} 
+                            className="flex-1 sm:flex-initial px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-black uppercase tracking-wider transition-colors shadow-sm"
+                          >
+                            Aprovar Atleta
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Members Roster & Documents Verification */}
+              <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-sm">
+                <div className="flex items-center justify-between pb-4 mb-4 border-b border-slate-100">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-2xl bg-blue-50 text-blue-600 border border-blue-200 flex items-center justify-center">
+                      <Users size={20} />
+                    </div>
+                    <div>
+                      <h4 className="font-extrabold text-slate-900 text-base">Atletas Cadastrados na Atlética</h4>
+                      <p className="text-xs text-slate-500">Membros oficiais da equipe e status de documentação</p>
+                    </div>
+                  </div>
+                  <span className="bg-slate-100 text-slate-700 text-xs font-black px-3 py-1 rounded-full">
+                    {teamMembers.length} atleta(s)
+                  </span>
+                </div>
+
+                {loadingMembers ? (
+                  <div className="flex justify-center py-8"><Loader2 className="animate-spin text-blue-600" size={32} /></div>
+                ) : teamMembers.length === 0 ? (
+                  <div className="bg-slate-50 rounded-2xl p-6 text-center border border-dashed border-slate-300">
+                    <Users size={32} className="mx-auto text-slate-300 mb-2" />
+                    <p className="text-xs font-bold text-slate-700">Nenhum atleta cadastrado ainda</p>
+                    <p className="text-[11px] text-slate-500 mt-0.5">Use o botão de convite para adicionar membros.</p>
+                  </div>
+                ) : (
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left text-xs whitespace-nowrap">
+                      <thead>
+                        <tr className="bg-slate-50 text-slate-500 border-b border-slate-200 uppercase tracking-wider font-black">
+                          <th className="px-4 py-3">Atleta</th>
+                          <th className="px-4 py-3">Cargo</th>
+                          <th className="px-4 py-3">RG / Identidade</th>
+                          <th className="px-4 py-3">Matrícula</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-100 font-medium">
+                        {teamMembers.map(member => (
+                          <tr key={member.id} className="hover:bg-slate-50/80 transition-colors">
+                            <td className="px-4 py-3.5">
+                              <p className="font-bold text-slate-900 text-xs flex items-center gap-1.5">
+                                {member.user?.name || 'Sem nome'}
+                                {member.user?.id === user?.id && (
+                                  <span className="bg-orange-100 text-orange-700 px-1.5 py-0.2 rounded text-[9px] font-black">(Você)</span>
+                                )}
+                              </p>
+                              <p className="text-[10px] text-slate-500 font-mono">CPF: {member.cpf || 'N/A'}</p>
+                            </td>
+                            <td className="px-4 py-3.5">
+                              <span className={`px-2 py-0.5 rounded text-[10px] font-black uppercase ${
+                                member.teamRole === 'PRESIDENT' ? 'bg-orange-100 text-orange-800' : 'bg-slate-100 text-slate-700'
+                              }`}>
+                                {member.teamRole === 'PRESIDENT' ? 'Presidente' : 'Atleta'}
+                              </span>
+                            </td>
+                            <td className="px-4 py-3.5">
+                              {getDocStatusBadge(member.documentRgStatus)}
+                            </td>
+                            <td className="px-4 py-3.5">
+                              {getDocStatusBadge(member.documentEnrollmentStatus)}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
+
+            </div>
+          )}
+
+        </main>
+      </div>
+
+      {/* FLOATING DOCK FOR BULK REGISTRATION */}
       {selectedModalities.length > 0 && user && athleteProfile?.team && (
-        <div className="fixed bottom-0 left-0 right-0 bg-slate-900/90 backdrop-blur-md border-t border-slate-800 shadow-[0_-10px_40px_-10px_rgba(0,0,0,0.5)] p-4 px-6 z-40 transform transition-transform animate-in slide-in-from-bottom-10">
+        <div className="fixed bottom-0 left-0 right-0 bg-slate-900/95 backdrop-blur-md border-t border-slate-800 shadow-[0_-10px_40px_rgba(0,0,0,0.4)] p-4 px-6 z-40 animate-in slide-in-from-bottom-10">
           <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div className="flex items-center gap-3 w-full sm:w-auto">
-              <div className="w-10 h-10 rounded-full bg-blue-900/50 border border-blue-500/50 text-blue-400 flex items-center justify-center font-bold text-lg shrink-0">
+            <div className="flex items-center gap-3.5 w-full sm:w-auto">
+              <div className="w-11 h-11 rounded-2xl bg-orange-600 text-white font-black text-lg flex items-center justify-center shrink-0 shadow-lg shadow-orange-600/30">
                 {selectedModalities.length}
               </div>
               <div className="flex-1">
-                <p className="font-bold text-white leading-tight">Modalidades selecionadas</p>
-                <p className="text-xs text-slate-400 line-clamp-1">
+                <p className="font-black text-white text-sm leading-tight">Modalidades Selecionadas</p>
+                <p className="text-xs text-slate-400 line-clamp-1 mt-0.5">
                   {selectedModalities.map(id => champ.modalities?.find((m: any) => m.id === id)?.name).join(', ')}
                 </p>
               </div>
             </div>
             <button 
               onClick={() => setIsConfirmModalOpen(true)}
-              className="w-full sm:w-auto bg-blue-600 text-white px-8 py-3 rounded-xl font-bold hover:bg-blue-700 active:scale-95 transition-all shadow-md shadow-blue-600/20 disabled:opacity-70 flex justify-center items-center gap-2"
+              className="w-full sm:w-auto bg-orange-600 hover:bg-orange-700 text-white px-8 py-3 rounded-xl font-black text-xs uppercase tracking-wider transition-all shadow-lg shadow-orange-600/30 disabled:opacity-70 flex items-center justify-center gap-2"
               disabled={isSubscribing}
             >
-              {isSubscribing ? <Loader2 className="animate-spin" size={20} /> : 'Confirmar Inscrições'}
+              {isSubscribing ? <Loader2 className="animate-spin" size={16} /> : null}
+              <span>{isSubscribing ? 'Processando Inscrição...' : 'Confirmar Inscrições'}</span>
             </button>
           </div>
         </div>
@@ -963,10 +1455,9 @@ export default function ChampionshipDetailPage() {
         profile={athleteProfile} 
         onSuccess={(updated) => {
           setAthleteProfile(updated);
-          // Auto continue
           handleBulkSubscribe();
         }}
       />
-    </>
+    </div>
   );
 }
