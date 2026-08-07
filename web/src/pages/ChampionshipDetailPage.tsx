@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { 
   Trophy, 
@@ -155,6 +155,16 @@ export default function ChampionshipDetailPage() {
   const [delegateDocModalState, setDelegateDocModalState] = useState<{isOpen: boolean, athleteId: string, athleteName: string, docType: 'rg'|'enrollment'}>({
     isOpen: false, athleteId: '', athleteName: '', docType: 'rg'
   });
+
+  const contentRef = useRef<HTMLDivElement>(null);
+
+  const handleTabChange = (tabId: 'visao-geral' | 'competicao' | 'painel') => {
+    setActiveTab(tabId);
+    // Give it a tiny delay to allow React to render the new tab content, then scroll
+    setTimeout(() => {
+      contentRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 50);
+  };
 
   // Filters State
   const [filterText, setFilterText] = useState('');
@@ -600,18 +610,18 @@ export default function ChampionshipDetailPage() {
         </div>
       </div>
 
-      {/* 2. STICKY 3-TAB NAVIGATION BAR */}
+      {/* 2. FLOATING BOTTOM NAVIGATION */}
       <ChampionshipDetailNav
         modalitiesCount={champ.modalities?.length || 0}
         activeSection={activeTab}
-        onSelectSection={(tabId: any) => setActiveTab(tabId)}
+        onSelectSection={handleTabChange}
         isPresident={isPresident}
         isAthlete={isAthlete}
         pendingRequestsCount={joinRequests.length}
       />
 
       {/* 3. MAIN CONTENT CONTAINER */}
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6">
+      <div ref={contentRef} className="max-w-5xl mx-auto px-4 sm:px-6 py-6 scroll-mt-24">
 
         {/* TAB 1: VISÃO GERAL & INSCRIÇÃO (EVERYTHING ON MAIN PAGE) */}
         {activeTab === 'visao-geral' && (
