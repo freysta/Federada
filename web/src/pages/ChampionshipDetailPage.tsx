@@ -498,7 +498,7 @@ export default function ChampionshipDetailPage() {
   const isAthlete = !!user && (!isPresident || !!athleteProfile);
 
   return (
-    <div className="min-h-screen bg-slate-50 pb-28 font-inter text-slate-900 pt-20">
+    <div className="min-h-screen bg-slate-50 pb-28 font-inter text-slate-900">
       
       {/* 1. HERO HEADER */}
       <div className="bg-gradient-to-br from-slate-900 via-slate-900 to-slate-800 text-white py-8 md:py-12 px-4 sm:px-6 shadow-md relative overflow-hidden">
@@ -569,7 +569,7 @@ export default function ChampionshipDetailPage() {
               </p>
 
               {/* Metadata Bar */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 pt-4 border-t border-slate-800">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 sm:gap-4 pt-4 border-t border-slate-800">
                 <div className="flex items-start gap-2.5">
                   <div className="w-8 h-8 rounded-lg bg-orange-500/10 border border-orange-500/20 text-orange-400 flex items-center justify-center shrink-0 mt-0.5">
                     <Calendar size={16} />
@@ -1308,7 +1308,7 @@ export default function ChampionshipDetailPage() {
                 </div>
 
                 {/* Dashboard Quick Stats */}
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-6">
                   <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200">
                     <p className="text-[10px] font-black uppercase tracking-wider text-slate-400">Total no Elenco</p>
                     <p className="text-2xl font-black text-slate-900 mt-1">{teamMembers.length}</p>

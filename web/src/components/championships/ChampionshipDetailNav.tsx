@@ -32,8 +32,8 @@ export default function ChampionshipDetailNav({
   }
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 lg:static w-full bg-white lg:rounded-3xl border-t lg:border border-slate-200 shadow-[0_-10px_40px_rgba(0,0,0,0.08)] lg:shadow-sm p-2 pb-safe lg:p-4 z-50 lg:z-auto transition-all">
-      <nav className="flex flex-row justify-around lg:flex-col gap-1 lg:gap-2 relative max-w-md mx-auto lg:max-w-none">
+    <div className="fixed bottom-0 left-0 right-0 lg:static w-full bg-white lg:rounded-3xl border-t lg:border border-slate-200 shadow-[0_-10px_40px_rgba(0,0,0,0.08)] lg:shadow-sm p-1.5 lg:p-4 z-50 lg:z-auto transition-all">
+      <nav className="flex flex-row lg:flex-col gap-1 lg:gap-2 relative overflow-x-auto no-scrollbar scroll-smooth px-1 max-w-full lg:max-w-none">
         {navItems.map((item) => {
           const Icon = item.icon;
           const isActive = activeSection === item.id;
@@ -42,7 +42,7 @@ export default function ChampionshipDetailNav({
             <button
               key={item.id}
               onClick={() => onSelectSection(item.id)}
-              className={`relative group flex flex-col lg:flex-row items-center justify-center lg:justify-between gap-1 lg:gap-3 p-1.5 lg:px-4 lg:py-3 lg:min-h-[44px] rounded-xl lg:rounded-2xl font-black transition-all flex-1 ${
+              className={`relative group flex flex-col lg:flex-row items-center justify-center lg:justify-between gap-1 lg:gap-3 p-1.5 lg:px-4 lg:py-3 lg:min-h-[44px] rounded-xl lg:rounded-2xl font-black transition-all shrink-0 sm:shrink lg:shrink flex-1 min-w-[56px] lg:min-w-0 ${
                 isActive
                   ? 'text-orange-600 lg:bg-orange-500/10 lg:border lg:border-orange-500/30'
                   : 'text-slate-400 lg:text-slate-500 hover:text-slate-900 lg:hover:bg-slate-100 lg:border lg:border-transparent'
