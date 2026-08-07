@@ -11,11 +11,12 @@ export default {
         'neon-cyan': '#00FFFF',
       },
       fontFamily: {
-        'sans': ['Plus Jakarta Sans', 'Inter', 'system-ui', 'sans-serif'],
+        'sans': ['Bebas Neue', 'sans-serif'],
         'bebas': ['Bebas Neue', 'sans-serif'],
         'serif': ['Playfair Display', 'serif'],
         'mono': ['JetBrains Mono', 'monospace'],
         'inter': ['Inter', 'sans-serif'],
+        'jakarta': ['Plus Jakarta Sans', 'sans-serif'],
       },
       animation: {
         'marquee': 'marquee 25s linear infinite',
