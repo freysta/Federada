@@ -76,7 +76,7 @@ export default function ColumnFilterHeader({
           </div>
 
           <div className="max-h-52 overflow-y-auto space-y-0.5">
-            {options.map((opt) => {
+            {(options || []).map((opt) => {
               const isSelected = selectedValue === opt.value;
               return (
                 <button

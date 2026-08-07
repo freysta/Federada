@@ -95,7 +95,8 @@ export default function AdminOrders() {
     document.body.removeChild(link);
   };
 
-  const filteredOrders = orders.filter(o => {
+  const filteredOrders = (Array.isArray(orders) ? orders : []).filter(o => {
+    if (!o) return false;
     const matchesSearch = o.id.includes(searchTerm) || o.user?.name?.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = statusFilter === 'ALL' || o.status === statusFilter;
     return matchesSearch && matchesStatus;

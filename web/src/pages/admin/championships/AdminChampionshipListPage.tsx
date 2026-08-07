@@ -56,7 +56,8 @@ export default function AdminChampionshipListPage() {
     fetchChampionships();
   }, []);
 
-  const filteredChampionships = championships.filter(champ => {
+  const filteredChampionships = (Array.isArray(championships) ? championships : []).filter(champ => {
+    if (!champ) return false;
     const matchesSearch = champ.name?.toLowerCase().includes(searchQuery.toLowerCase()) || 
       (champ.description && champ.description.toLowerCase().includes(searchQuery.toLowerCase()));
     const matchesStatus = statusFilter === 'ALL' || champ.status === statusFilter;

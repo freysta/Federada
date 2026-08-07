@@ -190,7 +190,8 @@ export default function AdminChampionshipDocumentsPage() {
   };
 
   // Filtering Logic
-  const filteredDocuments = documents.filter(doc => {
+  const filteredDocuments = (Array.isArray(documents) ? documents : []).filter(doc => {
+    if (!doc) return false;
     const search = searchQuery.toLowerCase().trim();
     const athleteName = doc.athlete?.user?.name?.toLowerCase() || '';
     const athleteEmail = doc.athlete?.user?.email?.toLowerCase() || '';

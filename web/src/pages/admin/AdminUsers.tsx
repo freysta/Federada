@@ -139,7 +139,8 @@ export default function AdminUsers() {
     }
   };
 
-  const filteredUsers = users.filter(u => {
+  const filteredUsers = (Array.isArray(users) ? users : []).filter(u => {
+    if (!u) return false;
     const matchesSearch = u.name?.toLowerCase().includes(searchQuery.toLowerCase()) || 
       u.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
       u.cpf?.includes(searchQuery);

@@ -79,7 +79,8 @@ export default function AdminChampionshipSubscriptionsPage() {
     });
   };
 
-  const filteredSubs = subscriptions.filter(sub => {
+  const filteredSubs = (Array.isArray(subscriptions) ? subscriptions : []).filter(sub => {
+    if (!sub) return false;
     const search = searchQuery.toLowerCase();
     const teamName = sub.team?.name?.toLowerCase() || '';
     const athleteName = sub.athlete?.user?.name?.toLowerCase() || '';
