@@ -44,6 +44,7 @@ const AdminChampionshipSubscriptionsPage = lazy(() => import('./pages/admin/cham
 const AdminChampionshipMatchesPage = lazy(() => import('./pages/admin/championships/AdminChampionshipMatchesPage'));
 const AdminChampionshipResultsPage = lazy(() => import('./pages/admin/championships/AdminChampionshipResultsPage'));
 const AdminChampionshipModalitiesPage = lazy(() => import('./pages/admin/championships/AdminChampionshipModalitiesPage'));
+const AdminChampionshipDocumentsPage = lazy(() => import('./pages/admin/championships/AdminChampionshipDocumentsPage'));
 const InvitePage = lazy(() => import('./pages/teams/InvitePage'));
 const TeamsDirectoryPage = lazy(() => import('./pages/TeamsDirectoryPage'));
 
@@ -111,6 +112,7 @@ function App() {
                   <Route index element={<div className="p-8 text-slate-500 font-sans">Bem-vindo ao painel deste campeonato. Selecione uma opção acima.</div>} />
                   <Route path="modalities" element={<AdminChampionshipModalitiesPage />} />
                   <Route path="subscriptions" element={<AdminChampionshipSubscriptionsPage />} />
+                  <Route path="documents" element={<AdminChampionshipDocumentsPage />} />
                   <Route path="settings" element={<AdminChampionshipSettingsPage />} />
                   <Route path="matches" element={<AdminChampionshipMatchesPage />} />
                   <Route path="results" element={<AdminChampionshipResultsPage />} />

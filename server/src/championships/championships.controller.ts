@@ -146,8 +146,8 @@ export class ChampionshipsController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('ADMIN', 'SPORTS_ADMIN')
   @Get('admin/documents')
-  getAdminPendingDocuments() {
-    return this.championshipsService.getAdminPendingDocuments();
+  getAdminPendingDocuments(@Query('championshipId') championshipId?: string) {
+    return this.championshipsService.getAdminPendingDocuments(championshipId);
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)

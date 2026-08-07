@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Outlet, Link, useLocation, useParams } from 'react-router-dom';
 import { apiClient } from '../../../utils/apiClient';
 import { API_URL } from '../../../config';
-import { ChevronRight, Loader2, Home, Settings, Users, Trophy, Flag, Activity } from 'lucide-react';
+import { ChevronRight, Loader2, Home, Settings, Users, Trophy, Flag, Activity, FileCheck2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 export default function AdminChampionshipLayout() {
@@ -37,6 +37,7 @@ export default function AdminChampionshipLayout() {
     { path: `/admin/championships/${id}`, label: 'Visão Geral', icon: <Home size={16} /> },
     { path: `/admin/championships/${id}/modalities`, label: 'Modalidades', icon: <Activity size={16} /> },
     { path: `/admin/championships/${id}/subscriptions`, label: 'Inscrições', icon: <Users size={16} /> },
+    { path: `/admin/championships/${id}/documents`, label: 'Documentação dos Atletas', icon: <FileCheck2 size={16} /> },
     { path: `/admin/championships/${id}/matches`, label: 'Partidas', icon: <Flag size={16} /> },
     { path: `/admin/championships/${id}/results`, label: 'Resultados', icon: <Trophy size={16} /> },
     { path: `/admin/championships/${id}/settings`, label: 'Configurações', icon: <Settings size={16} /> },

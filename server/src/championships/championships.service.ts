@@ -294,8 +294,10 @@ export class ChampionshipsService {
     return this.subscriptionRepository.save(sub);
   }
 
-  async getAdminPendingDocuments() {
+  async getAdminPendingDocuments(championshipId?: string) {
+    const whereCondition = championshipId ? { championship: { id: championshipId } } : {};
     return this.athleteDocumentRepository.find({
+      where: whereCondition,
       relations: ['athlete', 'athlete.user', 'athlete.team', 'championship'],
       order: { createdAt: 'DESC' }
     });

@@ -170,9 +170,29 @@ export default function AdminDocuments() {
     <div className="space-y-6 font-sans">
       <div>
         <h1 className="text-2xl font-black text-slate-900 uppercase tracking-tight flex items-center gap-2">
-          <FileCheck2 className="text-blue-600" size={28} /> Validação de Documentações
+          <FileCheck2 className="text-blue-600" size={28} /> Validação Geral de Documentações
         </h1>
-        <p className="text-slate-500 text-sm mt-1">Verifique e aprove as documentações de matrícula e RG dos atletas cadastrados.</p>
+        <p className="text-slate-500 text-sm mt-1">Visão geral unificada de todos os campeonatos da plataforma.</p>
+      </div>
+
+      <div className="bg-gradient-to-r from-blue-900 to-slate-900 text-white p-5 rounded-2xl shadow-md flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-blue-600/30 border border-blue-400/30 flex items-center justify-center shrink-0 text-blue-400">
+            <FileCheck2 size={22} />
+          </div>
+          <div>
+            <h4 className="font-extrabold text-sm uppercase tracking-wide">Gestão Unificada por Campeonato</h4>
+            <p className="text-xs text-slate-300 mt-0.5">
+              Agora você pode gerenciar a documentação dos atletas de forma 100% isolada, com filtros por equipe, tabelas completas e exportação CSV diretamente na aba do campeonato correspondente.
+            </p>
+          </div>
+        </div>
+        <a 
+          href="/admin/championships" 
+          className="bg-blue-600 hover:bg-blue-500 text-white font-black text-xs uppercase px-4 py-2.5 rounded-xl transition-all shadow-md shrink-0 whitespace-nowrap active:scale-95"
+        >
+          Ir para Campeonatos
+        </a>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
