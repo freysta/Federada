@@ -1,4 +1,4 @@
-import { LayoutGrid, Swords, Shield } from 'lucide-react';
+import { LayoutGrid, Swords, Shield, FileText } from 'lucide-react';
 
 interface ChampionshipDetailNavProps {
   modalitiesCount: number;
@@ -20,15 +20,13 @@ export default function ChampionshipDetailNav({
   const navItems = [
     { 
       id: 'visao-geral', 
-      label: 'Visão Geral & Inscrição', 
-      shortLabel: 'Inscrição', 
+      label: 'Geral', 
       icon: LayoutGrid, 
-      count: modalitiesCount 
+      count: modalitiesCount > 0 ? modalitiesCount : undefined 
     },
     { 
       id: 'competicao', 
-      label: 'Competição', 
-      shortLabel: 'Jogos & Times', 
+      label: 'Jogos', 
       icon: Swords 
     },
   ];
@@ -36,16 +34,15 @@ export default function ChampionshipDetailNav({
   if (isPresident || isAthlete) {
     navItems.push({ 
       id: 'painel', 
-      label: isPresident ? 'Painel da Atlética' : 'Meus Documentos', 
-      shortLabel: isPresident ? 'Sua Atlética' : 'Meus Docs', 
-      icon: Shield,
+      label: isPresident ? 'Painel' : 'Meus Docs', 
+      icon: isPresident ? Shield : FileText,
       count: isPresident && pendingRequestsCount > 0 ? pendingRequestsCount : undefined,
     });
   }
 
   return (
-    <div className="sticky top-16 z-30 w-full bg-slate-900/95 backdrop-blur-md border-y border-slate-800 shadow-md py-2 px-3 transition-all">
-      <nav className="max-w-4xl mx-auto flex items-center justify-around gap-2">
+    <div className="fixed bottom-4 sm:bottom-6 left-1/2 -translate-x-1/2 z-50 w-[92%] max-w-[360px] animate-in slide-in-from-bottom-8 duration-300">
+      <nav className="bg-slate-900/90 backdrop-blur-xl border border-slate-700/60 shadow-[0_15px_40px_rgba(0,0,0,0.6)] p-1.5 rounded-3xl flex items-center justify-between gap-1">
         {navItems.map((item) => {
           const Icon = item.icon;
           const isActive = activeSection === item.id;
@@ -54,26 +51,28 @@ export default function ChampionshipDetailNav({
             <button
               key={item.id}
               onClick={() => onSelectSection(item.id)}
-              className={`relative flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-xl text-xs font-black transition-all active:scale-95 whitespace-nowrap min-h-[42px] max-w-[220px] ${
+              className={`relative flex-1 flex flex-col items-center justify-center gap-1 py-2 rounded-2xl transition-all duration-300 active:scale-95 min-h-[52px] ${
                 isActive
-                  ? 'bg-orange-600 text-white shadow-md shadow-orange-600/30'
-                  : 'bg-slate-800/80 text-slate-300 hover:text-white hover:bg-slate-800 border border-slate-700/60'
+                  ? 'bg-orange-600 shadow-md shadow-orange-600/30'
+                  : 'hover:bg-slate-800'
               }`}
             >
-              <Icon size={16} className={`shrink-0 ${isActive ? 'text-white' : 'text-slate-400'}`} />
+              <div className="relative">
+                <Icon size={18} className={`${isActive ? 'text-white' : 'text-slate-400'}`} />
+                {item.count !== undefined && item.count > 0 && (
+                  <span className={`absolute -top-2 -right-3 px-1.5 py-0.5 rounded-full text-[9px] font-black min-w-[16px] text-center ${
+                    isActive ? 'bg-white text-orange-600' : 'bg-orange-600 text-white'
+                  }`}>
+                    {item.count}
+                  </span>
+                )}
+              </div>
               
-              <span className="uppercase tracking-wider font-extrabold text-[11px] sm:text-xs">
-                <span className="inline sm:hidden">{item.shortLabel}</span>
-                <span className="hidden sm:inline">{item.label}</span>
+              <span className={`text-[10px] uppercase font-black tracking-wider ${
+                isActive ? 'text-white' : 'text-slate-400'
+              }`}>
+                {item.label}
               </span>
-
-              {item.count !== undefined && item.count > 0 && (
-                <span className={`px-1.5 py-0.2 rounded-full text-[10px] font-mono font-black shrink-0 ${
-                  isActive ? 'bg-white/20 text-white' : 'bg-orange-600 text-white'
-                }`}>
-                  {item.count}
-                </span>
-              )}
             </button>
           );
         })}

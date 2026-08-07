@@ -436,7 +436,7 @@ export default function ChampionshipDetailPage() {
   const isAthlete = !!user && (!isPresident || !!athleteProfile);
 
   return (
-    <div className="min-h-screen bg-slate-50 pb-28 font-inter text-slate-900">
+    <div className="min-h-screen bg-slate-50 pb-48 font-inter text-slate-900">
       
       {/* 1. HERO HEADER WITH INTEGRATED ROLE NOTICE */}
       <div className="bg-gradient-to-br from-slate-900 via-slate-900 to-slate-800 text-white py-5 sm:py-8 md:py-10 px-4 sm:px-6 shadow-md relative overflow-hidden">

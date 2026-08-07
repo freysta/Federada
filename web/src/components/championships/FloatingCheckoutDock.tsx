@@ -21,7 +21,7 @@ export default function FloatingCheckoutDock({
   );
 
   return (
-    <div className="fixed bottom-4 sm:bottom-6 left-1/2 -translate-x-1/2 w-[94%] max-w-3xl z-50 animate-in slide-in-from-bottom-6 duration-300">
+    <div className="fixed bottom-[88px] sm:bottom-[96px] left-1/2 -translate-x-1/2 w-[94%] max-w-3xl z-40 animate-in slide-in-from-bottom-12 duration-300">
       <div className="bg-slate-900/98 border border-orange-500/40 shadow-[0_15px_40px_rgba(0,0,0,0.5)] rounded-2xl p-3.5 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-3 backdrop-blur-md">
         
         {/* Left Side: Badge + List Preview */}
