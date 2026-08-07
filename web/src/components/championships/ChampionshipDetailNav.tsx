@@ -32,8 +32,8 @@ export default function ChampionshipDetailNav({
   }
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 lg:static w-full bg-white/95 backdrop-blur-md lg:backdrop-blur-none lg:bg-white lg:rounded-3xl border-t lg:border border-slate-200 shadow-[0_-8px_30px_rgba(0,0,0,0.12)] lg:shadow-sm p-1.5 lg:p-4 z-40 lg:z-auto transition-all pb-[calc(0.5rem+env(safe-area-inset-bottom))] lg:pb-4">
-      <nav className="flex flex-row lg:flex-col items-center gap-1 lg:gap-2 relative overflow-x-auto no-scrollbar scroll-smooth px-1 max-w-full lg:max-w-none">
+    <div className="sticky top-16 z-30 w-full bg-slate-900/95 backdrop-blur-md border-y border-slate-800 shadow-md py-2 px-3 transition-all">
+      <nav className="max-w-7xl mx-auto flex flex-row items-center gap-1.5 overflow-x-auto no-scrollbar scroll-smooth">
         {navItems.map((item) => {
           const Icon = item.icon;
           const isActive = activeSection === item.id;
@@ -42,70 +42,34 @@ export default function ChampionshipDetailNav({
             <button
               key={item.id}
               onClick={() => onSelectSection(item.id)}
-              className={`relative group flex flex-col lg:flex-row items-center justify-center lg:justify-between gap-1 lg:gap-3 px-2.5 py-1.5 lg:px-4 lg:py-3 h-14 lg:h-auto lg:min-h-[44px] rounded-xl lg:rounded-2xl transition-all shrink-0 flex-1 min-w-[68px] lg:min-w-0 active:scale-95 lg:active:scale-100 ${
+              className={`relative group flex items-center justify-center gap-2 px-3.5 py-2 rounded-xl text-xs font-black transition-all shrink-0 active:scale-95 whitespace-nowrap min-h-[40px] ${
                 isActive
-                  ? 'text-orange-600 bg-orange-500/10 border border-orange-500/30'
-                  : 'text-slate-500 hover:text-slate-900 hover:bg-slate-100/80 border border-transparent'
+                  ? 'bg-orange-600 text-white shadow-md shadow-orange-600/30'
+                  : 'bg-slate-800/80 text-slate-300 hover:text-white hover:bg-slate-800 border border-slate-700/60'
               }`}
             >
-              {/* Left/Top Content: Icon + Label */}
-              <div className="flex flex-col lg:flex-row items-center justify-center gap-1 lg:gap-3">
-                <div className="relative flex items-center justify-center shrink-0">
-                  <Icon
-                    size={20}
-                    className={`transition-colors lg:w-[18px] lg:h-[18px] ${
-                      isActive ? 'text-orange-600' : 'text-slate-400 group-hover:text-slate-600'
-                    }`}
-                  />
-                  {/* Mobile Badge overlay on top-right of Icon */}
-                  {item.count !== undefined && item.count > 0 && (
-                    <span className="lg:hidden absolute -top-1.5 -right-2.5 text-[9px] font-mono font-black px-1.5 py-0.2 rounded-full bg-orange-600 text-white shadow-sm">
-                      {item.count}
-                    </span>
-                  )}
-                  {item.badge && item.count === undefined && (
-                    <span className={`lg:hidden absolute -top-1 -right-1 w-2 h-2 rounded-full ${isActive ? 'bg-orange-600' : 'bg-amber-500'}`} />
-                  )}
-                </div>
-                
-                <span className={`text-[10px] lg:text-sm tracking-tight lg:tracking-wider uppercase whitespace-nowrap leading-none ${isActive ? 'font-black' : 'font-extrabold'}`}>
-                  {item.label}
-                </span>
-              </div>
+              <Icon size={16} className={isActive ? 'text-white' : 'text-slate-400 group-hover:text-slate-200'} />
+              
+              <span className="uppercase tracking-wider font-extrabold text-[11px] sm:text-xs">
+                {item.label}
+              </span>
 
-              {/* Desktop Badges */}
-              {item.count !== undefined && (
-                <span
-                  className={`hidden lg:inline-flex px-2 py-0.5 rounded-full text-[10px] font-mono font-black transition-colors ${
-                    isActive
-                      ? 'bg-orange-600 text-white shadow-sm'
-                      : 'bg-slate-200 text-slate-600 group-hover:bg-slate-300 group-hover:text-slate-800 border border-slate-200'
-                  }`}
-                >
+              {/* Count badge inline */}
+              {item.count !== undefined && item.count > 0 && (
+                <span className={`px-1.5 py-0.2 rounded-full text-[10px] font-mono font-black ${
+                  isActive ? 'bg-white/20 text-white' : 'bg-slate-700 text-slate-300'
+                }`}>
                   {item.count}
                 </span>
               )}
 
-              {item.badge && (
-                <span
-                  className={`hidden lg:inline-flex px-2 py-0.5 rounded-full text-[9px] font-extrabold uppercase tracking-widest ${
-                    isActive
-                      ? 'bg-amber-500/20 text-amber-700 border border-amber-500/30'
-                      : 'bg-slate-200 text-slate-600 border border-slate-250'
-                  }`}
-                >
+              {/* Status badge inline */}
+              {item.badge && item.count === undefined && (
+                <span className={`hidden sm:inline-block px-1.5 py-0.2 rounded text-[9px] font-extrabold uppercase ${
+                  isActive ? 'bg-white/20 text-white' : 'bg-slate-700 text-slate-400'
+                }`}>
                   {item.badge}
                 </span>
-              )}
-
-              {/* Active Indicator Bar */}
-              {isActive && (
-                <>
-                  {/* Mobile Top Indicator Line */}
-                  <span className="absolute top-0 left-2 right-2 h-0.5 bg-orange-600 rounded-b-full shadow-[0_2px_6px_rgba(249,115,22,0.6)] lg:hidden" />
-                  {/* Desktop Left Indicator Bar */}
-                  <span className="absolute -left-1 top-2 bottom-2 w-1 bg-orange-600 rounded-full shadow-[0_0_10px_#f97316] hidden lg:block" />
-                </>
               )}
             </button>
           );

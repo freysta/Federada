@@ -502,7 +502,7 @@ export default function ChampionshipDetailPage() {
     <div className="min-h-screen bg-slate-50 pb-28 font-inter text-slate-900">
       
       {/* 1. HERO HEADER */}
-      <div className="bg-gradient-to-br from-slate-900 via-slate-900 to-slate-800 text-white py-8 md:py-12 px-4 sm:px-6 shadow-md relative overflow-hidden">
+      <div className="bg-gradient-to-br from-slate-900 via-slate-900 to-slate-800 text-white py-5 sm:py-8 md:py-12 px-4 sm:px-6 shadow-md relative overflow-hidden">
         {/* Decorative Background */}
         <div className="absolute top-0 right-0 opacity-5 pointer-events-none transform translate-x-1/4 -translate-y-1/4">
           <Trophy size={450} />
@@ -512,7 +512,7 @@ export default function ChampionshipDetailPage() {
         <div className="max-w-7xl mx-auto relative z-10">
           <Link 
             to="/campeonatos" 
-            className="inline-flex items-center gap-2 text-slate-400 hover:text-white transition-colors mb-6 text-xs font-bold uppercase tracking-wider bg-slate-800/80 px-3 py-1.5 rounded-lg border border-slate-700/60"
+            className="inline-flex items-center gap-2 text-slate-400 hover:text-white transition-colors mb-4 sm:mb-6 text-xs font-bold uppercase tracking-wider bg-slate-800/80 px-3 py-1.5 rounded-lg border border-slate-700/60"
           >
             <ArrowLeft size={14} /> Voltar para Campeonatos
           </Link>
@@ -520,7 +520,7 @@ export default function ChampionshipDetailPage() {
           <div className="flex flex-col md:flex-row gap-6 md:gap-8 items-start">
             
             {/* Banner/Logo Card */}
-            <div className="w-full md:w-56 lg:w-64 max-w-xs mx-auto md:mx-0 shrink-0">
+            <div className="w-24 h-24 sm:w-40 sm:h-40 md:w-56 md:h-56 lg:w-64 lg:h-64 mx-auto md:mx-0 shrink-0">
               <div className="aspect-square bg-slate-800 rounded-3xl overflow-hidden relative group shadow-xl border-2 border-slate-700/80">
                 {champ.bannerUrl ? (
                   <img 
