@@ -22,8 +22,11 @@ import {
   Sparkles,
   FileCheck2,
   Swords,
-  Users
+  Users,
+  X,
+  Loader2
 } from 'lucide-react';
+import { QRCodeSVG } from 'qrcode.react';
 import { useAuth } from '../contexts/AuthContext';
 import { apiClient } from '../utils/apiClient';
 import { API_URL } from '../config';
@@ -68,9 +71,6 @@ function InviteQrCodeModal({ isOpen, onClose, inviteLink }: { isOpen: boolean, o
     </div>
   );
 }
-
-import { QRCodeSVG } from 'qrcode.react';
-import { X } from 'lucide-react';
 
 interface IChampionship {
   id: string;
@@ -359,6 +359,30 @@ export default function ChampionshipDetailPage() {
   const handleShowRoster = (sub: any) => {
     setSelectedSubscription(sub);
     setShowRosterModal(true);
+  };
+
+  const handleAddToRoster = async (subId: string, athleteId: string) => {
+    const toastId = toast.loading('Adicionando atleta ao elenco...');
+    try {
+      const data = await apiClient.post<any>(`/championships/subscription/${subId}/roster/${athleteId}`, {});
+      toast.success('Atleta adicionado ao elenco!', { id: toastId });
+      setSelectedSubscription(data);
+      fetchMySubscriptions();
+    } catch (err: any) {
+      toast.error(err.message || 'Erro ao adicionar ao elenco.', { id: toastId });
+    }
+  };
+
+  const handleRemoveFromRoster = async (subId: string, athleteId: string) => {
+    const toastId = toast.loading('Removendo do elenco...');
+    try {
+      const data = await apiClient.delete<any>(`/championships/subscription/${subId}/roster/${athleteId}`);
+      toast.success('Atleta removido do elenco!', { id: toastId });
+      setSelectedSubscription(data);
+      fetchMySubscriptions();
+    } catch (err: any) {
+      toast.error(err.message || 'Erro ao remover do elenco.', { id: toastId });
+    }
   };
 
   const getDocStatusBadge = (status?: string) => {
