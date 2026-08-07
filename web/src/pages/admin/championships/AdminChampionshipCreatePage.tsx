@@ -38,7 +38,13 @@ export default function AdminChampionshipCreatePage() {
     }
     setLoading(true);
     try {
-      const data = await apiClient.post<any>('/championships', formData);
+      const payload = {
+        ...formData,
+        startDate: formData.startDate || undefined,
+        endDate: formData.endDate || undefined,
+        organizer: formData.organizer || undefined,
+      };
+      const data = await apiClient.post<any>('/championships', payload);
       setChampId(data.id);
       setStep(2);
     } catch (err: any) {
@@ -85,7 +91,7 @@ export default function AdminChampionshipCreatePage() {
       await apiClient.patch(`/championships/${champId}/status`, { status: 'PUBLISHED' });
 
       toast.success('Campeonato publicado com sucesso!');
-      navigate('/campeonatos');
+      navigate(`/admin/championships/${champId}`);
     } catch (err: any) {
       toast.error(err.message);
     } finally {
