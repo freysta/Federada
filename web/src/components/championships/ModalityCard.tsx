@@ -132,36 +132,36 @@ export default function ModalityCard({
   return (
     <div
       onClick={() => isEnrollmentOpen && onToggle(mod.id)}
-      className={`group relative bg-white rounded-2xl border transition-all duration-300 flex flex-col overflow-hidden ${
+      className={`group relative bg-white rounded-3xl border transition-all duration-300 flex flex-col overflow-hidden active:scale-[0.98] ${
         !isEnrollmentOpen
           ? 'opacity-50 cursor-not-allowed border-slate-200 grayscale'
           : isSelected
-          ? 'border-2 border-orange-500 shadow-[0_10px_25px_rgba(249,115,22,0.15)] cursor-pointer -translate-y-1 bg-gradient-to-b from-orange-50/50 via-white to-white'
-          : 'border-slate-200 hover:border-orange-500/50 hover:shadow-[0_10px_25px_rgba(0,0,0,0.05)] hover:-translate-y-1 cursor-pointer'
+          ? 'border-2 border-orange-500 shadow-[0_12px_30px_rgba(249,115,22,0.18)] cursor-pointer -translate-y-1 bg-gradient-to-b from-orange-50/60 via-white to-white'
+          : 'border-slate-200 hover:border-orange-500/50 hover:shadow-[0_10px_25px_rgba(0,0,0,0.06)] hover:-translate-y-0.5 cursor-pointer'
       }`}
     >
       {/* Dynamic Selection Indicator Stamp Checkbox */}
       <div className="absolute top-4 right-4 z-10">
         <div
-          className={`w-7 h-7 rounded-lg flex items-center justify-center transition-all duration-200 ${
+          className={`w-8 h-8 rounded-xl flex items-center justify-center transition-all duration-200 ${
             isSelected
-              ? 'bg-orange-500 text-white shadow-lg shadow-orange-500/30 scale-110'
+              ? 'bg-orange-600 text-white shadow-lg shadow-orange-600/30 scale-110'
               : 'border-2 border-slate-300 bg-slate-50 group-hover:border-orange-500/60 group-hover:bg-orange-50'
           }`}
         >
           {isSelected ? (
-            <Check size={16} strokeWidth={3.5} className="animate-in zoom-in-75" />
+            <Check size={18} strokeWidth={3.5} className="animate-in zoom-in-75" />
           ) : (
-            <div className="w-2 h-2 rounded-full bg-slate-300 group-hover:bg-orange-500" />
+            <div className="w-2.5 h-2.5 rounded-full bg-slate-300 group-hover:bg-orange-500" />
           )}
         </div>
       </div>
 
-      <div className="p-6 pb-4 border-b border-slate-100 flex-1">
+      <div className="p-5 sm:p-6 pb-4 border-b border-slate-100 flex-1">
         {/* Badges Bar */}
-        <div className="flex flex-wrap gap-2 mb-3 pr-10">
+        <div className="flex flex-wrap gap-2 mb-3 pr-12">
           <span
-            className={`text-[10px] font-black px-2.5 py-1 rounded uppercase tracking-wider flex items-center gap-1 border ${
+            className={`text-[10px] font-black px-2.5 py-1 rounded-lg uppercase tracking-wider flex items-center gap-1 border ${
               isColetivo
                 ? 'bg-indigo-50 text-indigo-700 border-indigo-200'
                 : 'bg-teal-50 text-teal-700 border-teal-200'
@@ -172,14 +172,14 @@ export default function ModalityCard({
           </span>
 
           <span
-            className={`text-[10px] font-black px-2.5 py-1 rounded uppercase tracking-wider flex items-center gap-1.5 border ${genderBadge.bgClass}`}
+            className={`text-[10px] font-black px-2.5 py-1 rounded-lg uppercase tracking-wider flex items-center gap-1.5 border ${genderBadge.bgClass}`}
           >
             <span className={`w-1.5 h-1.5 rounded-full ${genderBadge.dotClass}`}></span>
             {genderBadge.label}
           </span>
         </div>
 
-        <h4 className="font-black text-slate-800 text-xl uppercase tracking-tight leading-tight mb-2 group-hover:text-orange-600 transition-colors">
+        <h4 className="font-black text-slate-900 text-lg sm:text-xl uppercase tracking-tight leading-tight mb-2 group-hover:text-orange-600 transition-colors">
           {mod.name}
         </h4>
 
@@ -190,7 +190,7 @@ export default function ModalityCard({
         )}
 
         {/* Modality Features Specs */}
-        <div className="flex flex-wrap gap-3 mt-4 pt-3 border-t border-slate-100 text-xs font-semibold text-slate-600">
+        <div className="flex flex-wrap gap-2.5 mt-4 pt-3 border-t border-slate-100 text-xs font-semibold text-slate-600">
           {isColetivo && (
             <div className="flex items-center gap-1.5 bg-slate-50 border border-slate-200 px-2.5 py-1 rounded-lg">
               <Users size={13} className="text-orange-500" />
@@ -211,10 +211,10 @@ export default function ModalityCard({
 
       {/* Footer Price & Pass Action */}
       <div
-        className={`px-6 py-4 flex items-center justify-between transition-colors ${
+        className={`px-5 sm:px-6 py-3.5 sm:py-4 flex items-center justify-between transition-colors ${
           isSelected
-            ? 'bg-orange-50 border-t border-orange-200'
-            : 'bg-slate-50 border-t border-slate-200'
+            ? 'bg-orange-50/80 border-t border-orange-200'
+            : 'bg-slate-50/90 border-t border-slate-200'
         }`}
       >
         <div>
@@ -222,11 +222,11 @@ export default function ModalityCard({
             TAXA DE INSCRIÇÃO
           </span>
           {priceNum === 0 ? (
-            <span className="inline-block mt-0.5 px-2.5 py-0.5 rounded text-xs font-black uppercase tracking-wider bg-emerald-100 text-emerald-800 border border-emerald-200 font-mono">
+            <span className="inline-block mt-0.5 px-2.5 py-0.5 rounded-md text-xs font-black uppercase tracking-wider bg-emerald-100 text-emerald-800 border border-emerald-200 font-mono">
               GRÁTIS
             </span>
           ) : (
-            <span className="font-mono font-black text-xl text-slate-900 tracking-tight">
+            <span className="font-mono font-black text-lg sm:text-xl text-slate-900 tracking-tight">
               R$ {priceNum.toFixed(2).replace('.', ',')}
             </span>
           )}
@@ -234,7 +234,7 @@ export default function ModalityCard({
 
         <div>
           <span
-            className={`text-xs font-black px-4 py-2 rounded-xl uppercase tracking-wider transition-all flex items-center gap-1.5 ${
+            className={`text-xs font-black px-4 py-2.5 min-h-[40px] rounded-xl uppercase tracking-wider transition-all flex items-center gap-1.5 ${
               isSelected
                 ? 'bg-orange-600 text-white shadow-md shadow-orange-600/20'
                 : 'bg-white text-slate-700 border border-slate-300 group-hover:bg-orange-600 group-hover:text-white group-hover:border-orange-600'

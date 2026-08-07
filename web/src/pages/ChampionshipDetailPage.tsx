@@ -19,32 +19,33 @@ import DelegateDocumentUploadModal from '../components/championships/DelegateDoc
 import RosterModal from '../components/championships/RosterModal';
 import ModalityCard from '../components/championships/ModalityCard';
 import ChampionshipDetailNav from '../components/championships/ChampionshipDetailNav';
+import FloatingCheckoutDock from '../components/championships/FloatingCheckoutDock';
 
 function InviteQrCodeModal({ isOpen, onClose, inviteLink }: { isOpen: boolean, onClose: () => void, inviteLink: string }) {
   if (!isOpen || !inviteLink) return null;
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200 font-inter">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/70 backdrop-blur-md animate-in fade-in duration-200 font-inter">
       <div className="bg-white rounded-3xl w-full max-w-sm overflow-hidden shadow-2xl border border-slate-200 animate-in zoom-in-95 duration-200 p-6 text-center">
-        <div className="flex justify-between items-center mb-4">
-          <h3 className="font-extrabold text-slate-900 text-lg">Convite da Atlética</h3>
-          <button onClick={onClose} className="text-slate-400 hover:text-slate-700 transition-colors">
+        <div className="flex justify-between items-center mb-4 pb-2 border-b border-slate-100">
+          <h3 className="font-black text-slate-900 text-base sm:text-lg uppercase tracking-tight">Convite da Atlética</h3>
+          <button onClick={onClose} className="text-slate-400 hover:text-slate-700 transition-colors p-1.5 rounded-full hover:bg-slate-100 active:scale-95">
             <X size={20} />
           </button>
         </div>
-        <div className="bg-slate-50 p-4 rounded-2xl flex justify-center border border-slate-200 mb-4">
-          <QRCodeSVG value={inviteLink} size={200} />
+        <div className="bg-slate-50 p-5 rounded-2xl flex justify-center border border-slate-200 mb-4 shadow-inner">
+          <QRCodeSVG value={inviteLink} size={180} />
         </div>
-        <p className="text-xs text-slate-500 mb-4">
-          Mostre este QR Code para os atletas escanearem e entrarem na sua atlética.
+        <p className="text-xs text-slate-500 mb-5 leading-relaxed font-medium">
+          Mostre este QR Code aos seus atletas para ingressarem na atlética instantaneamente.
         </p>
         <button 
           onClick={() => {
             navigator.clipboard.writeText(inviteLink);
             toast.success('Link de convite copiado!');
           }}
-          className="w-full bg-orange-600 text-white font-bold py-2.5 rounded-xl hover:bg-orange-700 transition-colors flex items-center justify-center gap-2 text-sm"
+          className="w-full bg-orange-600 text-white font-black py-3 rounded-xl hover:bg-orange-700 active:scale-95 transition-all flex items-center justify-center gap-2 text-xs uppercase tracking-wider shadow-lg shadow-orange-600/20 min-h-[44px]"
         >
-          <Copy size={16} /> Copiar Link
+          <Copy size={16} /> Copiar Link de Convite
         </button>
       </div>
     </div>
@@ -569,14 +570,14 @@ export default function ChampionshipDetailPage() {
               </p>
 
               {/* Metadata Bar */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 sm:gap-4 pt-4 border-t border-slate-800">
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-3.5 sm:gap-4 pt-4 border-t border-slate-800">
                 <div className="flex items-start gap-2.5">
                   <div className="w-8 h-8 rounded-lg bg-orange-500/10 border border-orange-500/20 text-orange-400 flex items-center justify-center shrink-0 mt-0.5">
                     <Calendar size={16} />
                   </div>
-                  <div>
+                  <div className="min-w-0">
                     <p className="text-[10px] text-slate-400 font-black uppercase tracking-wider">Período</p>
-                    <p className="font-semibold text-slate-200 text-xs sm:text-sm">
+                    <p className="font-semibold text-slate-200 text-xs sm:text-sm truncate">
                       {champ.startDate ? new Date(champ.startDate).toLocaleDateString('pt-BR') : 'A definir'}
                       {champ.endDate ? ` a ${new Date(champ.endDate).toLocaleDateString('pt-BR')}` : ''}
                     </p>
@@ -587,9 +588,9 @@ export default function ChampionshipDetailPage() {
                   <div className="w-8 h-8 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-400 flex items-center justify-center shrink-0 mt-0.5">
                     <Clock size={16} />
                   </div>
-                  <div>
+                  <div className="min-w-0">
                     <p className="text-[10px] text-slate-400 font-black uppercase tracking-wider">Prazo Inscrições</p>
-                    <p className="font-semibold text-slate-200 text-xs sm:text-sm">
+                    <p className="font-semibold text-slate-200 text-xs sm:text-sm truncate">
                       {champ.enrollmentDeadline ? new Date(champ.enrollmentDeadline).toLocaleDateString('pt-BR') : 'Sem prazo'}
                     </p>
                   </div>
@@ -599,9 +600,9 @@ export default function ChampionshipDetailPage() {
                   <div className="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0 mt-0.5">
                     <MapPin size={16} />
                   </div>
-                  <div>
+                  <div className="min-w-0">
                     <p className="text-[10px] text-slate-400 font-black uppercase tracking-wider">Local</p>
-                    <p className="font-semibold text-slate-200 text-xs sm:text-sm truncate max-w-[120px]">
+                    <p className="font-semibold text-slate-200 text-xs sm:text-sm truncate">
                       {champ.settings?.locations?.join(', ') || 'A definir'}
                     </p>
                   </div>
@@ -611,10 +612,10 @@ export default function ChampionshipDetailPage() {
                   <div className="w-8 h-8 rounded-lg bg-blue-500/10 border border-blue-500/20 text-blue-400 flex items-center justify-center shrink-0 mt-0.5">
                     <Trophy size={16} />
                   </div>
-                  <div>
+                  <div className="min-w-0">
                     <p className="text-[10px] text-slate-400 font-black uppercase tracking-wider">Modalidades</p>
-                    <p className="font-semibold text-slate-200 text-xs sm:text-sm">
-                      {champ.modalities?.length || 0} categorias
+                    <p className="font-semibold text-slate-200 text-xs sm:text-sm truncate">
+                      {champ.modalities?.length || 0} disputas
                     </p>
                   </div>
                 </div>
@@ -1275,12 +1276,12 @@ export default function ChampionshipDetailPage() {
 
                   {/* Invite & Delegate Subscription Buttons */}
                   {athleteProfile?.team?.inviteCode && (
-                    <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+                    <div className="grid grid-cols-2 sm:flex sm:flex-row gap-2 w-full sm:w-auto">
                       <button 
                         onClick={() => setIsQrCodeModalOpen(true)}
-                        className="w-full sm:w-auto bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold px-4 py-2.5 rounded-xl text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 shrink-0 border border-slate-300 shadow-sm"
+                        className="bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold px-3.5 py-2.5 rounded-xl text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-1.5 shrink-0 border border-slate-300 shadow-sm min-h-[44px] active:scale-95"
                       >
-                        <QrCode size={16} />
+                        <QrCode size={16} className="text-slate-600" />
                         <span>QR Code</span>
                       </button>
                       <button 
@@ -1291,14 +1292,14 @@ export default function ChampionshipDetailPage() {
                           toast.success('Link de convite copiado!');
                           setTimeout(() => setCopiedInvite(false), 2500);
                         }}
-                        className="w-full sm:w-auto bg-slate-900 hover:bg-slate-800 text-white font-bold px-4 py-2.5 rounded-xl text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 shrink-0 shadow-sm"
+                        className="bg-slate-900 hover:bg-slate-800 text-white font-bold px-3.5 py-2.5 rounded-xl text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-1.5 shrink-0 shadow-sm min-h-[44px] active:scale-95"
                       >
                         {copiedInvite ? <Check size={16} className="text-emerald-400" /> : <Copy size={16} />}
-                        <span>{copiedInvite ? 'Copiado!' : 'Copiar Convite'}</span>
+                        <span>{copiedInvite ? 'Copiado!' : 'Convite'}</span>
                       </button>
                       <button 
                         onClick={() => setIsDelegateSubModalOpen(true)}
-                        className="w-full sm:w-auto bg-orange-600 hover:bg-orange-700 text-white font-bold px-4 py-2.5 rounded-xl text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 shrink-0 shadow-sm"
+                        className="col-span-2 sm:col-span-1 bg-orange-600 hover:bg-orange-700 text-white font-black px-4 py-2.5 rounded-xl text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 shrink-0 shadow-md shadow-orange-600/20 min-h-[44px] active:scale-95"
                       >
                         <Plus size={16} />
                         <span>Inscrever Atleta</span>
@@ -1308,29 +1309,29 @@ export default function ChampionshipDetailPage() {
                 </div>
 
                 {/* Dashboard Quick Stats */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-6">
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mt-6">
                   <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200">
                     <p className="text-[10px] font-black uppercase tracking-wider text-slate-400">Total no Elenco</p>
-                    <p className="text-2xl font-black text-slate-900 mt-1">{teamMembers.length}</p>
-                    <p className="text-[11px] text-slate-500 mt-0.5">Atletas vinculados</p>
+                    <p className="text-xl sm:text-2xl font-black text-slate-900 mt-1">{teamMembers.length}</p>
+                    <p className="text-[11px] text-slate-500 mt-0.5 truncate">Atletas vinculados</p>
                   </div>
 
                   <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200">
-                    <p className="text-[10px] font-black uppercase tracking-wider text-slate-400">Aprovações Pendentes</p>
-                    <p className="text-2xl font-black text-orange-600 mt-1">{joinRequests.length}</p>
-                    <p className="text-[11px] text-slate-500 mt-0.5">Solicitações de entrada</p>
+                    <p className="text-[10px] font-black uppercase tracking-wider text-slate-400">Aprovações</p>
+                    <p className="text-xl sm:text-2xl font-black text-orange-600 mt-1">{joinRequests.length}</p>
+                    <p className="text-[11px] text-slate-500 mt-0.5 truncate">Pendentes</p>
                   </div>
 
                   <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200">
                     <p className="text-[10px] font-black uppercase tracking-wider text-slate-400">Inscrições Ativas</p>
-                    <p className="text-2xl font-black text-emerald-600 mt-1">{mySubscriptions.length}</p>
-                    <p className="text-[11px] text-slate-500 mt-0.5">Modalidades no campeonato</p>
+                    <p className="text-xl sm:text-2xl font-black text-emerald-600 mt-1">{mySubscriptions.length}</p>
+                    <p className="text-[11px] text-slate-500 mt-0.5 truncate">Modalidades inscritas</p>
                   </div>
 
                   <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200">
-                    <p className="text-[10px] font-black uppercase tracking-wider text-slate-400">Disponíveis p/ Jogar</p>
-                    <p className="text-2xl font-black text-blue-600 mt-1">{teamAvailabilities.filter(a => a.status === 'AVAILABLE').length}</p>
-                    <p className="text-[11px] text-slate-500 mt-0.5">Sinalizaram disponibilidade</p>
+                    <p className="text-[10px] font-black uppercase tracking-wider text-slate-400">Disponíveis</p>
+                    <p className="text-xl sm:text-2xl font-black text-blue-600 mt-1">{teamAvailabilities.filter(a => a.status === 'AVAILABLE').length}</p>
+                    <p className="text-[11px] text-slate-500 mt-0.5 truncate">Para convocação</p>
                   </div>
                 </div>
               </div>
@@ -1550,29 +1551,12 @@ export default function ChampionshipDetailPage() {
 
       {/* FLOATING DOCK FOR BULK REGISTRATION */}
       {selectedModalities.length > 0 && user && athleteProfile?.team && (
-        <div className="fixed bottom-0 left-0 right-0 bg-slate-900/95 backdrop-blur-md border-t border-slate-800 shadow-[0_-10px_40px_rgba(0,0,0,0.4)] p-4 px-6 z-40 animate-in slide-in-from-bottom-10">
-          <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div className="flex items-center gap-3.5 w-full sm:w-auto">
-              <div className="w-11 h-11 rounded-2xl bg-orange-600 text-white font-black text-lg flex items-center justify-center shrink-0 shadow-lg shadow-orange-600/30">
-                {selectedModalities.length}
-              </div>
-              <div className="flex-1">
-                <p className="font-black text-white text-sm leading-tight">Modalidades Selecionadas</p>
-                <p className="text-xs text-slate-400 line-clamp-1 mt-0.5">
-                  {selectedModalities.map(id => champ.modalities?.find((m: any) => m.id === id)?.name).join(', ')}
-                </p>
-              </div>
-            </div>
-            <button 
-              onClick={() => setIsConfirmModalOpen(true)}
-              className="w-full sm:w-auto bg-orange-600 hover:bg-orange-700 text-white px-8 py-3 rounded-xl font-black text-xs uppercase tracking-wider transition-all shadow-lg shadow-orange-600/30 disabled:opacity-70 flex items-center justify-center gap-2"
-              disabled={isSubscribing}
-            >
-              {isSubscribing ? <Loader2 className="animate-spin" size={16} /> : null}
-              <span>{isSubscribing ? 'Processando Inscrição...' : 'Confirmar Inscrições'}</span>
-            </button>
-          </div>
-        </div>
+        <FloatingCheckoutDock
+          selectedModalities={champ.modalities?.filter((m: any) => selectedModalities.includes(m.id)) || []}
+          onConfirm={() => setIsConfirmModalOpen(true)}
+          onClear={() => setSelectedModalities([])}
+          isSubscribing={isSubscribing}
+        />
       )}
 
       {/* ROSTER MODAL */}

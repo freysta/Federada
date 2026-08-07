@@ -74,65 +74,65 @@ export default function DelegateDocumentUploadModal({
   const docTitle = docType === 'rg' ? 'RG / Documento de Identidade' : 'Comprovante de Matrícula';
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-4">
       <div 
         className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" 
         onClick={onClose}
       />
-      <div className="relative bg-white rounded-3xl w-full max-w-md shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
-        <div className="flex items-center justify-between p-6 border-b border-slate-100">
+      <div className="relative bg-white rounded-3xl w-full max-w-md shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200 max-h-[90vh] flex flex-col">
+        <div className="flex items-center justify-between p-5 sm:p-6 border-b border-slate-100 shrink-0">
           <div>
-            <h3 className="text-xl font-black text-slate-900 tracking-tight">Enviar Documento</h3>
-            <p className="text-sm text-slate-500 line-clamp-1">Procuração para: {athleteName}</p>
+            <h3 className="text-lg sm:text-xl font-black text-slate-900 tracking-tight">Enviar Documento</h3>
+            <p className="text-xs sm:text-sm text-slate-500 line-clamp-1">Procuração para: {athleteName}</p>
           </div>
           <button
             onClick={onClose}
-            className="w-10 h-10 flex items-center justify-center rounded-xl hover:bg-slate-100 text-slate-500 transition-colors"
+            className="w-10 h-10 flex items-center justify-center rounded-xl hover:bg-slate-100 text-slate-500 transition-colors active:scale-95 shrink-0"
           >
             <X size={20} />
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-6 space-y-6">
-          <div className="bg-slate-50 rounded-2xl p-6 border-2 border-dashed border-slate-200 text-center">
-            <div className="w-12 h-12 bg-white rounded-xl shadow-sm border border-slate-100 flex items-center justify-center mx-auto mb-3 text-blue-500">
+        <form onSubmit={handleSubmit} className="p-5 sm:p-6 space-y-5 overflow-y-auto flex-1">
+          <div className="bg-slate-50 rounded-2xl p-5 sm:p-6 border-2 border-dashed border-slate-200 text-center">
+            <div className="w-12 h-12 bg-white rounded-2xl shadow-sm border border-slate-100 flex items-center justify-center mx-auto mb-3 text-blue-600">
               <FileText size={24} />
             </div>
-            <h4 className="font-bold text-slate-900">{docTitle}</h4>
-            <p className="text-xs text-slate-500 mt-1 mb-4">
+            <h4 className="font-extrabold text-slate-900 text-sm sm:text-base">{docTitle}</h4>
+            <p className="text-xs text-slate-500 mt-1 mb-4 leading-relaxed">
               Faça o upload do documento em PDF, JPG ou PNG (Máx 5MB).
             </p>
             
             <input
               type="file"
-              id="file-upload"
+              id="file-upload-delegate"
               accept=".pdf,image/*"
               className="hidden"
               onChange={e => setSelectedFile(e.target.files?.[0] || null)}
             />
             <label
-              htmlFor="file-upload"
-              className="inline-flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 text-slate-700 rounded-xl text-sm font-bold hover:bg-slate-50 hover:border-slate-300 cursor-pointer transition-colors shadow-sm"
+              htmlFor="file-upload-delegate"
+              className="inline-flex items-center justify-center gap-2 px-5 py-3 bg-white border border-slate-300 text-slate-700 rounded-xl text-xs font-black uppercase tracking-wider hover:bg-slate-50 hover:border-slate-400 cursor-pointer transition-colors shadow-sm min-h-[44px] active:scale-95"
             >
-              <UploadCloud size={18} />
+              <UploadCloud size={18} className="text-blue-600" />
               Escolher Arquivo
             </label>
 
             {selectedFile && (
-              <div className="mt-4 p-3 bg-blue-50 text-blue-700 rounded-xl text-sm font-medium border border-blue-100 flex items-center justify-between">
-                <span className="truncate max-w-[200px]">{selectedFile.name}</span>
-                <button type="button" onClick={() => setSelectedFile(null)} className="text-blue-500 hover:text-blue-800">
+              <div className="mt-4 p-3 bg-blue-50 text-blue-800 rounded-xl text-xs font-bold border border-blue-200 flex items-center justify-between">
+                <span className="truncate max-w-[200px] font-mono">{selectedFile.name}</span>
+                <button type="button" onClick={() => setSelectedFile(null)} className="text-blue-500 hover:text-blue-800 p-1">
                   <X size={16} />
                 </button>
               </div>
             )}
           </div>
 
-          <div className="flex justify-end gap-3 pt-2">
+          <div className="flex flex-col sm:flex-row justify-end gap-2.5 pt-2 border-t border-slate-100">
             <button
               type="button"
               onClick={onClose}
-              className="px-5 py-2.5 rounded-xl font-bold text-slate-600 hover:bg-slate-100 transition-colors"
+              className="w-full sm:w-auto px-5 py-3 rounded-xl font-bold text-xs text-slate-600 hover:bg-slate-100 transition-colors order-2 sm:order-1 min-h-[44px]"
               disabled={submitting}
             >
               Cancelar
@@ -140,7 +140,7 @@ export default function DelegateDocumentUploadModal({
             <button
               type="submit"
               disabled={submitting || !selectedFile}
-              className="px-6 py-2.5 rounded-xl font-black bg-blue-600 hover:bg-blue-700 text-white flex items-center gap-2 transition-all shadow-lg shadow-blue-600/20 disabled:opacity-70"
+              className="w-full sm:w-auto px-6 py-3 rounded-xl font-black text-xs uppercase tracking-wider bg-blue-600 hover:bg-blue-700 text-white flex items-center justify-center gap-2 transition-all shadow-lg shadow-blue-600/20 disabled:opacity-70 active:scale-95 order-1 sm:order-2 min-h-[44px]"
             >
               {submitting ? <Loader2 size={18} className="animate-spin" /> : <UploadCloud size={18} />}
               Enviar Documento
