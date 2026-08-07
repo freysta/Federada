@@ -24,7 +24,9 @@ import {
   Swords,
   Users,
   X,
-  Loader2
+  Loader2,
+  Megaphone,
+  ScrollText
 } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
 import { useAuth } from '../contexts/AuthContext';
@@ -643,18 +645,78 @@ export default function ChampionshipDetailPage() {
                 {champ.description || 'Campeonato oficial organizado na plataforma Federada. Confira abaixo todas as modalidades disponíveis para inscrição.'}
               </p>
 
-              {champ.rulesUrl && (
-                <div className="pt-2">
+            </div>
+
+            {/* DOCUMENTOS, EDITAIS E REGULAMENTOS */}
+            <div className="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm space-y-4">
+              <div className="flex items-center gap-3 pb-3 border-b border-slate-100">
+                <div className="w-10 h-10 rounded-2xl bg-blue-50 text-blue-600 border border-blue-200 flex items-center justify-center shrink-0">
+                  <ScrollText size={20} />
+                </div>
+                <div>
+                  <h3 className="text-lg font-black text-slate-900 uppercase tracking-tight">Editais & Regulamentos</h3>
+                  <p className="text-xs text-slate-500 font-medium">Documentos oficiais e comunicados do campeonato</p>
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+                {/* Regulamento Geral */}
+                {champ.rulesUrl ? (
                   <a 
                     href={`${API_URL}${champ.rulesUrl}`} 
                     target="_blank" 
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 text-xs font-bold text-orange-600 hover:text-orange-700 bg-orange-50 px-3.5 py-2 rounded-xl border border-orange-200 transition-colors"
+                    className="flex flex-col gap-2 p-4 rounded-2xl bg-slate-50 hover:bg-orange-50 border border-slate-200 hover:border-orange-200 transition-colors group"
                   >
-                    <ExternalLink size={14} /> Baixar PDF do Regulamento Oficial
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <FileText size={16} className="text-orange-500" />
+                        <span className="font-bold text-xs uppercase text-slate-900 group-hover:text-orange-700">Regulamento Oficial</span>
+                      </div>
+                      <ExternalLink size={14} className="text-slate-400 group-hover:text-orange-500" />
+                    </div>
+                    <p className="text-[11px] text-slate-500 line-clamp-2">Regras gerais, sistema de pontuação e normas de conduta da competição.</p>
                   </a>
-                </div>
-              )}
+                ) : (
+                  <div className="flex flex-col gap-2 p-4 rounded-2xl bg-slate-50 border border-slate-200 opacity-60">
+                    <div className="flex items-center gap-2">
+                      <FileText size={16} className="text-slate-400" />
+                      <span className="font-bold text-xs uppercase text-slate-500">Regulamento Oficial</span>
+                    </div>
+                    <p className="text-[11px] text-slate-400">O regulamento ainda não foi publicado pela organização.</p>
+                  </div>
+                )}
+
+                {/* Editais e Comunicados (Mocked for now since backend doesn't have an array yet, but UI is ready) */}
+                {(champ.settings as any)?.officialDocuments?.length > 0 ? (
+                  (champ.settings as any).officialDocuments.map((doc: any, i: number) => (
+                    <a 
+                      key={i}
+                      href={doc.url.startsWith('http') ? doc.url : `${API_URL}${doc.url}`} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="flex flex-col gap-2 p-4 rounded-2xl bg-slate-50 hover:bg-blue-50 border border-slate-200 hover:border-blue-200 transition-colors group"
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <Megaphone size={16} className="text-blue-500" />
+                          <span className="font-bold text-xs uppercase text-slate-900 group-hover:text-blue-700">{doc.title}</span>
+                        </div>
+                        <ExternalLink size={14} className="text-slate-400 group-hover:text-blue-500" />
+                      </div>
+                      <p className="text-[11px] text-slate-500 line-clamp-2">{doc.description || 'Acesse o link para ler o comunicado na íntegra.'}</p>
+                    </a>
+                  ))
+                ) : (
+                  <div className="flex flex-col gap-2 p-4 rounded-2xl bg-slate-50 border border-slate-200 opacity-60">
+                    <div className="flex items-center gap-2">
+                      <Megaphone size={16} className="text-slate-400" />
+                      <span className="font-bold text-xs uppercase text-slate-500">Nenhum Comunicado</span>
+                    </div>
+                    <p className="text-[11px] text-slate-400">Não há editais ou comunicados adicionais no momento.</p>
+                  </div>
+                )}
+              </div>
             </div>
 
             {/* MODALITIES SECTION DIRECTLY ON MAIN TAB */}
