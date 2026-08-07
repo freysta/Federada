@@ -58,8 +58,10 @@ export default function AdminChampionshipListPage() {
 
   const filteredChampionships = (Array.isArray(championships) ? championships : []).filter(champ => {
     if (!champ) return false;
-    const matchesSearch = champ.name?.toLowerCase().includes(searchQuery.toLowerCase()) || 
-      (champ.description && champ.description.toLowerCase().includes(searchQuery.toLowerCase()));
+    const search = (searchQuery || '').toLowerCase();
+    const name = String(champ.name || '').toLowerCase();
+    const description = String(champ.description || '').toLowerCase();
+    const matchesSearch = name.includes(search) || description.includes(search);
     const matchesStatus = statusFilter === 'ALL' || champ.status === statusFilter;
     const matchesFocus = focusFilter === 'ALL' || champ.audienceFocus === focusFilter;
     return matchesSearch && matchesStatus && matchesFocus;

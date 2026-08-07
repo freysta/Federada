@@ -81,10 +81,10 @@ export default function AdminChampionshipSubscriptionsPage() {
 
   const filteredSubs = (Array.isArray(subscriptions) ? subscriptions : []).filter(sub => {
     if (!sub) return false;
-    const search = searchQuery.toLowerCase();
-    const teamName = sub.team?.name?.toLowerCase() || '';
-    const athleteName = sub.athlete?.user?.name?.toLowerCase() || '';
-    const modalityName = sub.modality?.name?.toLowerCase() || '';
+    const search = (searchQuery || '').toLowerCase();
+    const teamName = String(sub.team?.name || '').toLowerCase();
+    const athleteName = String(sub.athlete?.user?.name || '').toLowerCase();
+    const modalityName = String(sub.modality?.name || '').toLowerCase();
 
     const matchesSearch = teamName.includes(search) || athleteName.includes(search) || modalityName.includes(search);
     const matchesStatus = statusFilter === 'ALL' || 

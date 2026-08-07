@@ -192,11 +192,11 @@ export default function AdminChampionshipDocumentsPage() {
   // Filtering Logic
   const filteredDocuments = (Array.isArray(documents) ? documents : []).filter(doc => {
     if (!doc) return false;
-    const search = searchQuery.toLowerCase().trim();
-    const athleteName = doc.athlete?.user?.name?.toLowerCase() || '';
-    const athleteEmail = doc.athlete?.user?.email?.toLowerCase() || '';
-    const athleteCpf = doc.athlete?.cpf || '';
-    const teamName = doc.athlete?.team?.name?.toLowerCase() || '';
+    const search = (searchQuery || '').toLowerCase().trim();
+    const athleteName = String(doc.athlete?.user?.name || '').toLowerCase();
+    const athleteEmail = String(doc.athlete?.user?.email || '').toLowerCase();
+    const athleteCpf = String(doc.athlete?.cpf || '');
+    const teamName = String(doc.athlete?.team?.name || '').toLowerCase();
 
     const matchesSearch = !search || 
       athleteName.includes(search) || 
