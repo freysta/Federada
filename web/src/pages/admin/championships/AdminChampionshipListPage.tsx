@@ -5,18 +5,39 @@ import { apiClient } from '../../../utils/apiClient';
 import { Loader2, Plus, Trophy, Search } from 'lucide-react';
 import toast from 'react-hot-toast';
 import Pagination from '../../../components/admin/Pagination';
+import ColumnFilterHeader, { FilterOption } from '../../../components/admin/ColumnFilterHeader';
+
+const STATUS_OPTIONS: FilterOption[] = [
+  { label: 'Todos os Status', value: 'ALL' },
+  { label: 'Rascunho (DRAFT)', value: 'DRAFT' },
+  { label: 'Publicado (PUBLISHED)', value: 'PUBLISHED' },
+  { label: 'Inscrições Abertas (OPEN)', value: 'OPEN' },
+  { label: 'Inscrições Encerradas (CLOSED)', value: 'CLOSED' },
+  { label: 'Em Andamento (ONGOING)', value: 'ONGOING' },
+  { label: 'Finalizado (FINISHED)', value: 'FINISHED' },
+];
+
+const FOCUS_OPTIONS: FilterOption[] = [
+  { label: 'Todos os Públicos', value: 'ALL' },
+  { label: 'Geral', value: 'GENERAL' },
+  { label: 'Universitário', value: 'UNIVERSITY' },
+  { label: 'Escolar', value: 'SCHOOL' },
+  { label: 'Cidade / Região', value: 'CITY' },
+];
 
 export default function AdminChampionshipListPage() {
   const navigate = useNavigate();
   const [championships, setChampionships] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
+  const [statusFilter, setStatusFilter] = useState('ALL');
+  const [focusFilter, setFocusFilter] = useState('ALL');
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchQuery]);
+  }, [searchQuery, statusFilter, focusFilter]);
 
   const fetchChampionships = () => {
     setLoading(true);
@@ -35,10 +56,13 @@ export default function AdminChampionshipListPage() {
     fetchChampionships();
   }, []);
 
-  const filteredChampionships = championships.filter(champ => 
-    champ.name?.toLowerCase().includes(searchQuery.toLowerCase()) || 
-    (champ.description && champ.description.toLowerCase().includes(searchQuery.toLowerCase()))
-  );
+  const filteredChampionships = championships.filter(champ => {
+    const matchesSearch = champ.name?.toLowerCase().includes(searchQuery.toLowerCase()) || 
+      (champ.description && champ.description.toLowerCase().includes(searchQuery.toLowerCase()));
+    const matchesStatus = statusFilter === 'ALL' || champ.status === statusFilter;
+    const matchesFocus = focusFilter === 'ALL' || champ.audienceFocus === focusFilter;
+    return matchesSearch && matchesStatus && matchesFocus;
+  });
 
   const totalPages = Math.ceil(filteredChampionships.length / itemsPerPage);
   const paginatedChampionships = filteredChampionships.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
@@ -68,7 +92,7 @@ export default function AdminChampionshipListPage() {
             <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
             <input
               type="text"
-              placeholder="Buscar campeonato..."
+              placeholder="Buscar campeonato por nome ou descrição..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full border border-slate-300 rounded-xl pl-10 pr-4 py-2.5 text-sm outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100 transition-all bg-white"
@@ -94,7 +118,24 @@ export default function AdminChampionshipListPage() {
               <thead className="bg-slate-100/70 text-slate-700 font-bold text-xs uppercase tracking-wider border-b border-slate-200">
                 <tr>
                   <th className="px-6 py-4">CAMPEONATO</th>
-                  <th className="px-6 py-4 text-center">STATUS</th>
+                  <th className="px-6 py-4 text-center">
+                    <ColumnFilterHeader 
+                      title="STATUS"
+                      options={STATUS_OPTIONS}
+                      selectedValue={statusFilter}
+                      onChange={setStatusFilter}
+                      align="center"
+                    />
+                  </th>
+                  <th className="px-6 py-4 text-center">
+                    <ColumnFilterHeader 
+                      title="PÚBLICO ALVO"
+                      options={FOCUS_OPTIONS}
+                      selectedValue={focusFilter}
+                      onChange={setFocusFilter}
+                      align="center"
+                    />
+                  </th>
                   <th className="px-6 py-4 text-center">INÍCIO</th>
                   <th className="px-6 py-4 text-center">MODALIDADES</th>
                   <th className="px-6 py-4 text-right">AÇÕES</th>

@@ -5,11 +5,31 @@ import { Loader2, Search, CheckCircle, XCircle, DollarSign, Clock, Users, User a
 import { useParams } from 'react-router-dom';
 import toast from 'react-hot-toast';
 
+import ColumnFilterHeader, { FilterOption } from '../../../components/admin/ColumnFilterHeader';
+
+const SUB_STATUS_OPTIONS: FilterOption[] = [
+  { label: 'Todos os Status', value: 'ALL' },
+  { label: 'Confirmadas / Aprovadas', value: 'CONFIRMED' },
+  { label: 'Aguardando Documentos', value: 'PENDING_DOCS' },
+  { label: 'Pendente (Pronta)', value: 'PENDING' },
+  { label: 'Elenco Incompleto', value: 'PENDING_ROSTER' },
+  { label: 'Rejeitadas', value: 'REJECTED' },
+];
+
+const PAYMENT_OPTIONS: FilterOption[] = [
+  { label: 'Todos os Pagamentos', value: 'ALL' },
+  { label: 'Pago', value: 'PAID' },
+  { label: 'Pendente', value: 'PENDING' },
+  { label: 'Isento / Grátis', value: 'FREE' },
+];
+
 export default function AdminChampionshipSubscriptionsPage() {
   const { id } = useParams();
   const [subscriptions, setSubscriptions] = useState<any[]>([]);
   const [loadingSubs, setLoadingSubs] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [statusFilter, setStatusFilter] = useState('ALL');
+  const [paymentFilter, setPaymentFilter] = useState('ALL');
 
   // Roster Modal State
   const [isRosterModalOpen, setIsRosterModalOpen] = useState(false);
@@ -64,7 +84,14 @@ export default function AdminChampionshipSubscriptionsPage() {
     const teamName = sub.team?.name?.toLowerCase() || '';
     const athleteName = sub.athlete?.user?.name?.toLowerCase() || '';
     const modalityName = sub.modality?.name?.toLowerCase() || '';
-    return teamName.includes(search) || athleteName.includes(search) || modalityName.includes(search);
+
+    const matchesSearch = teamName.includes(search) || athleteName.includes(search) || modalityName.includes(search);
+    const matchesStatus = statusFilter === 'ALL' || 
+      (statusFilter === 'CONFIRMED' && (sub.status === 'CONFIRMED' || sub.status === 'APPROVED' || sub.status === 'DOCS_APPROVED')) ||
+      sub.status === statusFilter;
+    const matchesPayment = paymentFilter === 'ALL' || sub.paymentStatus === paymentFilter;
+
+    return matchesSearch && matchesStatus && matchesPayment;
   });
 
   return (
@@ -108,8 +135,22 @@ export default function AdminChampionshipSubscriptionsPage() {
                 <tr>
                   <th className="px-6 py-4">Inscrito (Equipe / Atleta)</th>
                   <th className="px-6 py-4">Modalidade</th>
-                  <th className="px-6 py-4">Status Inscrição</th>
-                  <th className="px-6 py-4">Pagamento</th>
+                  <th className="px-6 py-4">
+                    <ColumnFilterHeader
+                      title="STATUS INSCRIÇÃO"
+                      options={SUB_STATUS_OPTIONS}
+                      selectedValue={statusFilter}
+                      onChange={setStatusFilter}
+                    />
+                  </th>
+                  <th className="px-6 py-4">
+                    <ColumnFilterHeader
+                      title="PAGAMENTO"
+                      options={PAYMENT_OPTIONS}
+                      selectedValue={paymentFilter}
+                      onChange={setPaymentFilter}
+                    />
+                  </th>
                   <th className="px-6 py-4">Documentos</th>
                   <th className="px-6 py-4 text-right">Ações</th>
                 </tr>

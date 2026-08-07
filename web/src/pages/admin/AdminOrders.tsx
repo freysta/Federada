@@ -2,7 +2,16 @@ import { useState, useEffect } from 'react';
 import { apiClient } from '../../utils/apiClient';
 import { Loader2, Search, Download, X, Truck, CheckCircle, Package, ShoppingBag } from 'lucide-react';
 import toast from 'react-hot-toast';
-import Pagination from '../../components/admin/Pagination';
+import ColumnFilterHeader, { FilterOption } from '../../components/admin/ColumnFilterHeader';
+
+const ORDER_STATUS_OPTIONS: FilterOption[] = [
+  { label: 'Todos os Status', value: 'ALL' },
+  { label: 'Pago', value: 'PAID' },
+  { label: 'Pendente', value: 'PENDING' },
+  { label: 'Enviado', value: 'SHIPPED' },
+  { label: 'Estornado', value: 'REFUNDED' },
+  { label: 'Cancelado', value: 'CANCELLED' },
+];
 
 export default function AdminOrders() {
   const [orders, setOrders] = useState<any[]>([]);
@@ -167,7 +176,14 @@ export default function AdminOrders() {
                 <th className="px-6 py-4">ID / DATA</th>
                 <th className="px-6 py-4">CLIENTE</th>
                 <th className="px-6 py-4">TOTAL</th>
-                <th className="px-6 py-4">STATUS</th>
+                <th className="px-6 py-4">
+                  <ColumnFilterHeader
+                    title="STATUS"
+                    options={ORDER_STATUS_OPTIONS}
+                    selectedValue={statusFilter}
+                    onChange={setStatusFilter}
+                  />
+                </th>
                 <th className="px-6 py-4 text-right">AÇÕES</th>
               </tr>
             </thead>

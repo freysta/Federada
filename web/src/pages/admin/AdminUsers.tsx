@@ -4,6 +4,23 @@ import { apiClient } from '../../utils/apiClient';
 import { Loader2, Edit, Ban, CheckCircle, Package, MessageCircle, Trash2, Search, X, Users, Plus } from 'lucide-react';
 import toast from 'react-hot-toast';
 import Pagination from '../../components/admin/Pagination';
+import ColumnFilterHeader, { FilterOption } from '../../components/admin/ColumnFilterHeader';
+
+const ROLE_OPTIONS: FilterOption[] = [
+  { label: 'Todos os Cargos', value: 'ALL' },
+  { label: 'Super Admin', value: 'ADMIN' },
+  { label: 'Gerente Loja', value: 'STORE_ADMIN' },
+  { label: 'Org. Esportivo', value: 'SPORTS_ADMIN' },
+  { label: 'Cliente / Atleta', value: 'CUSTOMER' },
+];
+
+const USER_TYPE_OPTIONS: FilterOption[] = [
+  { label: 'Todos os Tipos', value: 'ALL' },
+  { label: 'Aluno', value: 'ALUNO' },
+  { label: 'Ex-Aluno', value: 'EX_ALUNO' },
+  { label: 'Servidor / Professor', value: 'SERVIDOR' },
+  { label: 'Comunidade Externa', value: 'EXTERNO' },
+];
 
 export default function AdminUsers() {
   const { user: currentUser } = useAuth();
@@ -11,12 +28,14 @@ export default function AdminUsers() {
   const [orders, setOrders] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
+  const [roleFilter, setRoleFilter] = useState('ALL');
+  const [userTypeFilter, setUserTypeFilter] = useState('ALL');
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchQuery]);
+  }, [searchQuery, roleFilter, userTypeFilter]);
 
   // Modal States
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -120,11 +139,14 @@ export default function AdminUsers() {
     }
   };
 
-  const filteredUsers = users.filter(u => 
-    u.name?.toLowerCase().includes(searchQuery.toLowerCase()) || 
-    u.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    u.cpf?.includes(searchQuery)
-  );
+  const filteredUsers = users.filter(u => {
+    const matchesSearch = u.name?.toLowerCase().includes(searchQuery.toLowerCase()) || 
+      u.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      u.cpf?.includes(searchQuery);
+    const matchesRole = roleFilter === 'ALL' || u.role === roleFilter;
+    const matchesUserType = userTypeFilter === 'ALL' || u.userType === userTypeFilter;
+    return matchesSearch && matchesRole && matchesUserType;
+  });
 
   const totalPages = Math.ceil(filteredUsers.length / itemsPerPage);
   const paginatedUsers = filteredUsers.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
@@ -139,7 +161,7 @@ export default function AdminUsers() {
           <h1 className="text-2xl font-black text-slate-900 uppercase tracking-tight flex items-center gap-2">
             <Users className="text-blue-600" size={28} /> Gestão de Usuários
           </h1>
-          <p className="text-slate-500 text-sm mt-1">Gerencie os membros da plataforma, niveis de acesso e privilégios.</p>
+          <p className="text-slate-500 text-sm mt-1">Gerencie os membros da plataforma, níveis de acesso e privilégios.</p>
         </div>
 
         <button 
@@ -173,9 +195,23 @@ export default function AdminUsers() {
             <thead className="bg-slate-100/70 text-slate-700 font-bold text-xs uppercase tracking-wider border-b border-slate-200">
               <tr>
                 <th className="px-6 py-4">NOME / EMAIL</th>
-                <th className="px-6 py-4">TIPO</th>
+                <th className="px-6 py-4">
+                  <ColumnFilterHeader
+                    title="TIPO"
+                    options={USER_TYPE_OPTIONS}
+                    selectedValue={userTypeFilter}
+                    onChange={setUserTypeFilter}
+                  />
+                </th>
                 <th className="px-6 py-4">WHATSAPP</th>
-                <th className="px-6 py-4">STATUS / CARGO</th>
+                <th className="px-6 py-4">
+                  <ColumnFilterHeader
+                    title="CARGO / ACESSO"
+                    options={ROLE_OPTIONS}
+                    selectedValue={roleFilter}
+                    onChange={setRoleFilter}
+                  />
+                </th>
                 <th className="px-6 py-4 text-right">AÇÕES</th>
               </tr>
             </thead>
