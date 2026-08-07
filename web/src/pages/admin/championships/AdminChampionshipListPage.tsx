@@ -5,7 +5,7 @@ import { apiClient } from '../../../utils/apiClient';
 import { Loader2, Plus, Trophy, Search } from 'lucide-react';
 import toast from 'react-hot-toast';
 import Pagination from '../../../components/admin/Pagination';
-import ColumnFilterHeader, { FilterOption } from '../../../components/admin/ColumnFilterHeader';
+import ColumnFilterHeader, { type FilterOption } from '../../../components/admin/ColumnFilterHeader';
 
 const STATUS_OPTIONS: FilterOption[] = [
   { label: 'Todos os Status', value: 'ALL' },

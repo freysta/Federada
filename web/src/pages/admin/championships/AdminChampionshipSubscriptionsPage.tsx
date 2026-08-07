@@ -5,7 +5,7 @@ import { Loader2, Search, CheckCircle, XCircle, DollarSign, Clock, Users, User a
 import { useParams } from 'react-router-dom';
 import toast from 'react-hot-toast';
 
-import ColumnFilterHeader, { FilterOption } from '../../../components/admin/ColumnFilterHeader';
+import ColumnFilterHeader, { type FilterOption } from '../../../components/admin/ColumnFilterHeader';
 
 const SUB_STATUS_OPTIONS: FilterOption[] = [
   { label: 'Todos os Status', value: 'ALL' },

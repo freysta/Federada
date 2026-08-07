@@ -4,7 +4,7 @@ import { apiClient } from '../../utils/apiClient';
 import { Loader2, Edit, Ban, CheckCircle, Package, MessageCircle, Trash2, Search, X, Users, Plus } from 'lucide-react';
 import toast from 'react-hot-toast';
 import Pagination from '../../components/admin/Pagination';
-import ColumnFilterHeader, { FilterOption } from '../../components/admin/ColumnFilterHeader';
+import ColumnFilterHeader, { type FilterOption } from '../../components/admin/ColumnFilterHeader';
 
 const ROLE_OPTIONS: FilterOption[] = [
   { label: 'Todos os Cargos', value: 'ALL' },

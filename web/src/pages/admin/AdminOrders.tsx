@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { apiClient } from '../../utils/apiClient';
 import { Loader2, Search, Download, X, Truck, CheckCircle, Package, ShoppingBag } from 'lucide-react';
 import toast from 'react-hot-toast';
-import ColumnFilterHeader, { FilterOption } from '../../components/admin/ColumnFilterHeader';
+import ColumnFilterHeader, { type FilterOption } from '../../components/admin/ColumnFilterHeader';
 
 const ORDER_STATUS_OPTIONS: FilterOption[] = [
   { label: 'Todos os Status', value: 'ALL' },
