@@ -11,7 +11,8 @@ export default {
         'neon-cyan': '#00FFFF',
       },
       fontFamily: {
-        'sans': ['Bebas Neue', 'sans-serif'],
+        'sans': ['Plus Jakarta Sans', 'Inter', 'system-ui', 'sans-serif'],
+        'bebas': ['Bebas Neue', 'sans-serif'],
         'serif': ['Playfair Display', 'serif'],
         'mono': ['JetBrains Mono', 'monospace'],
         'inter': ['Inter', 'sans-serif'],
