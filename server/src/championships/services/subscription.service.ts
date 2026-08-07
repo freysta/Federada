@@ -429,8 +429,15 @@ export class SubscriptionService {
     });
   }
 
-  async updateSubscriptionStatus(subId: string, status: SubscriptionStatus) {
-    if (!Object.values(SubscriptionStatus).includes(status)) {
+  async updateSubscriptionStatus(subId: string, status: string) {
+    let targetStatus: SubscriptionStatus;
+    if (status === 'APPROVED' || status === 'CONFIRMED') {
+      targetStatus = SubscriptionStatus.CONFIRMED;
+    } else if (status === 'REJECTED') {
+      targetStatus = SubscriptionStatus.REJECTED;
+    } else if (Object.values(SubscriptionStatus).includes(status as SubscriptionStatus)) {
+      targetStatus = status as SubscriptionStatus;
+    } else {
       throw new BadRequestException('Status de inscrição inválido.');
     }
 
@@ -439,7 +446,7 @@ export class SubscriptionService {
     });
     if (!sub) throw new NotFoundException('Inscrição não encontrada');
 
-    sub.status = status;
+    sub.status = targetStatus;
     return this.subscriptionRepository.save(sub);
   }
 

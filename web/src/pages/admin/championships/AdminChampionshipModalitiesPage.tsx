@@ -154,7 +154,7 @@ export default function AdminChampionshipModalitiesPage() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
             <div>
               <label className="block text-xs font-black uppercase text-slate-700 mb-1.5">Mín. Atletas</label>
               <input type="number" min="1" required value={formData.minAthletes} onChange={e => setFormData({...formData, minAthletes: Number(e.target.value)})} className="w-full border border-slate-300 rounded-xl p-2.5 text-sm outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100 transition-all bg-white" />
@@ -170,6 +170,10 @@ export default function AdminChampionshipModalitiesPage() {
             <div>
               <label className="block text-xs font-black uppercase text-slate-700 mb-1.5">Idade Máx.</label>
               <input type="number" min="0" required value={formData.maxAge} onChange={e => setFormData({...formData, maxAge: Number(e.target.value)})} className="w-full border border-slate-300 rounded-xl p-2.5 text-sm outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100 transition-all bg-white" />
+            </div>
+            <div>
+              <label className="block text-xs font-black uppercase text-slate-700 mb-1.5">Vagas Máx. (Equipes/Atletas)</label>
+              <input type="number" min="0" required value={formData.maxSpots} onChange={e => setFormData({...formData, maxSpots: Number(e.target.value)})} className="w-full border border-slate-300 rounded-xl p-2.5 text-sm outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100 transition-all bg-white" placeholder="0 = Ilimitado" />
             </div>
           </div>
           

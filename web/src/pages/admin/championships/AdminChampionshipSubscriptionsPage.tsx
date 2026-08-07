@@ -143,8 +143,8 @@ export default function AdminChampionshipSubscriptionsPage() {
                       <div className="text-xs text-slate-500">{sub.modality?.type} • {sub.modality?.gender}</div>
                     </td>
                     <td className="px-6 py-4">
-                      {sub.status === 'APPROVED' ? (
-                        <span className="px-2.5 py-1 bg-emerald-50 text-emerald-700 rounded-full text-[10px] font-black tracking-wider uppercase border border-emerald-250">APROVADA</span>
+                      {sub.status === 'CONFIRMED' || sub.status === 'APPROVED' || sub.status === 'DOCS_APPROVED' ? (
+                        <span className="px-2.5 py-1 bg-emerald-50 text-emerald-700 rounded-full text-[10px] font-black tracking-wider uppercase border border-emerald-250">CONFIRMADA</span>
                       ) : sub.status === 'REJECTED' ? (
                         <span className="px-2.5 py-1 bg-rose-50 text-rose-700 rounded-full text-[10px] font-black tracking-wider uppercase border border-rose-250">REJEITADA</span>
                       ) : sub.status === 'PENDING' ? (
@@ -194,9 +194,9 @@ export default function AdminChampionshipSubscriptionsPage() {
                           <DollarSign size={12} /> RECEBIDO
                         </button>
                       )}
-                      {sub.status !== 'APPROVED' && (
+                      {sub.status !== 'CONFIRMED' && sub.status !== 'APPROVED' && (
                         <button 
-                          onClick={() => updateStatus(sub.id, 'APPROVED')}
+                          onClick={() => updateStatus(sub.id, 'CONFIRMED')}
                           className="bg-emerald-50 hover:bg-emerald-100 text-emerald-600 px-3 py-1.5 rounded-lg text-xs font-bold transition-all shadow-sm active:scale-95 inline-flex items-center gap-1"
                         >
                           <CheckCircle size={12} /> APROVAR

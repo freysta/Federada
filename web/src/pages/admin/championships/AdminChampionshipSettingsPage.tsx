@@ -20,7 +20,10 @@ export default function AdminChampionshipSettingsPage() {
     endDate: '',
     status: 'DRAFT',
     organizer: '',
-    audienceFocus: 'GENERAL'
+    audienceFocus: 'GENERAL',
+    requireRg: false,
+    requireEnrollment: false,
+    locationsText: '',
   });
 
   useEffect(() => {
@@ -39,7 +42,10 @@ export default function AdminChampionshipSettingsPage() {
         endDate: data.endDate?.split('T')[0] || '',
         status: data.status || 'DRAFT',
         organizer: data.organizer || '',
-        audienceFocus: data.audienceFocus || 'GENERAL'
+        audienceFocus: data.audienceFocus || 'GENERAL',
+        requireRg: !!data.settings?.requireRg,
+        requireEnrollment: !!data.settings?.requireEnrollment,
+        locationsText: Array.isArray(data.settings?.locations) ? data.settings.locations.join(', ') : '',
       });
     } catch (err: any) {
       toast.error(err.message);
@@ -58,7 +64,13 @@ export default function AdminChampionshipSettingsPage() {
         startDate: formData.startDate,
         endDate: formData.endDate,
         organizer: formData.organizer,
-        audienceFocus: formData.audienceFocus
+        audienceFocus: formData.audienceFocus,
+        settings: {
+          ...(champ.settings || {}),
+          requireRg: formData.requireRg,
+          requireEnrollment: formData.requireEnrollment,
+          locations: formData.locationsText.split(',').map((s: string) => s.trim()).filter(Boolean),
+        }
       });
       toast.success('Configurações salvas com sucesso!');
       fetchChampionship();
@@ -185,6 +197,43 @@ export default function AdminChampionshipSettingsPage() {
           <div>
             <label className="block text-xs font-black uppercase text-slate-700 mb-1.5">Data de Término</label>
             <input type="date" value={formData.endDate} onChange={e => setFormData({...formData, endDate: e.target.value})} className="w-full border border-slate-300 rounded-xl p-2.5 text-sm outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100 transition-all bg-white" required />
+          </div>
+        </div>
+
+        <div className="pt-4 border-t border-slate-100 space-y-4">
+          <h3 className="text-xs font-black uppercase text-slate-800 tracking-wider">Regras de Documentação & Locais das Partidas</h3>
+          
+          <div className="flex flex-col sm:flex-row gap-6">
+            <label className="flex items-center gap-2 cursor-pointer text-xs font-bold text-slate-700">
+              <input 
+                type="checkbox" 
+                checked={formData.requireRg} 
+                onChange={e => setFormData({...formData, requireRg: e.target.checked})} 
+                className="w-4 h-4 rounded text-blue-600 focus:ring-blue-500" 
+              />
+              Exigir Foto do RG / Documento Oficial
+            </label>
+
+            <label className="flex items-center gap-2 cursor-pointer text-xs font-bold text-slate-700">
+              <input 
+                type="checkbox" 
+                checked={formData.requireEnrollment} 
+                onChange={e => setFormData({...formData, requireEnrollment: e.target.checked})} 
+                className="w-4 h-4 rounded text-blue-600 focus:ring-blue-500" 
+              />
+              Exigir Comprovante de Matrícula
+            </label>
+          </div>
+
+          <div>
+            <label className="block text-xs font-black uppercase text-slate-700 mb-1.5">Locais das Partidas (separados por vírgula)</label>
+            <input 
+              type="text" 
+              value={formData.locationsText} 
+              onChange={e => setFormData({...formData, locationsText: e.target.value})} 
+              className="w-full border border-slate-300 rounded-xl p-2.5 text-sm outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100 transition-all bg-white" 
+              placeholder="Ex: Ginásio Municipal, Campo do IFRO, Quadra Central" 
+            />
           </div>
         </div>
         

@@ -376,6 +376,39 @@ export class ChampionshipsController {
 
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('ADMIN', 'SPORTS_ADMIN')
+  @Post(':id/modalities/:modalityId/matches/:matchId/summary')
+  @UseInterceptors(
+    FileInterceptor('file', {
+      storage: diskStorage({
+        destination: './uploads',
+        filename: (req, file, cb) => {
+          const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+          cb(null, `match-summary-${uniqueSuffix}${extname(file.originalname)}`);
+        },
+      }),
+      limits: { fileSize: 10 * 1024 * 1024 },
+    }),
+  )
+  uploadMatchSummary(
+    @Param('id') championshipId: string,
+    @Param('modalityId') modalityId: string,
+    @Param('matchId') matchId: string,
+    @UploadedFile() file: any,
+    @Request() req: { user: RequestUser },
+  ) {
+    if (!file) throw new BadRequestException('Nenhum arquivo enviado');
+    const summaryFileUrl = `/uploads/${file.filename}`;
+    return this.matchService.updateMatch(
+      championshipId,
+      modalityId,
+      matchId,
+      { summaryFileUrl },
+      req.user,
+    );
+  }
+
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ADMIN', 'SPORTS_ADMIN')
   @Post(':id/modalities/:modalityId/generate-bracket')
   generateBracket(
     @Param('id') championshipId: string,
